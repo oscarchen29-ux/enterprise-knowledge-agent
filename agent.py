@@ -72,9 +72,16 @@ def run_task(task: str, provider) -> str:
 
         for call in result["tool_calls"]:
             print(f"[step {step}] 呼叫工具 {call['name']}({call['arguments']})")
-            fn = TOOL_FUNCTIONS[call["name"]]
-            tool_result = fn(**call["arguments"])
-            retrieved_context.append(tool_result)
+            fn = TOOL_FUNCTIONS.get(call["name"])
+            try:
+                if fn is None:
+                    raise ValueError(f"未知工具: {call['name']}")
+                tool_result = fn(**call["arguments"])
+            except TypeError as e:
+                print(f"[step {step}] 工具參數格式錯誤: {e}")
+                tool_result = f"工具呼叫失敗,參數格式不正確({e})。請改用正確格式重新呼叫 search_documents(query=...)。"
+            else:
+                retrieved_context.append(tool_result)
             messages.append({
                 "role": "tool",
                 "tool_call_id": call["id"],
