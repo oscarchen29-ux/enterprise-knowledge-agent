@@ -6,10 +6,11 @@
 
 本腳本只自動量測「可以客觀判定」的指標(工具呼叫、檢索命中、簡體字、延遲),
 答案正確率與幻覺率一律留給人工評分 —— 用 LLM 當裁判會引入另一層不確定性,
-在專題規模下人工評 30 題 x 3 次是可行的,而且比較好辯護。
+在專題規模下人工評 31 題 x 3 次是可行的,而且比較好辯護。
 
 用法:
     python benchmark/run_benchmark.py --model qwen2.5:7b --repeats 3
+    python benchmark/run_benchmark.py --category multi_hop --repeats 3
     python benchmark/run_benchmark.py --category unanswerable --repeats 5
     python benchmark/run_benchmark.py --limit 2 --repeats 1        # 冒煙測試
 """
@@ -126,7 +127,7 @@ def main():
     parser.add_argument("--repeats", type=int, default=3,
                         help="每題重複次數。LLM 輸出有隨機性,單次結果不可信,至少 3 次。")
     parser.add_argument("--category", default=None,
-                        help="只跑單一類別 (single_doc/cross_doc/unanswerable/procedural/conditional)")
+                        help="只跑單一類別 (multi_hop/unanswerable/cross_doc/procedural/single_doc/conditional)")
     parser.add_argument("--limit", type=int, default=None, help="只跑前 N 題,用於快速冒煙測試")
     parser.add_argument("--out", default=HERE, help="輸出目錄")
     args = parser.parse_args()
@@ -210,6 +211,25 @@ def main():
     print(f"後處理前含簡體字    : {sum(1 for r in results if r['raw_had_simplified']) / n:.1%}")
     print(f"後處理後仍含簡體字  : {sum(1 for r in results if r['final_had_simplified']) / n:.1%}  (應為 0%)")
     print(f"平均延遲            : {sum(r['latency_sec'] for r in results) / n:.1f} 秒")
+
+    # 分類拆解。抽取題與推理題量的是不同東西,合併成單一數字會失去意義,
+    # 詳見 benchmark/README.md「抽取題 vs 推理題」。
+    INFERENCE = {"multi_hop", "unanswerable", "conditional"}
+    print("\n分類拆解(自動指標):")
+    print(f"  {'類別':<14}{'性質':<6}{'n':>4}{'工具成功':>9}{'檢索全中':>9}{'平均秒':>8}")
+    for cat in ("multi_hop", "unanswerable", "conditional",
+                "cross_doc", "procedural", "single_doc"):
+        rows = [r for r in results if r["category"] == cat]
+        if not rows:
+            continue
+        hit_rows = [r for r in rows if r["expected_docs"]]
+        tool_ok = sum(1 for r in rows if not r["tool_arg_error"] and not r["error"]) / len(rows)
+        hit = (sum(1 for r in hit_rows if r["retrieval_hit_all"]) / len(hit_rows)) if hit_rows else None
+        lat = sum(r["latency_sec"] for r in rows) / len(rows)
+        kind = "推理" if cat in INFERENCE else "抽取"
+        hit_str = f"{hit:>8.0%}" if hit is not None else "     n/a"
+        print(f"  {cat:<14}{kind:<6}{len(rows):>4}{tool_ok:>8.0%} {hit_str}{lat:>8.1f}")
+
     print("\n輸出:")
     print(f"  {jsonl_path}")
     print(f"  {csv_path}  <- 用 Excel 開,填『【人工】』欄位")
