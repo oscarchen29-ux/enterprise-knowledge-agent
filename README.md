@@ -24,6 +24,7 @@ providers/
 tools.py               # agent 可呼叫的工具(目前:文件搜尋)
 agent.py               # planner-executor 主迴圈
 docs/                  # 暨大公開行政規定文件,給文件搜尋工具用
+benchmark/             # 30 題評估題組 + 執行器(標準答案對應文件原文條號)
 ```
 
 ## 環境設置
