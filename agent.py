@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 
 from opencc import OpenCC
 
@@ -29,6 +30,51 @@ VERIFY_PROMPT = (
 
 MAX_STEPS = 5
 
+# 模型有時不走 OpenAI 相容 API 的 tool_calls 欄位,而是把呼叫請求當成一般文字吐在
+# content 裡(常伴隨無意義的 token,例如「 Closet」「portun」)。Ollama 的相容層不會
+# 幫忙解析,結果 result["tool_calls"] 是空的,這一輪就被誤判成「模型不需要查文件」,
+# 直接拿模型記憶作答 —— 而且因為 retrieved_context 是空的,自我驗證也一併被跳過。
+# 31 題 x 3 次的基線測試裡,93 次執行有 35 次(38%)是這樣壞掉的,全程不報錯。
+_LEAKED_CALL_RE = re.compile(r'\{\s*"name"\s*:\s*"(?P<name>[\w.\-]+)"')
+
+
+def _recover_leaked_tool_calls(content: str) -> list[dict]:
+    """把寫進一般文字裡的工具呼叫解析回來,格式與 provider 回傳的 tool_calls 相同。
+
+    模型其實判斷對了(知道該查文件、也想好了查詢字串),只是寫錯欄位,沒必要浪費。
+    """
+    if not content:
+        return []
+
+    decoder = json.JSONDecoder()
+    recovered = []
+    for match in _LEAKED_CALL_RE.finditer(content):
+        try:
+            payload, _ = decoder.raw_decode(content, match.start())
+        except ValueError:
+            # 模型可能把括號寫壞或被截斷(觀察到「..."query": "退學 學分"}大大小」),
+            # 這種情況退而求其次,只把 query 字串撈出來。
+            query = re.search(r'"query"\s*:\s*"(.*?)"', content[match.start():])
+            if not query:
+                continue
+            payload = {"name": match.group("name"), "arguments": {"query": query.group(1)}}
+
+        arguments = payload.get("arguments")
+        if isinstance(arguments, str):  # 有時 arguments 自己又被包成 JSON 字串
+            try:
+                arguments = json.loads(arguments)
+            except ValueError:
+                continue
+        if not isinstance(arguments, dict):
+            continue
+
+        recovered.append({
+            "id": f"recovered_{len(recovered)}",
+            "name": payload.get("name") or match.group("name"),
+            "arguments": arguments,
+        })
+    return recovered
+
 
 def verify_answer(draft: str, retrieved_context: list[str], provider) -> str:
     if not retrieved_context:
@@ -51,26 +97,40 @@ def run_task(task: str, provider) -> str:
 
     for step in range(MAX_STEPS):
         result = provider.generate(messages, tools=TOOLS_SCHEMA)
+        tool_calls = result["tool_calls"]
+        content = result["content"] or ""
 
-        if not result["tool_calls"]:
+        if not tool_calls:
+            tool_calls = _recover_leaked_tool_calls(content)
+            if tool_calls:
+                print(f"[step {step}] 從文字中救回 {len(tool_calls)} 個外洩的工具呼叫")
+                # 殘骸(亂碼 token + JSON 字串)不要留在對話紀錄裡污染後續生成
+                content = ""
+
+        if not tool_calls:
+            # 模型既沒查文件、也沒產生任何內容。原本會回傳空字串,使用者看到一片空白,
+            # 可能誤以為「系統查不到就是沒這條規定」,比明講失敗更危險。
+            if not content.strip():
+                print(f"[step {step}] 模型回傳空白內容且未呼叫工具")
+                return "模型未產生有效回答,也沒有查詢任何文件。請重新提問,或把問題描述得更具體。"
             print(f"[step {step}] 草擬回答完成，進入自我驗證")
-            verified = verify_answer(result["content"], retrieved_context, provider)
+            verified = verify_answer(content, retrieved_context, provider)
             return _s2tw.convert(verified)
 
         messages.append({
             "role": "assistant",
-            "content": result["content"],
+            "content": content,
             "tool_calls": [
                 {
                     "id": call["id"],
                     "type": "function",
                     "function": {"name": call["name"], "arguments": json.dumps(call["arguments"], ensure_ascii=False)},
                 }
-                for call in result["tool_calls"]
+                for call in tool_calls
             ],
         })
 
-        for call in result["tool_calls"]:
+        for call in tool_calls:
             print(f"[step {step}] 呼叫工具 {call['name']}({call['arguments']})")
             fn = TOOL_FUNCTIONS.get(call["name"])
             try:
