@@ -1,0 +1,863 @@
+國立暨南國際大學資訊工程學系碩士班必選修科目一覽表（110-114學年度入學新生適用）
+
+【適用對象】110-114 學年度入學新生。本系每一入學年度各發布一份科目表,不同屆別的規定可能不同,查詢時務必確認入學學年度。
+
+【本檔案出處】
+來源檔案：docs_source/資工系碩士班必選修科目一覽表_110-114.pdf
+原始網址：https://www.csie.ncnu.edu.tw/coursedata/%E7%A2%A9%E5%A3%AB%E7%8F%AD/114%E7%A2%A9%E5%A3%AB%E7%8F%AD%E5%BF%85%E9%81%B8%E4%BF%AE%E7%A7%91%E7%9B%AE%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf
+下載時間：2026-08-30T00:25:00+08:00
+SHA-256：fbef5d237dbfd5b6...
+轉檔工具：scripts/build_docs.py
+
+【系必修科目（共 6 門、4 學分，含開課年級）】
+課程代號　課程名稱　學分　開課年級
+215011　專題研究 （一）　1學分　一上
+215015　專題研究（二）　1學分　一下
+215010　指導與實習（一）　0學分　一上
+215014　指導與實習（二）　0學分　一下
+215009　專題討論（一）　1學分　一上
+215013　專題討論（二）　1學分　一下
+
+【系必修依開課年級整理】
+一上（大一上學期）：專題研究 （一）(1學分)、指導與實習（一）(0學分)、專題討論（一）(1學分)
+一下（大一下學期）：專題研究（二）(1學分)、指導與實習（二）(0學分)、專題討論（二）(1學分)
+
+【原始 PDF 全文（未經整理，供查核用）】
+課程代號
+Course Code
+ 課 程 名 稱(中文及英文)
+Course Name (Chinese and
+English)
+學分數
+Credits
+修別
+Course type
+(required/ele
+ctive)
+開課年級
+Course
+availability
+備                註
+Notes
+215011 專題研究 （一）
+Independent Study (1) 1 必
+(R)
+一上
+Master 1st
+Semester
+215015 專題研究（二）
+Independent Study (2) 1 必
+(R)
+一下
+Master 2nd
+Semester
+215010 指導與實習（一）
+TA discipline (1) 0 必
+(R)
+一上
+Master 1st
+Semester
+215014 指導與實習（二）
+TA discipline (2) 0 必
+(R)
+一下
+Master 2nd
+Semester
+215009 專題討論（一）
+Seminar (1) 1 必
+(R)
+一上
+Master 1st
+Semester
+215013 專題討論（二）
+Seminar (2) 1 必
+(R)
+一下
+Master 2nd
+Semester
+215061 資料庫系統
+Database System 3 選
+(E)
+一
+Master
+215065 高等演算法（一）
+Advanced Algorithms (I) 3 選
+(E)
+一
+Master
+215062 Web程式設計
+Web Programming 3 選
+(E)
+一
+Master
+215070 圖論演算法
+Graph Algorithms 3 選
+(E)
+一
+Master
+215071
+數位通訊理論與技術(一)
+Digital Communications Theory &
+Technology(1)
+3 選
+(E)
+一
+Master
+215063 錯誤更正碼
+Error Correcting Code 3 選
+(E)
+一
+Master
+215076 網路原理與技術（一）
+CCNA Discovery (1) 3 選
+(E)
+一
+Master
+215074
+量子資訊科學導論
+Introduction to Quantum
+Information Science
+3 選
+(E)
+一
+Master
+國立暨南國際大學資訊工程學系碩士班必選修科目一覽表
+Master's  Program Course Catalog of Department of  Computer Science and
+Information Engineering, National Chi Nan University
+本表(110-114)學年度入學新生適用 Effective for students admitted in Fall, 2021-2025
+最低畢業學分：27學分；必修4學分，選修23學分。
+Master's program requirements: a minimum of 27 required credits, including  4  credits in Department
+required courses and 23  credits in elective courses.
+215055 語言學習與科技
+Language Learning and 3 選
+(E)
+一
+Master
+215059
+網際網路電話加值服務
+IP Telephony Service Creation
+Technology
+3 選
+(E)
+一
+Master
+215073
+智慧型演化計算
+Intelligent Evolutionary
+Computation
+3 選
+(E)
+一
+Master
+215067 IT科技日文
+IT/Technical Japanese 3 選
+(E)
+一
+Master
+需先修日文一(上)、日文一(下)
+prerequisite: Japanese I(1)、Japanese I(2)
+215068
+Python機器學習實務
+Machine Learning Practice with
+Python
+3 選
+(E)
+一
+Master
+215051
+C語言學習探討
+Discussion and Inquiry of Learning
+C
+3 選
+(E)
+一
+Master
+215053
+Python視窗程式設計
+Python GUI Programming with
+tkinter
+3 選
+(E)
+一
+Master
+215060 音樂程式設計
+Music Programming 3 選
+(E)
+一
+Master
+215075
+全球資訊新聞導讀
+Global Information Technology
+News
+3 選
+(E)
+一
+Master
+215054 程式設計與電腦系統
+Programming and Computer 3 選
+(E)
+一
+Master
+215058
+互動音樂程式設計與創作
+Interactive Music Program and
+Creation
+1 選
+(E)
+一
+Master
+215069 深度學習實驗
+Deep Learning Lab 3 選
+(E)
+一
+Master
+215056
+程式設計與運算思維
+Programming and Computational
+Thinking
+3 選
+(E)
+一
+Master
+215057
+程式設計與美學創作
+Creative Coding and Aesthetic
+Programming
+3 選
+(E)
+一
+Master
+215072
+機器學習的數學方法
+Mathematical method for machine
+learning
+3 選
+(E)
+一
+Master
+215064
+人工智慧導論
+Introduction to Artificial
+Intelligence
+3 選
+(E)
+一
+Master
+215066
+智慧型行動裝置軟體設計
+Intelligent Mobile Device
+Programming
+3 選
+(E)
+一
+Master
+215077
+電腦視覺與人機介面
+Computer Vision and Man-
+machine Interface
+3 選
+(E)
+一
+Master
+215078 數位影像處理
+Digital Image Processing 3 選
+(E)
+一
+Master
+215079 資料壓縮
+Data Compression 3 選
+(E)
+一
+Master
+215080 電腦圖學
+Computer Graphics 3 選
+(E)
+一
+Master
+215081 高等演算法（二）
+Advanced Algorithms (Ⅱ) 3 選
+(E)
+一
+Master
+215082 虛擬實境
+Virtual Reality 3 選
+(E)
+一
+Master
+215083 具體數學
+Concrete Mathematics 3 選
+(E)
+一
+Master
+215084 高等計算機結構
+Advanced Computer Architecture 3 選
+(E)
+一
+Master
+215085 生物計算
+Computational Biology 3 選
+(E)
+一
+Master
+215086 自然語言處理
+Natural Language Processing 3 選
+(E)
+一
+Master
+215087 高等電腦圖學
+Advanced Computer Graphics 3 選
+(E)
+一
+Master
+215088 計算理論
+Theory of Computation 3 選
+(E)
+一
+Master
+215089 平行計算
+Introduction to Parallel Algorithms 3 選
+(E)
+一
+Master
+215090 圖形理論
+Graph Theory 3 選
+(E)
+一
+Master
+215091 高等數位影像處理
+Advanced Digital Image Processing 3 選
+(E)
+一
+Master
+215092 資訊檢索
+Information Retrieval 3 選
+(E)
+一
+Master
+215093 非擬真成像技術
+Non Photo-realistic Rendering 3 選
+(E)
+一
+Master
+215094 智慧型系統實務(一)
+Intelligent System Practice (1) 3 選
+(E)
+一
+Master
+215095 智慧型系統實務（二）
+Intelligent System Practice (2) 2 選
+(E)
+一
+Master
+215096 智慧型系統實務（三）
+Intelligent System Practice (3) 2 選
+(E)
+一
+Master
+215097 智慧型系統實務（四）
+Intelligent System Practice (4) 2 選
+(E)
+一
+Master
+215098 機器學習
+Machine Learning 3 選
+(E)
+一
+Master
+215099 行動式3D電腦繪圖
+Mobile 3D Computer Graphics 3 選
+(E)
+一
+Master
+215100
+3D建模與互動多媒體應用
+3D Modeling and Interactive
+Multimedia Applications
+3 選
+(E)
+一
+Master
+215101 通訊導論
+Introduction to Communications 3 選
+(E)
+一
+Master
+215102
+尖端資訊科技國際課程
+International Studies on Leading
+Information Technologies
+1 選
+(E)
+一
+Master
+215103
+尖端資訊科技國際課程（二）
+International Studies on Leading
+Information Technologies(2)
+2 選
+(E)
+一
+Master
+215104 安卓程式設計
+Android Programming 3 選
+(E)
+一
+Master
+215105 QNAP應用程式設計
+Linux Programming for QNAP 3 選
+(E)
+一
+Master
+215106
+開源電子原型平台軟硬體整合設
+計與實作
+software / hardware co-design &
+implementation for open-source
+electronics prototyping platform
+3 選
+(E)
+一
+Master
+215107
+交響樂團與數位應用
+Orchestra and Its Digital
+Applications
+2 選
+(E)
+一
+Master
+215108
+音樂科技專題策展
+Capstone Project on Music
+Technology
+2 選
+(E)
+一
+Master
+215109 PHP 網頁程式設計
+PHP Web Programming 3 選
+(E)
+一
+Master
+215110 計算智能
+Computational Intelligence 3 選
+(E)
+一
+Master
+215111 大數據系統實務
+Big Data System and Practice 3 選
+(E)
+一
+Master
+215112 深度學習
+Deep Learning 3 選
+(E)
+一
+Master
+215113 編譯器
+Compilers 3 選
+(E)
+一
+Master
+215114 計算機網路
+Computer Networks 3 選
+(E)
+一
+Master
+215115
+程式練習及訓練與競賽課程
+Programming Practice, Training,
+and Contest Course
+3 選
+(E)
+一
+Master
+215116
+程式練習及訓練與競賽(二)
+Programming Practice, Training,
+and Contest Course (II)
+3 選
+(E)
+一
+Master
+215117 SQL程式設計
+SQL Programming 3 選
+(E)
+一
+Master
+215118 前端程式設計
+Frontend Programming 3 選
+(E)
+一
+Master
+大學部必須先修通過Web程式設計
+Undergraduate students must complete Web
+Programming as a prerequisite.
+215119 Python網頁擷取程式設計
+Web Scraping with Python 3 選
+(E)
+一
+Master
+需先修計算機概論
+prerequisite: Introduction to Computer
+Science
+215120 iOS App 程式開發
+iOS App Programming 3 選
+(E)
+一
+Master
+215121
+FPGA實作深度學習方法
+FPGA Implementation of Deep
+Learning Methods
+3 選
+(E)
+一
+Master
+需先修邏輯設計或邏輯設計與實驗
+prerequisite: Logic Design or Logic Design
+and Laboratory Experiments
+215122
+VR/AR應用實作
+VR/AR– Implementation and
+Applications
+3 選
+(E)
+一
+Master
+需先修電腦圖學
+prerequisite: Computer Graphics
+215123
+情境模擬控制系統之軟硬體整合
+應用實務
+Hardware / Software Integration &
+Practice for Situational Simulation
+Control System
+3 選
+(E)
+一
+Master
+215124
+智慧型積木機器人程式設計實務
+EV3 Intelligent Lego Robot
+Programming
+3 選
+(E)
+一
+Master
+215125 資訊科學特論
+Special Topics in Computer 3 選
+(E)
+一
+Master
+215126
+物聯網晶片開發實務
+Practices of Internet of Things Chip
+Development
+3 選
+(E)
+一
+Master
+需先修程式設計、邏輯設計與實驗(一)
+、邏輯設計與實驗(二)
+prerequisite: Programming、Logic Design
+and Laboratory Experiments (1)、Logic
+Design and Laboratory Experiments (2)
+215127
+秘密分享原理與應用
+The Principle and Application of
+Secret Sharing
+3 選
+(E)
+一
+Master
+需先修離散數學
+prerequisite: Discrete Mathematics
+215128
+區塊鏈原理與應用
+Principles and Practice of
+Blockchains
+3 選
+(E)
+一
+Master
+215129 網路攻防技術
+Network Attack and Defense 3 選
+(E)
+一
+Master
+215130 Golang程式設計
+Golang Programming 3 選
+(E)
+一
+Master
+215131
+數位通訊理論與技術(二)
+Digital Communications Theory &
+Technology(2)
+3 選
+(E)
+一
+Master
+215132 行動與無線網路
+Mobile and Wireless Networking 3 選
+(E)
+一
+Master
+215133
+資訊擷取
+Data Mining and Information
+Extraction
+3 選
+(E)
+一
+Master
+215134 完美圖理論
+Perfect Graph Theory 3 選
+(E)
+一
+Master
+215135 排隊理論
+Queueing Theory 3 選
+(E)
+一
+Master
+215136 組合最佳化
+Combinatorial Optimization 3 選
+(E)
+一
+Master
+215137 嵌入式系統設計
+Embedded System Design 3 選
+(E)
+一
+Master
+215138 編碼理論
+Coding Theory 3 選
+(E)
+一
+Master
+215139 網路原理與技術（二）
+CCNA Discovery (2) 3 選
+(E)
+一
+Master
+215140 樣型識別
+Pattern Recognition 3 選
+(E)
+一
+Master
+215141 通道編碼與應用
+Applications of Channel Coding 3 選
+(E)
+一
+Master
+215142 高等量子演算法
+Advanced Quantum Algorithms 3 選
+(E)
+一
+Master
+215143 量子計算與通訊
+Quantum Computing and Communication 3 選
+(E)
+一
+Master
+215144 行動軟體系統設計
+Deesign of Mobile Software 3 選
+(E)
+一
+Master
+215145 行動資訊程式設計
+Mobile Information Programming 3 選
+(E)
+一
+Master
+215146 智慧型機器人程式設計
+NXT Programming 3 選
+(E)
+一
+Master
+215147 網際網路電話
+IP Telephony 3 選
+(E)
+一
+Master
+215148 網際網路通訊協定第六版 (IPv6)
+Internet Protocol Version 6 3 選
+(E)
+一
+Master
+215149 網路電話品質量測技術
+VoIP Quality Measurement 3 選
+(E)
+一
+Master
+215150
+計算機網路特論
+Special Topics on Computer
+Networks
+3 選
+(E)
+一
+Master
+215151
+計算機網路特論二
+Special Topics on Computer
+Networks (II)
+3 選
+(E)
+一
+Master
+需先修計算機網路特論
+prerequisite: Special Topics on Computer
+Networks
+215152
+人工智慧程式交易系統
+Automated Trading System using
+Artificial Intelligence
+3 選
+(E)
+一
+Master
+215153 研究所企業實習
+Graduate Enterprise Internship 3 選
+(E)
+一
+Master
+215154 軟體定義網路
+Software-Defined Network 3 選
+(E)
+一
+Master
+215155
+Python網管程式設計
+Python for Network Management
+and System Administration
+3 選
+(E)
+一
+Master
+215156
+量子啟發式搜尋演算法
+Quantum-inspired heuristic and
+evolutionary algorithms
+3 選
+(E)
+一
+Master
+215157 命名資料網路
+Named Data Networking 3 選
+(E)
+一
+Master
+需先修計算機網路
+prerequisite: Computer Networks
+215158 Python 網路程式設計
+Python Network Programming 3 選
+(E)
+一
+Master
+需先修計算機網路
+prerequisite: Computer Networks
+215159
+Python特洛伊木馬程式設計
+Design Trojan Horses with Python
+Language
+3 選
+(E)
+一
+Master
+需先修Python網路程式設計
+prerequisite: Python Network Programming
+215160 5G通訊架構之網路切片技術
+Network Slicing in 5G 3 選
+(E)
+一
+Master
+需先修計算機網路
+prerequisite: Computer Networks
+215161
+弗列斯科網頁程式設計
+Flask: Web Development with
+Python
+3 選
+(E)
+一
+Master
+需先修Python程式設計
+prerequisite: Python Programming
+215162 方程式最佳化
+Function Optimization 3 選
+(E)
+一
+Master
+需先修高等計算智能
+prerequisite: Advanced Computational
+Intelligence
+215163 即時串流協議
+Real-Time Streaming Protocol 3 選
+(E)
+一
+Master
+需先修計算機網路 or 電腦網路通信協定
+prerequisite: Computer Networks or
+Computer Network Protocols
+215164
+K8S 微服務管理入門
+Managing Microservices using
+Kubernetes
+3 選
+(E)
+一
+Master
+215165 C語言安全程式設計
+Secure Coding in C and C++ 3 選
+(E)
+一
+Master
+需先修程式設計
+prerequisite: Programming
+215166
+MPI平行程式設計
+Parallel Programming with the
+Message-Passing Interface
+3 選
+(E)
+一
+Master
+需先修程式設計, 計算機網路
+prerequisite: Programming, Computer
+Networks
+215167 Python 開發維運一體化
+Python for DevOps 3 選
+(E)
+一
+Master
+215168 資料中心管理實務
+Data Center Management Practices 3 選
+(E)
+一
+Master
+215169
+程式設計與美學創作 (二)
+Creative Coding and Aesthetic
+Programming (2)
+3 選
+(E)
+一
+Master
+215170 進階科技日文
+Advanced IT Japanese 3 選
+(E)
+一
+Master
+215171
+高等計算智能
+Advanced Computational
+Intelligence
+3 選
+(E)
+一
+Master
+需先修計算智能
+prerequisite: Computational Intelligence

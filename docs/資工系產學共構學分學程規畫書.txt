@@ -1,3 +1,9 @@
+【⚠ 出處未經查核】
+本檔案為早期手工整理的摘要,非由官方 PDF 自動轉出,尚未在 docs_source/ 找到對應原始檔。
+內容可能已過期或在整理過程中遺漏欄位(同批摘要中的學士班科目表即曾整欄遺失「開課年級」,
+且版本落後五屆)。使用前請向系辦或原公告單位確認,並優先以官方公告為準。
+待補:原始 PDF、來源網址、下載日期。
+
 國立暨南國際大學資工系產學共構學分學程規畫書（來源：curriculum.ncnu.edu.tw，113年1月10日112學年度第3次教務會議通過；本學程為資工系企業實習/實務課程之依據）
 
 學程名稱：資工系產學共構學分學程 The University-industry Co-construction Program of Department of Computer Science and Information Engineering

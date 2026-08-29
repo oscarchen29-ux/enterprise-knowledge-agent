@@ -1,0 +1,510 @@
+國立暨南國際大學資訊工程學系學士班必選修科目一覽表（111學年度入學新生適用）
+
+【適用對象】111 學年度入學新生。本系每一入學年度各發布一份科目表,不同屆別的規定可能不同,查詢時務必確認入學學年度。
+
+【本檔案出處】
+來源檔案：docs_source/資工系學士班必選修科目一覽表_111.pdf
+原始網址：https://www.csie.ncnu.edu.tw/coursedata/%E5%AD%B8%E5%A3%AB%E7%8F%AD/111%E5%AD%B8%E5%A3%AB%E7%8F%AD%E5%BF%85%E9%81%B8%E4%BF%AE%E7%A7%91%E7%9B%AE%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf
+下載時間：2026-08-30T00:24:58+08:00
+SHA-256：e07165803e7d8438...
+轉檔工具：scripts/build_docs.py
+
+【畢業學分總覽】
+最低畢業學分：128 學分
+- 全校共同課程：15 學分
+- 通識領域課程：16 學分
+- 系必修：49 學分
+- 專業選修：42 學分
+- 自由學分：6 學分
+
+【系必修科目（共 17 門、49 學分，含開課年級）】
+課程代號　課程名稱　學分　開課年級
+210036　計算機概論　3學分　一上
+210003　微積分（上）　3學分　一上
+210013　離散數學　3學分　一上
+210008　微積分（下）　3學分　一下
+210099　程式設計　3學分　一下
+210151　邏輯設計與實驗（一）　3學分　一下
+210111　機率　3學分　一下
+210016　資料結構與演算法（一）　3學分　二上
+210152　邏輯設計與實驗（二）　3學分　二上
+210022　資料結構與演算法（二）　3學分　二下
+210026　線性代數　3學分　二下
+210025　計算機組織與結構　3學分　三上
+210093　系統程式　3學分　三上
+210121　專題（一）　2學分　三上
+210122　專題（二）　2學分　三下
+210102　作業系統　3學分　三下
+210038　微算機實驗　3學分　三下
+
+【系必修依開課年級整理】
+一上（大一上學期）：計算機概論(3學分)、微積分（上）(3學分)、離散數學(3學分)
+一下（大一下學期）：微積分（下）(3學分)、程式設計(3學分)、邏輯設計與實驗（一）(3學分)、機率(3學分)
+二上（大二上學期）：資料結構與演算法（一）(3學分)、邏輯設計與實驗（二）(3學分)
+二下（大二下學期）：資料結構與演算法（二）(3學分)、線性代數(3學分)
+三上（大三上學期）：計算機組織與結構(3學分)、系統程式(3學分)、專題（一）(2學分)
+三下（大三下學期）：專題（二）(2學分)、作業系統(3學分)、微算機實驗(3學分)
+
+【原始 PDF 全文（未經整理，供查核用）】
+一、共同課程（必修15學分） A. School-Wide Required Courses ( 15 credits )
+課程代號
+Course
+Code
+課      程      名      稱
+Course Name
+學分數
+Credits
+英文一(上)  English I(1) 2
+英文一(下)  English I(2) 2
+英文二 English II 2
+國文(上) Chinese(1) 2
+國文(下) Chinese(2) 2
+社會服務學習(上) Service Learning(1) 1
+社會服務學習(下) Service Learning(2) 1
+大一體育(上)Physical Education (1) 0.5
+大一體育(下)Physical Education (2) 0.5
+特色運動 （Featured Sports） 2
+0
+二、共同選修課程（各系依共同選修加列課程） B. School-Wide Elective Courses
+僑外生得以修習「僑外生華語文」抵免國文。（Overseas
+students take Chinese for Overseas Students）
+依所屬學系分班上課，無特殊原因不得跨班選課。（
+Students are divided into groups by their own department,
+without any proper reasons they cannot change the decision.）
+上學期依所屬學系分班上課，無特殊原因不得跨班
+選課，惟未達40人之學系、院學士班班級，則採合
+併班開課；下學期則依運動項目分班，自由選課。
+（In the first semester of freshman, students are arranged
+to take Physical Education (1) by their original
+department. Without any proper reasons, change will be
+prohibited. If a class of the department or the
+interdisciplinary program that is less than 40 students, the
+combined class will be adopted. In the second semester of
+freshman, studetns are able to take Physical Education (2)
+by their interesting.）
+大二開始，每學期限修一項，畢業前須完成至少2項特色
+運 動（Students are limited take one course each semester
+since Sophomore,At least 2 featured sports courses are required
+before graduation.）
+通識講座 General Education lecture program 畢業前至少應出席6場。（Students  are required to attend at
+least 6 lectures before graduation.）
+國立暨南國際大學資訊工程學系學士班必選修科目一覽表
+Undergraduate Program Course Catalog of Department of Computer
+Science and Information Engineering, National Chi Nan University
+本表(   111    )學年度入學新生適用 Effective for students admitted in Fall, 2022
+最低畢業學分：128 學分，全校共同課程  15  學分，通識領域課程  16  學分
+系必修  49  學分，專業選修 42 學分，自由學分 6 學分。 Undergraduate requirements: a
+minimum of 128  required credits, including 15 credits in the School-Wide Curriculum,  16
+credits of General Education Courses,  49  credits of Departmental Required Courses,  42
+credits of Elective Courses, and  6 credits of School Elective Courses.
+壹、全校共同課程 1.School-Wide Curriculum
+備                           註
+Notes
+自110學年度起，英文能力分班改為依照本校自辦
+英檢(OOPT)作依據，分為三級上課：前10%的同學
+將分配至「進階班英文」上課；中間80%的同學將
+分配至原班英文上課；後10%的同學將分配至「基
+礎班英文」上課。
+Since the first semester of 110 Academic Year
+(September2021), the competence-based class grouping
+policy of Freshmen English (Course Title: English 1) will
+be based on registered student’s OOPT scores; Students
+will be accordingly divided into three different levels:
+Advanced English (top 10%), General English (middle
+80%) and  Basic English (bottom 10%).
+第二外語 （Second Foreign Language）
+東南亞語言(Southeast Asia Languages)
+進階語文(Advanced English)
+其他選修(Other Elective Course)
+主領域
+Main
+Field
+次領域
+Sub-Field
+學分數
+Credits
+文學與藝術(Literature and Art)
+歷史哲學與文化(History, Philosophy and
+Culture)
+法政與教育(Law, Politics and Education)
+社經與管理(Society, Economy and Management)
+工程與科技(Engineering and Technology)
+生命與科學(Life and Science)
+東南亞(Southeast Asia)
+綠概念(Green Concept)
+在地實踐(Social Practice)
+參、系必修（至少49學分） 3.Departmental Required Courses ( 49 credits )
+課程代號
+Course
+Code
+ 課 程 名 稱(中文及英文)
+Course Name (Chinese and English)
+學分數
+Credits
+修別
+Course
+type
+(requi
+red/el
+ective
+)
+開課年級
+Course
+availability
+(freshman/so
+phomore/juni
+or/senior)
+備               註
+Notes
+210036 計算機概論
+Introduction to Computer Science 3 必 一上
+210003 微積分（上）
+Calculus(1) 3 必 一上
+210013 離散數學
+Discrete Mathematics 3 必 一上
+210008 微積分（下）
+Calculus(2) 3 必 一下
+210099 程式設計
+Programming 3 必 一下 擋修PHP網頁程式設計
+210151 邏輯設計與實驗（一）
+Logic Design and Laboratory Experiments (1) 3 必 一下
+210111 機率
+Probability 3 必 一下
+210016 資料結構與演算法（一）
+Data Structures and Algorithms (Ⅰ) 3 必 二上
+210152 邏輯設計與實驗（二）
+Logic Design and Laboratory Experiments (2) 3 必 二上
+自然領域
+Nature 4
+每次領域各1門，共至少修習4學分。 (Students in the two
+sub-fields should attend at least one course, and attend a total
+of at least 4 credits)
+特色通識領
+域 Topical
+General
+Education
+4
+自由選擇其中兩個次領域各修習一門，共至少修習 4學
+分。(Students should select two sub-fields courses in the
+main field, and attend a total of at least 4 credits)
+人文領域
+Humanities 4
+每次領域各1門，共至少修習4學分。 (Students in the two
+sub-fields should attend at least one course, and attend a total
+of at least 4 credits)
+社會領域
+Society 4
+每次領域各1門，共至少修習4學分。 (Students in the two
+sub-fields should attend at least one course, and attend a total
+of at least 4 credits)
+備                           註
+Notes
+含日文、韓文、法文、德文及西班牙文等。(Including
+Japanese, Korean, French, German and Spanish, etc.)
+含泰語、越南語、緬甸語、印尼語及馬來語，可抵特色
+通 識「東南亞」次領域。(Including  Thai, Vietnamese,
+Burmese, Indonesian and Malay. These courses can be credited
+course credits in Southeast Asia of Topical General Education)
+貳、通識領域課程（至少16學分） 2.General Education Courses ( 16 credits )
+210022 資料結構與演算法（二）
+Data Structures and Algorithms (Ⅱ) 3 必 二下
+210026 線性代數
+Linear Algebra 3 必 二下
+210025 計算機組織與結構
+Computer Organization and Architecture 3 必 三上
+210093 系統程式
+System Programming 3 必 三上
+210121 專題（一）
+Project Study (Ⅰ) 2 必 三上
+210122 專題（二）
+Project Study (II) 2 必 三下
+210102 作業系統
+Operating Systems 3 必 三下
+210038 微算機實驗
+Microcomputer Systems Lab 3 必 三下
+肆、專業選修（至少42學分） 4.Elective Courses ( 42 credits )
+210015 數位電子學
+Digital Electronics 3 選 1,2,3,4
+130031 軟體工程
+Software Engineering 3 選 3,4,g,p
+210021 組合數學
+Combinatorial Mathematics 3 選 1,2,3,4
+210123 自動機與形式語言
+Automata and Formal Language 3 選 1,2,3,4
+210124 數位系統設計
+Digital System Design 3 選 1,2,3,4
+210125 數值方法
+Numerical Methods 3 選 1,2,3,4
+210048 高等演算法（一）
+Advanced Algorithms (I) 3 選 3,4,g,p
+210126 電腦視覺與人機介面
+Computer Vision and Man-machine Interface 3 選 1,2,3,4
+210050 圖形理論及應用
+Graph Theory with Applications 3 選 3,4,g,p
+210052 數位影像處理
+Digital Image Processing 3 選 3,4,g,p
+210127 資料壓縮
+Data Compression 3 選 3,4,g
+210128 電腦圖學
+Computer Graphics 3 選 3,4,g
+210129 Web技術
+WEB Technologies 3 選 1,2,3,4
+210060 高等演算法（二）
+Advanced Algorithms (Ⅱ) 3 選 3,4,g,p
+210082 虛擬實境
+Virtual Reality 3 選 3,4,g,p
+210085 多媒體通訊
+Multimedia and Communication 3 選 3,4,g,p
+210130 具體數學
+Concrete Mathematics 3 選 1,2,3,4
+210131 UNIX程式設計
+UNIX Programming 3 選 1,2,3,4
+210132 程式語言
+Programming Languages 3 選 1,2,3,4
+210096 高等計算機結構
+Advanced Computer Architecture 3 選 3,4,g,p
+210103 生物計算
+Computational Biology 3 選 3,4,g,p
+210133 隨機程序
+Introduction to Fundamental Stochastic Processes
+3 選 1,2,3,4
+210107 組合語言
+Assembly Language 3 選 3,4,g,p
+210134 LISP程式設計
+LISP Programming 3 選 1,2,3,4
+210135 UNIX使用入門
+Introduction to Unix Environment 3 選 1,2,3,4
+215021 自然語言處理
+Natural Language Processing (NLP) 3 選 3,4,g,p
+210136 電腦網路通信協定
+Computer Network Protocols 3 選 1,2,3,4
+215038 錯誤更正碼
+Error Correcting Code 3 選 3,4,g,p
+215047 資訊檢索
+Information Retrieval 3 選 3,4,g,p
+215049 史料與史學
+Historical Sources and Historiography 3 選 3,4,g,p
+219066 嵌入式系統實作
+Embedded System Implementation 3 選 3,4,g,p
+219068 非擬真成像技術
+Non Photo-realistic Rendering 3 選 3,4,g,p 擋修電腦圖學及高等電腦圖學
+210137 科技英文(一)
+Technical English(I) 3 選 1,2,3,4
+219091 智慧型演化計算
+Intelligent Evolutionary Computation 3 選 3,4,g,p
+210140 智慧型行動裝置軟體設計
+Intelligent Mobile Device Programming 3 選 1,2,3,4
+219093 智慧型系統實務(一)
+Intelligent System Practice (1) 2 選 3,4,g,p
+219096 Linux系統管理
+Linux System Administration 3 選 3,4,g,p
+219097 進階Linux系統管理
+Advanced Linux System Administration 3 選 3,4,g,p
+219101 語言學習與科技
+Language Learning and Technology 3 選 3,4,g,p
+219103 機器學習
+ Machine Learning 3 選 3,4,g,p
+219106
+適地性文創應用與服務系統
+Location-based Cultural & Creative
+Application and Service Systems
+3 選 3,4,g,p
+219107
+智慧型文化導向行動導覽服務創意平台
+技術
+ Intelligent Web Mobile Platform for Culture-
+Oriented and Creative Services
+3 選 3,4,g,p
+219108 行動式3D電腦繪圖
+Mobile 3D Computer Graphics 3 選 3,4,g,p 擋修電腦圖學及高等電腦圖學
+219110 地方文獻編纂與習作
+Local Bibliography Compilation and Practice 3 選 3,4,g,p
+210141
+3D建模與互動多媒體應用
+3D Modeling and Interactive Multimedia
+Applications
+3 選 1,2,3,4     
+219113 網際網路電話加值服務
+IP Telephony Service Creation Technology 3 選 3,4,g,p
+210142 數值分析
+Numerical Analysis 3 選 1,2,3,4
+210143 Web服務和應用
+Web Services and Applications 3 選 1,2,3,4
+210144 通訊導論
+Introduction to Communications 3 選 3,4,g,p
+210119 網際網路程式設計
+WWW Programming Design 3 選 3,4,g,p
+219076 智慧型系統實務（三）
+Intelligent System Practice (3) 2 選 3,4,g,p
+219099 雲端系統設計
+Design of Cloud Computing System 3 選 3,4,g,p
+219115 音樂,大腦,與科技
+Music,Brain,Science and Technology 3 選 3,4,g,p
+219116
+英文寫作, 口說, 簡報 (一)
+On English Writing, Speaking andPresentation
+(1)
+3 選 3,4,g,p
+219117
+英文寫作, 口說, 簡報 (二)
+On English Writing, Speaking andPresentation
+(2)
+3 選 3,4,g,p
+210146 基礎程式設計
+Computer Fundamentals & Programming 1 選 1,2,3,4
+219121
+尖端資訊科技國際課程
+International Studies on Leading Information
+Technologies
+1 選 3,4,g,p
+219118
+史學研究與資訊科技跨領域合作實務
+When History Meets Computer Science:
+Theory and Practice
+3 選 3,4,g,p
+219130 安卓程式設計
+Android Programming 3 選 3,4,g,p
+219122 QNAP應用程式設計
+ Linux Programming for QNAP 3 選 3,4,g,p
+219123
+開源電子原型平台軟硬體整合設計與實
+作
+software / hardware co-design &
+implementation for open-source electronics
+prototyping platform
+3 選 3,4,g,p
+210147 基礎程式設計 (二)
+C++ Programming Fundamentals 1 選 1,2,3,4
+219128 數位音樂學習與創作
+Digital Music Learning and Creation 3 選 3,4,g,p
+219133
+國際IT科技發展趨勢
+Global Trend of Information Technology
+Development
+2 選 3,4,g,p
+219134
+尖端資訊科技國際課程（二）
+International Studies on Leading Information
+Technologies(2)
+2 選 3,4,g,p
+210148 專業實習
+Specialized Internship 3 選 4
+210149 企業實習
+Enterprise Internship 6 選 4
+219135 交響樂團與數位應用
+Orchestra and Its Digital Applications 2 選 3,4,g,p
+219136 音樂科技專題策展
+Capstone Project on Music Technology 2 選 3,4,g,p
+219137
+數位錄音錄影工程
+Digital Audio/Video Recording and
+Engineering
+2 選 3,4,g,p
+219138 音樂, 大腦, 與科技
+Music, Brain, Science and Technology 2 選 3,4,g,p
+219139 數位音樂學習與創作
+Digital Music Learning and Creation 2 選 3,4,g,p
+219140 PHP 網頁程式設計
+PHP Web Programming 3 選 3,4,g,p 需先修210099程式設計
+219141 計算智能
+Computational Intelligence 3 選 3,4,g,p
+219142 大數據系統實務
+Big Data System and Practice 3 選 3,4,g,p
+219143 深度學習
+Deep Learning 3 選 3,4,g,p
+210009 電子電路
+Electrical Circuits 3 選 1,2,3,4
+210086 工程數學
+Engineering Mathematics 3 選 1,2,3,4
+210115 邏輯設計
+Logic Design 3 選 1,2,3,4
+210040 編譯器
+Compilers 3 選 3,4,g,p
+210076 資料庫系統
+Database System 3 選 3,4,g,p
+210145 計算機網路
+Computer Networks 3 選 1,2,3,4
+210023 數位電路實驗
+Digital Circuits Lab 1 選 1,2,3,4
+210029 微算機系統
+Microcomputer Systems 3 選 1,2,3,4
+210150
+ 基本電學
+Basic Electricity 3 選 1,2,3,4
+210153 MFC視窗程式設計
+Windows MFC Programming 3 選 1,2,3,4 需先修程式設計
+210154 個人電腦概論
+ Information Technology Essentials 3 選 1,2,3,4 需先修計算機概論
+219146
+程式練習及訓練與競賽課程
+Programming Practice, Training, and Contest
+Course
+3 選 3,4,g,p
+210155 Web程式設計
+Web Programming 3 選 3,4,g,p
+210156 JavaScript程式設計
+JavaScript Programming 3 選 1,2,3,4 需先修程式設計
+219148 SQL程式設計
+SQL Programming 3 選 3,4,g,p 大學部必須先修通過資料庫系統
+219149
+程式練習及訓練與競賽（二）
+Programming Practice, Training, and Contest
+Course (II)
+3 選 3,4,g,p
+219150 前端程式設計
+Frontend Programming 3 選 3,4,g,p 大學部必須先修通過Web程式設計
+219151 IT科技日文
+IT/Technical Japanese 3 選 3,4,g,p 需先修日文一(上)、日文一(下)
+219152 Python網頁擷取程式設計
+Web Scraping with Python 3 選 3,4,g,p 需先修計算機概論
+215050 MXNET之深度學習實驗
+MXNET-based Deep Learning Lab 3 選 2,3,4,g
+219155 Python機器學習實務
+Machine Learning Practice with Python 3 選 3,4,g,p
+219156 iOS App 程式開發
+iOS App Programming 3 選 3,4,g,p
+215051 C 語言教學探討
+Discussion and Inquiry of Learning C 3 選 3,4,g
+219157
+FPGA實作深度學習方法
+FPGA Implementation of Deep Learning
+Methods
+3 選 3,4,g,p 需先修邏輯設計或邏輯設計與實驗
+215052 VR/AR應用實作
+VR/AR– Implementation and Applications 3 選 3,4,g,p 需先修電腦圖學
+219159
+情境模擬控制系統之軟硬體整合應用實
+務
+Hardware / Software Integration & Practice
+for Situational Simulation Control System
+3 選 3,4,g,p
+219160 智慧型積木機器人程式設計實務 EV3
+Intelligent Lego Robot Programming 3 選 3,4,g,p
+219161 音樂程式設計
+Music Programming 3 選 3,4,g,p
+210106 電腦與資訊安全
+Computer and Information Security 3 選 3,4,g,p
+210157 企業實習240(一)
+Enterprise Internship 240(一) 3 選 4
+210158 企業實習240(二)
+Enterprise Internship 240(二) 3 選 4
+210159 企業實習(二)
+Corporate Internship (2) 6 選 4
+219169 資訊科學特論
+Special Topics in Computer Science 3 選 3,4,g,p
+219168
+物聯網晶片開發實務
+Practices of Internet of Things Chip
+Development
+3 選 3,4,g,p
+215058 互動音樂程式設計與創作
+Interactive Music Program and Creation 1 選 1,2,3,4,g
+210161 Linux系統管理
+Linux System Administratio 3 選 1,2,3,4
+219171 深度學習實驗
+Deep Learning Lab 3 選 3,4,g,p
+215056 程式設計與運算思維
+Programming and Computational Thinking 3 選 1,2,3,4,g
+215057 程式設計與美學創作
+Creative Coding and Aesthetic Programming 3 選 1,2,3,4,g
+專業選修42學分：開課年級依各課程決定，修課建議請參考課程地圖。

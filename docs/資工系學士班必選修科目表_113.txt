@@ -1,0 +1,611 @@
+國立暨南國際大學資訊工程學系學士班必選修科目一覽表（113學年度入學新生適用）
+
+【適用對象】113 學年度入學新生。本系每一入學年度各發布一份科目表,不同屆別的規定可能不同,查詢時務必確認入學學年度。
+
+【本檔案出處】
+來源檔案：docs_source/資工系學士班必選修科目一覽表_113.pdf
+原始網址：https://www.csie.ncnu.edu.tw/coursedata/%E5%AD%B8%E5%A3%AB%E7%8F%AD/113%E5%AD%B8%E5%A3%AB%E7%8F%AD%E5%BF%85%E9%81%B8%E4%BF%AE%E7%A7%91%E7%9B%AE%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf
+下載時間：2026-08-30T00:24:59+08:00
+SHA-256：77baa48c47286a3f...
+轉檔工具：scripts/build_docs.py
+
+【畢業學分總覽】
+最低畢業學分：128 學分
+- 全校共同課程：16 學分
+- 通識領域課程：15 學分
+- 系必修：49 學分
+- 專業選修：42 學分
+- 自由學分：6 學分
+
+【系必修科目（共 17 門、49 學分，含開課年級）】
+課程代號　課程名稱　學分　開課年級
+210036　計算機概論　3學分　一上
+210003　微積分（上）　3學分　一上
+210013　離散數學　3學分　一上
+210008　微積分（下）　3學分　一下
+210099　程式設計　3學分　一下
+210151　邏輯設計與實驗（一）　3學分　一下
+210111　機率　3學分　一下
+210016　資料結構與演算法（一）　3學分　二上
+210152　邏輯設計與實驗（二）　3學分　二上
+210022　資料結構與演算法（二）　3學分　二下
+210026　線性代數　3學分　二下
+210025　計算機組織與結構　3學分　三上
+210093　系統程式　3學分　三上
+210121　專題（一）　2學分　三上
+210122　專題（二）　2學分　三下
+210102　作業系統　3學分　三下
+210160　微算機實驗　3學分　三下
+
+【系必修依開課年級整理】
+一上（大一上學期）：計算機概論(3學分)、微積分（上）(3學分)、離散數學(3學分)
+一下（大一下學期）：微積分（下）(3學分)、程式設計(3學分)、邏輯設計與實驗（一）(3學分)、機率(3學分)
+二上（大二上學期）：資料結構與演算法（一）(3學分)、邏輯設計與實驗（二）(3學分)
+二下（大二下學期）：資料結構與演算法（二）(3學分)、線性代數(3學分)
+三上（大三上學期）：計算機組織與結構(3學分)、系統程式(3學分)、專題（一）(2學分)
+三下（大三下學期）：專題（二）(2學分)、作業系統(3學分)、微算機實驗(3學分)
+
+【原始 PDF 全文（未經整理，供查核用）】
+一、共同課程（必修16學分） A. School-Wide Required Courses ( 16 credits )
+課程代號
+Course
+Code
+課      程      名      稱
+Course Name
+學分數
+Credits
+跨域專業學術英文(一)：文本解析與書寫
+Cross-disciplinary ESAP: Textual
+Interpretation and Composition
+2
+跨域專業學術英文(二)：思辨與表達
+Cross-disciplinary ESAP: Critical Thinking
+and Expression
+2
+跨域專業學術英文(三)：跨文化溝通與表
+達
+Cross-disciplinary ESAP: Cross-Cultural
+Communicative Skills
+2
+中文思辨與表達一：閱讀書寫
+Critical Thinking and  Expression In
+Chinese （Ⅰ）：Reading And Writing
+2
+中文思辨與表達二：多元應用
+Critical Thinking and  Expression In
+Chinese（Ⅱ）：Multiple Applications
+2
+社會服務學習 Service Learning 1
+資訊科技 Information Technology 1
+大一體育(上)Physical Education (1) 1
+僑外生修習「僑外生華語文」可抵通識人文領域課程，不
+得以「僑外生華語文」抵免中文思辨與表達課程。（
+Overseas students who take Chinese for Overseas Students can
+be credited in field of Humanities, but cannot be certified as
+Critical Thinking And Expression In Chinese.）
+上學期依所屬學系分班上課，無特殊原因不得跨班選
+課，惟未達40人之學系、院學士班班級，則採合併班
+開課；下學期則依運動項目分班，自由選課。（In
+the first semester of freshman, students are arranged to
+take Physical Education (1) by their original department.
+Without any proper reasons, change will be prohibited. If
+a class of the department or the interdisciplinary program
+that is less than 40 students, the combined class will be
+adopted. In the second semester of freshman, studetns are
+able to take Physical Education (2) by their interesting.）
+依所屬學系分班上課，無特殊原因不得跨班選課。（
+Students are divided into groups by their own department,
+without any proper reasons they cannot change the decision.）
+每學年於上學期開課，不分學系上課。(Freshmen take
+courses in the first semester of each academic year, regardless
+of department.)
+自110學年度起，英文能力分班改為依照本校自辦英
+檢(OOPT)作依據，分為三級上課：前10%的同學將
+分配至「跨域專業學術英文(一)：文本解析與書寫(進
+階)/跨域專業學術英文(二)：思辨與表達(進階)/跨域
+專業學術英文(三)：跨文化溝通與表達(進階)」上
+課；中間80%的同學將分配至原班英文上課；後10%
+的同學將分配至「跨域專業學術英文(一)：文本解析
+與書寫(基礎)/跨域專業學術英文(二)：思辨與表達(基
+礎)/跨域專業學術英文(三)：跨文化溝通與表達(基
+礎)」上課。
+Since the first semester of 110 Academic Year
+(September 2021), the competence-based class grouping
+policy of Freshmen English (Course Title: Cross-
+disciplinary ESAP: Textual Interpretation and
+Composition) will be based on registered student's OOPT
+scores; Students will be accordingly divided into three
+different levels: advanced (top 10%), general (middle
+80%) and basic (bottom 10%).
+國立暨南國際大學 資訊工程學系學士班必選修科目一覽表
+Undergraduate Program Course Catalog of Department of Computer
+Science and Information Engineering, National Chi Nan University
+本表( 113 )學年度入學新生適用 Effective for students admitted in Fall, 2024
+最低畢業學分：128 學分，全校共同課程  16  學分，通識領域課程  15  學分
+系必修  49  學分，專業選修 42 學分，自由學分 6 學分。 Undergraduate requirements: a minimum
+of 128  required credits, including 16 credits in the School-Wide Curriculum, 15 credits of General
+Education Courses,  49  credits of Departmental Required Courses,  42 credits of Elective Courses, and
+6 credits of School Elective Courses.
+壹、全校共同課程 1.School-Wide Curriculum
+備            註
+Notes
+1
+大一體育(下)Physical Education (2) 1
+特色運動 （Featured Sports） 2
+0
+二、共同選修課程（各系依共同選修加列課程） B. School-Wide Elective Courses
+第二外語 （Second Foreign Language）
+東南亞語言(Southeast Asia Languages)
+進階語文(Advanced English)
+其他選修(Other Elective Course)
+學分數
+Credits
+文學與藝術(Literature and Art)
+歷史哲學與文化(History, Philosophy and
+Culture)
+AI文創協作(AI Collaboration in Cultural
+Creativity)
+法政與教育(Law, Politics and Education)
+社經與管理(Society, Economy and
+Management)
+資料科學分析(Data Science Analysis)
+工程與科技(Engineering and Technology)
+生命與科學(Life and Science)
+程式設計(Programming)
+國際連結(International Connection)
+淨零永續(Net-Zero Sustainability)
+社會創新(Social Innovation)
+自然領域
+Nature 3 至少修習3學分。(Students should attend a total of at
+least 3 credits.)
+特色通識領
+域
+Characterist
+ic General
+Education
+3 至少修習3學分。(Students should attend a total of at
+least 3 credits.)
+人文領域
+Humanities 3 至少修習3學分。(Students should attend a total of at
+least 3 credits.)
+社會領域
+Society 3 至少修習3學分。(Students should attend a total of at
+least 3 credits.)
+備            註
+Notes
+上學期依所屬學系分班上課，無特殊原因不得跨班選
+課，惟未達40人之學系、院學士班班級，則採合併班
+開課；下學期則依運動項目分班，自由選課。（In
+the first semester of freshman, students are arranged to
+take Physical Education (1) by their original department.
+Without any proper reasons, change will be prohibited. If
+a class of the department or the interdisciplinary program
+that is less than 40 students, the combined class will be
+adopted. In the second semester of freshman, studetns are
+able to take Physical Education (2) by their interesting.）
+大二開始，每學期限修一項，畢業前須完成至少2項特色
+運 動（Students are limited take one course each semester
+since Sophomore,At least 2 featured sports courses are
+required before graduation.）
+含日文、韓文、法文、德文及西班牙文等。(Including
+Japanese, Korean, French, German and Spanish, etc.)
+含泰語、越南語、緬甸語、印尼語及馬來語，可抵特色通
+識領域。(Including Thai, Vietnamese, Burmese, Indonesian
+and Malay. These courses can be credited course credits in
+Topical General Education)
+貳、通識領域課程（至少15學分） 2.General Education Courses ( 15 credits )
+通識講座 General Education lecture program 畢業前至少應出席6場。（Students  are required to attend at
+least 6 lectures before graduation.）
+領域 Field
+(須修習資訊科技與自主學習課程 )
+(Information Technology and Self-directed
+Learning courses are required)
+2
+參、系必修（至少49學分） 3.Departmental Required Courses ( 49 credits )
+課程代號
+Course
+Code
+ 課 程 名 稱(中文及英文)
+ Course Name (Chinese and English)
+學分數
+Credits
+修別
+Course
+type
+(require
+d/electiv
+e)
+開課年級
+Course
+availability
+備               註Notes
+210036 計算機概論
+Introduction to Computer Science 3 必
+(R)
+一上
+Freshman
+1st
+Semester
+210003 微積分（上）
+Calculus(1) 3 必
+(R)
+一上
+Freshman
+1st
+Semester
+210013 離散數學
+Discrete Mathematics 3 必
+(R)
+一上
+Freshman
+1st
+Semester
+210008 微積分（下）
+Calculus(2) 3 必
+(R)
+一下
+Freshman
+2nd
+Semester
+210099 程式設計
+Programming 3 必
+(R)
+一下
+Freshman
+2nd
+Semester
+210151
+邏輯設計與實驗（一）
+Logic Design and Laboratory
+Experiments (1)
+3 必
+(R)
+一下
+Freshman
+2nd
+Semester
+210111 機率
+Probability 3 必
+(R)
+一下
+Freshman
+2nd
+Semester
+210016 資料結構與演算法（一）
+Data Structures and Algorithms (Ⅰ) 3 必
+(R)
+二上
+Sophomore
+1st
+Semester
+210152
+邏輯設計與實驗（二）
+Logic Design and Laboratory
+Experiments (2)
+3 必
+(R)
+二上
+Sophomore
+1st
+Semester
+210022 資料結構與演算法（二）
+Data Structures and Algorithms (Ⅱ) 3 必
+(R)
+二下
+Sophomore
+2nd
+Semester
+通識各主領域課程(人文、社會、自然及特色通識)得單一領域跨域認抵，至多4學分 (需經通識教育中心認定之)
+General education courses from various fields (humanities, social, natural, and topical general education) can be cross-credited
+within a single field, up to a maximum of 4 credits (subject to approval by the General Education Center).
+領域課程15學分中，學生須至少修習二門資訊科技課程，且須包括自主學習類型課程1學分。
+Students are required to take at least two Information Technology courses and get 1 credit of Self-directed Learning courses out of
+the 15 credits of General Education Courses.
+3
+210026 線性代數
+Linear Algebra 3 必
+(R)
+二下
+Sophomore
+2nd
+Semester
+210025 計算機組織與結構
+Computer Organization and Architecture 3 必
+(R)
+三上
+Junior 1st
+Semester
+210093 系統程式
+System Programming 3 必
+(R)
+三上
+Junior 1st
+Semester
+210121 專題（一）
+Project Study (Ⅰ) 2 必
+(R)
+三上
+Junior 1st
+Semester
+210122 專題（二）
+Project Study (II) 2 必
+(R)
+三下
+Junior 2nd
+Semester
+210102 作業系統
+Operating Systems 3 必
+(R)
+三下
+Junior 2nd
+Semester
+210160 微算機實驗
+Microcomputer Systems Lab 3 必
+(R)
+三下
+Junior 2nd
+Semester
+肆、專業選修（至少42學分） 4.Elective Courses ( 42 credits )
+210009 基本電學
+Basic Electricity 3 選
+(E)
+一
+Freshman
+210012
+資訊系統與網路導論(二)
+Introduction to Computer System and
+Network Ⅱ
+3 選
+(E)
+一
+Freshman
+210015 數位電子學
+Digital Electronics 3 選
+(E)
+一
+Freshman
+210021 組合數學
+Combinatorial Mathematics 3 選
+(E)
+一
+Freshman
+210023 數位電路實驗
+Digital Circuits Lab 1 選
+(E)
+二
+Sophomore
+210123 自動機與形式語言
+Automata and Formal Language 3 選
+(E)
+三
+Junior
+210124 數位系統設計
+Digital System Design 3 選
+(E)
+一
+Freshman
+210125 數值方法
+Numerical Methods 3 選
+(E)
+一
+Freshman
+210126
+電腦視覺與人機介面
+Computer Vision and Man-machine
+Interface
+3 選
+(E)
+一
+Freshman
+210130 具體數學
+Concrete Mathematics 3 選
+(E)
+一
+Freshman
+210131 UNIX程式設計
+UNIX Programming 3 選
+(E)
+一
+Freshman
+210132 程式語言
+Programming Languages 3 選
+(E)
+一
+Freshman
+4
+210133
+隨機程序
+Introduction to Fundamental Stochastic
+Processes
+3 選
+(E)
+二
+Sophomore
+210134 LISP程式設計
+LISP Programming 3 選
+(E)
+一
+Freshman
+210135 UNIX使用入門
+Introduction to Unix Environment 3 選
+(E)
+一
+Freshman
+210136 電腦網路通信協定
+Computer Network Protocols 3 選
+(E)
+一
+Freshman
+210140 智慧型行動裝置軟體設計
+Intelligent Mobile Device Programming 3 選
+(E)
+一
+Freshman
+210141
+3D建模與互動多媒體應用
+3D Modeling and Interactive
+Multimedia Applications
+3 選
+(E)
+一
+Freshman     
+210142 數值分析
+Numerical Analysis 3 選
+(E)
+一
+Freshman
+210143 Web服務和應用
+Web Services and Applications 3 選
+(E)
+一
+Freshman
+210146 基礎程式設計
+Computer Fundamentals & 1 選
+(E)
+一
+Freshman
+210147 基礎程式設計 (二)
+C++ Programming Fundamentals 1 選
+(E)
+一
+Freshman
+210148 專業實習
+Specialized Internship 3 選
+(E)
+四
+Senior
+210149 企業實習
+Enterprise Internship 6 選
+(E)
+四
+Senior
+210009 電子電路
+Electrical Circuits 3 選
+(E)
+一
+Freshman
+210086 工程數學
+Engineering Mathematics 3 選
+(E)
+二
+Sophomore
+210115 邏輯設計
+Logic Design 3 選
+(E)
+一
+Freshman
+210145 計算機網路
+Computer Networks 3 選
+(E)
+一
+Freshman
+210029 微算機系統
+Microcomputer Systems 3 選
+(E)
+一
+Freshman
+210153 MFC視窗程式設計
+Windows MFC Programming 3 選
+(E)
+一
+Freshman
+需先修程式設計
+prerequisite: Programming
+210154 個人電腦概論
+Information Technology Essentials 3 選
+(E)
+一
+Freshman
+需先修計算機概論
+prerequisite: Introduction to Computer
+Science
+210156 JavaScript程式設計
+JavaScript Programming 3 選
+(E)
+一
+Freshman
+需先修程式設計
+prerequisite: Programming
+210157 企業實習240(一)
+Enterprise Internship 240(一) 3 選
+(E)
+四
+Senior
+210158 企業實習240(二)
+Enterprise Internship 240(二) 3 選
+(E)
+四
+Senior
+210159 企業實習(二)
+Corporate Internship (2) 6 選
+(E)
+四
+Senior
+210161 Linux系統管理
+Linux System Administratio 3 選
+(E)
+一
+Freshman
+5
+210163
+電腦與資訊安全概論
+Introduction to Computer and
+Information Security
+3 選
+(E)
+一
+Freshman
+210164 音樂,大腦,與科技
+Music,Brain,Science and Technology 2 選
+(E)
+一
+Freshman
+210165
+英文寫作, 口說, 簡報 (一)
+On English Writing, Speaking
+andPresentation (1)
+3 選
+(E)
+一
+Freshman
+210166 數位音樂學習與創作
+Digital Music Learning and Creation 2 選
+(E)
+一
+Freshman
+210167 Python 網路程式設計
+Python Network Programming 3 選
+(E)
+二
+Sophomore
+210168 程式競賽練習
+Practice of Competitive Programming 3 選
+(E)
+一
+Freshman
+210169 C++程式設計實戰
+C++ Programming Practice 3 選
+(E)
+一
+Freshman
+210170 弗列斯科網頁程式設計
+Flask: Web Development with Python 3 選
+(E)
+一
+Freshman
+210171
+程式設計與美學創作 (一)
+Creative Coding and Aesthetic
+Programming (1)
+3 選
+(E)
+一
+Freshman
+210172 資訊科學特論
+Special Topics in Computer Science 3 選
+(E)
+一
+Freshman
+備註:
+Notes: 專業選修42學分，3年級以上可選修系上碩士班課程作為專業選修。
+6
