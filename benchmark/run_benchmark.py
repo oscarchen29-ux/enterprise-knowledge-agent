@@ -34,9 +34,22 @@ from providers.ollama_provider import OllamaProvider
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# s2t 只做字形轉換。轉換後若與原文不同,代表原文含簡體字。
-# (少數異體字可能誤判,屬已知限制,見 benchmark/README.md)
-_s2t = OpenCC("s2t")
+# 偵測器必須跟 agent.py 的後處理用「同一個」轉換設定,否則會誤判。
+# 曾用 s2t 偵測而 pipeline 用 s2tw,結果把「群→羣」這種異體字正規化、
+# 以及「核准」的准(繁體本來就有這個字)都算成簡體字,虛報 13% 的後處理漏洞,
+# 改用 s2tw 後實際為 0%。詳見 benchmark/README.md 第七節。
+_s2tw_probe = OpenCC("s2tw")
+
+
+def _has_simplified(text: str) -> bool:
+    """s2tw 轉換後若與原文不同,代表原文含 pipeline 應該要處理掉的簡體字。"""
+    return bool(text) and _s2tw_probe.convert(text) != text
+
+
+# 模型有時不走 API 的 tool-call 機制,而是把呼叫請求當成一般文字吐出來。
+# 這種情況 agent.py 會判定為「沒有工具呼叫」而直接進入回答階段,不會報錯,
+# 所以必須另外偵測,否則會被誤計為成功。
+_LEAK_MARKERS = ("search_documents", "tool_call", '{"name"')
 
 # 側錄緩衝。probe 只安裝一次,每次執行前由 run_one() 清空。
 TOOL_LOG = []
@@ -102,12 +115,18 @@ def run_one(question, provider):
         "category": question["category"],
         "question": question["question"],
         "answer": answer,
+        # 保留後處理前的原始輸出,事後才有辦法重新分析繁簡問題而不必重跑
+        "raw_answer": raw_answer,
         "error": error,
         "latency_sec": elapsed,
         # --- 工具呼叫 ---
         "tool_call_count": len(TOOL_LOG),
         "tool_queries": [c["query"] for c in TOOL_LOG],
         "tool_arg_error": "工具參數格式錯誤" in stdout_log,
+        # 該查文件卻一次都沒查 —— 靜默失敗,不會報錯但答案沒有文件依據
+        "no_tool_call": len(TOOL_LOG) == 0,
+        # 把工具呼叫當成純文字吐出來,是 no_tool_call 最常見的成因
+        "tool_call_leaked_as_text": any(m in answer for m in _LEAK_MARKERS),
         "hit_max_steps": answer.startswith("已達最大步驟數"),
         # --- 檢索 ---
         "returned_docs": sorted(returned),
@@ -115,8 +134,8 @@ def run_one(question, provider):
         "retrieval_hit_all": bool(expected) and expected.issubset(returned),
         "retrieval_hit_any": bool(expected & returned),
         # --- 繁簡 ---
-        "raw_had_simplified": bool(raw_answer) and _s2t.convert(raw_answer) != raw_answer,
-        "final_had_simplified": bool(answer) and _s2t.convert(answer) != answer,
+        "raw_had_simplified": _has_simplified(raw_answer),
+        "final_had_simplified": _has_simplified(answer),
         "stdout_log": stdout_log,
     }
 
@@ -178,7 +197,7 @@ def main():
         writer = csv.writer(cf)
         writer.writerow([
             "id", "category", "run", "question", "gold_points", "answer",
-            "檢索是否命中", "工具呼叫是否成功", "延遲(秒)",
+            "檢索是否命中", "有無實際查文件", "延遲(秒)",
             "【人工】命中要點數", "要點總數", "【人工】幻覺主張數",
             "【人工】判定(通過/失敗)", "【人工】備註",
         ])
@@ -189,7 +208,7 @@ def main():
                 "\n".join(f"- {p}" for p in q["gold_points"]),
                 r["answer"],
                 "是" if r["retrieval_hit_all"] else ("部分" if r["retrieval_hit_any"] else "否"),
-                "否" if (r["tool_arg_error"] or r["error"]) else "是",
+                "沒查(靜默失敗)" if r["no_tool_call"] else "有查",
                 r["latency_sec"],
                 "", len(q["gold_points"]), "", "", "",
             ])
@@ -202,7 +221,12 @@ def main():
     print("\n" + "=" * 52)
     print(f"模型: {args.model}   題數: {len(questions)}   重複: {args.repeats}   總執行: {n}")
     print("=" * 52)
-    print(f"工具呼叫成功率      : {sum(1 for r in results if not r['tool_arg_error'] and not r['error']) / n:.1%}")
+    # 「有沒有真的去查文件」比「有沒有報錯」重要 —— 靜默失敗不會報錯,
+    # 但答案完全沒有文件依據,是最危險的一種失效。
+    print(f"有實際呼叫工具      : {sum(1 for r in results if not r['no_tool_call']) / n:.1%}")
+    print(f"  靜默失敗(沒查就答): {sum(1 for r in results if r['no_tool_call']) / n:.1%}")
+    print(f"  其中呼叫外洩成文字: {sum(1 for r in results if r['no_tool_call'] and r['tool_call_leaked_as_text'])}")
+    print(f"工具參數格式錯誤    : {sum(1 for r in results if r['tool_arg_error'])}")
     print(f"程式崩潰次數        : {sum(1 for r in results if r['error'])}")
     print(f"達最大步驟數未完成  : {sum(1 for r in results if r['hit_max_steps'])}")
     if ans:
@@ -216,19 +240,20 @@ def main():
     # 詳見 benchmark/README.md「抽取題 vs 推理題」。
     INFERENCE = {"multi_hop", "unanswerable", "conditional"}
     print("\n分類拆解(自動指標):")
-    print(f"  {'類別':<14}{'性質':<6}{'n':>4}{'工具成功':>9}{'檢索全中':>9}{'平均秒':>8}")
+    print(f"  {'類別':<14}{'性質':<6}{'n':>4}{'有查文件':>9}{'檢索全中':>9}{'簡體(前)':>10}{'平均秒':>8}")
     for cat in ("multi_hop", "unanswerable", "conditional",
                 "cross_doc", "procedural", "single_doc"):
         rows = [r for r in results if r["category"] == cat]
         if not rows:
             continue
         hit_rows = [r for r in rows if r["expected_docs"]]
-        tool_ok = sum(1 for r in rows if not r["tool_arg_error"] and not r["error"]) / len(rows)
+        searched = sum(1 for r in rows if not r["no_tool_call"]) / len(rows)
         hit = (sum(1 for r in hit_rows if r["retrieval_hit_all"]) / len(hit_rows)) if hit_rows else None
+        simp = sum(1 for r in rows if r["raw_had_simplified"]) / len(rows)
         lat = sum(r["latency_sec"] for r in rows) / len(rows)
         kind = "推理" if cat in INFERENCE else "抽取"
         hit_str = f"{hit:>8.0%}" if hit is not None else "     n/a"
-        print(f"  {cat:<14}{kind:<6}{len(rows):>4}{tool_ok:>8.0%} {hit_str}{lat:>8.1f}")
+        print(f"  {cat:<14}{kind:<6}{len(rows):>4}{searched:>8.0%} {hit_str}{simp:>9.0%}{lat:>8.1f}")
 
     print("\n輸出:")
     print(f"  {jsonl_path}")
