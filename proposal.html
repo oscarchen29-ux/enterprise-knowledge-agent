@@ -1,0 +1,406 @@
+<title>系辦助理 Agent 專題規劃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --paper:      #F4F5F2;
+    --surface:    #FFFFFF;
+    --ink:        #1B1E22;
+    --ink-soft:   #4E545C;
+    --ink-faint:  #7C838B;
+    --seal:       #9E3B32;
+    --seal-wash:  #9E3B321A;
+    --rule:       #D3D6D0;
+    --rule-soft:  #E4E6E1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:     #131619;
+      --surface:   #1A1E22;
+      --ink:       #E7E8E4;
+      --ink-soft:  #A8ADB3;
+      --ink-faint: #7B8188;
+      --seal:      #D2776A;
+      --seal-wash: #D2776A1F;
+      --rule:      #2E343A;
+      --rule-soft: #23282D;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:     #131619;
+    --surface:   #1A1E22;
+    --ink:       #E7E8E4;
+    --ink-soft:  #A8ADB3;
+    --ink-faint: #7B8188;
+    --seal:      #D2776A;
+    --seal-wash: #D2776A1F;
+    --rule:      #2E343A;
+    --rule-soft: #23282D;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Noto Sans TC", -apple-system, "Segoe UI", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.85;
+    margin: 0;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1.1rem, 5vw, 2rem) 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    max-width: 46rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  /* ---- letterhead ---- */
+
+  header { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .7rem;
+    letter-spacing: .16em;
+    color: var(--seal);
+    text-transform: uppercase;
+  }
+
+  .mark::before {
+    content: "";
+    width: 1.9rem;
+    height: 2px;
+    background: var(--seal);
+  }
+
+  h1 {
+    font-family: "Noto Serif TC", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 5.2vw, 2.7rem);
+    line-height: 1.28;
+    letter-spacing: .01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 34rem;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1rem 1.75rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .meta div { display: flex; flex-direction: column; gap: .15rem; }
+
+  .meta dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .66rem;
+    letter-spacing: .13em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  .meta dd {
+    margin: 0;
+    font-size: .95rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- sections ---- */
+
+  section { display: flex; flex-direction: column; gap: 1rem; }
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: .75rem;
+    font-family: "Noto Serif TC", Georgia, serif;
+    font-weight: 700;
+    font-size: 1.22rem;
+    line-height: 1.4;
+    margin: 0;
+    padding-bottom: .7rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  h2 .n {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--seal);
+    letter-spacing: .04em;
+    flex: none;
+  }
+
+  p { margin: 0; }
+
+  ul { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: .55rem; }
+  li::marker { color: var(--ink-faint); }
+
+  strong { font-weight: 700; }
+
+  em {
+    font-style: normal;
+    color: var(--seal);
+    font-weight: 500;
+  }
+
+  /* ---- tables ---- */
+
+  .scroll { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .92rem;
+    min-width: 30rem;
+  }
+
+  th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 500;
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0 1rem .6rem 0;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: .85rem 1rem .85rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+    line-height: 1.65;
+  }
+
+  td:last-child, th:last-child { padding-right: 0; }
+
+  .when {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .82rem;
+    white-space: nowrap;
+    color: var(--seal);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- question blocks ---- */
+
+  .asks { display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .ask {
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--seal);
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+
+  .ask h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .ask p { color: var(--ink-soft); font-size: .95rem; }
+
+  /* ---- footer ---- */
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    font-size: .88rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+
+  code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .85em;
+    background: var(--seal-wash);
+    color: var(--seal);
+    padding: .12em .4em;
+    border-radius: 2px;
+  }
+
+  a { color: var(--seal); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--seal); outline-offset: 3px; }
+</style>
+
+<div class="sheet">
+
+  <header>
+    <span class="mark">專題方向確認</span>
+    <h1>系辦助理 Agent:本地端受管制領域問答的可行性評估</h1>
+    <p class="standfirst">以校系行政作為第一個驗證場域,目標是建立一套可遷移到其他文件密集領域的評估方法。原型已可運作,想在投入正式評估前,先與老師確認研究定位、對照組設計與訪談可行性。</p>
+    <dl class="meta">
+      <div><dt>致</dt><dd>【教授姓名】 教授</dd></div>
+      <div><dt>學生</dt><dd>【姓名】(資工系)</dd></div>
+      <div><dt>執行期間</dt><dd>115 學年度全年</dd></div>
+      <div><dt>日期</dt><dd>2026 / 08 / 25</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2><span class="n">01</span>目前進度</h2>
+    <p>暑假期間已完成一個可實際運作的本地端原型,能處理需要跨多份文件才能回答的行政問題。</p>
+    <ul>
+      <li><strong>執行環境</strong>:Ollama 搭配 qwen2.5(7B / 14B),全程本地推論,文件不外流。</li>
+      <li><strong>系統結構</strong>:planner-executor 迴圈 + 文件檢索工具 + 自我驗證步驟,並以 provider 抽象層封裝模型後端,之後可直接替換為雲端 API 或系上 GPU 推論服務。</li>
+      <li><strong>知識庫</strong>:17 份暨大公開行政文件,涵蓋學則、資工系必選修科目表、學位論文格式、獎學金與外語畢業門檻等。</li>
+      <li><strong>已驗證能力</strong>:可回答需同時查閱兩份文件的問題,例如「轉系生轉入三年級的抵免上限」與「畢業應修總學分」。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span>開發過程觀察到的失效模式</h2>
+    <p>這部分是目前最具研究價值的材料 —— 每一項都是先出現失敗案例,才回頭找到原因並修正。</p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>觀察到的問題</th><th>修正方式</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>模型已查到正確文件,回答仍編造出文件中不存在的流程</td>
+            <td>加入自我驗證步驟,逐項比對草稿與原文,刪除無依據的主張</td>
+          </tr>
+          <tr>
+            <td>14B 模型的工具呼叫格式失敗,7B 反而穩定成功</td>
+            <td>顯示模型規模與工具呼叫穩定性未必正相關,需列為獨立量測指標</td>
+          </tr>
+          <tr>
+            <td>提示詞明確要求繁體中文,模型仍整段輸出簡體</td>
+            <td>改以 OpenCC 後處理轉換;但積極詞彙替換會把「程序」誤轉為「程式」,最終改用較保守的 <code>s2tw</code></td>
+          </tr>
+          <tr>
+            <td>21KB 的《學則》靠篇幅累積關鍵字命中數,擠掉真正對題的短文件</td>
+            <td>排序依據由「命中次數」改為「命中密度」,前三名回到正確文件</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span>研究問題</h2>
+    <ul>
+      <li><em>RQ1</em>　本地開源小模型在中文校務文件的多步驟問答上,答案正確率與工具呼叫成功率為何?</li>
+      <li><em>RQ2</em>　自我驗證步驟能否有效降低幻覺率?降幅多少?</li>
+      <li><em>RQ3</em>　相較於通用 agent 框架直接套用,領域化設計帶來多少實質改善?</li>
+      <li><em>RQ4</em>　系辦人員與學生實際試用後,認為可用或不可用的原因為何?(質化)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">04</span>長期延伸方向</h2>
+    <p>校系行政之所以適合作為第一個場域,是因為它同時具備三個特徵:<strong>文件密集、規則明確、答錯有實際代價</strong>,但取得資料與受訪者的門檻低。這三個特徵在其他領域同樣成立,因此本專題真正想產出的是一套<strong>可換場域的評估方法</strong>,而非單一工具。</p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>延伸場域</th><th>可行性評估</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>中小企業內部規章、家庭文書</td>
+            <td>近期最可行。文件性質與校系行政接近,風險等級相當,可直接沿用同一套 benchmark 題型結構</td>
+          </tr>
+          <tr>
+            <td>法律文件檢索</td>
+            <td>中期。技術可遷移,但須明確區隔「條文檢索」與「法律意見」,後者涉及律師法規範</td>
+          </tr>
+          <tr>
+            <td>醫療</td>
+            <td>長期,且須額外條件。病歷屬特種個資,錯誤答案有實質傷害風險,需先取得倫理審查與領域專家共同設計評估標準,不在本專題範圍內</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>為支撐遷移性,系統設計上會將<strong>領域描述與知識庫抽離為設定</strong>,更換場域不需修改 agent 邏輯;benchmark 也會以題型結構(單文件查詢、跨文件整合、文件未涵蓋的陷阱題)為骨架,僅替換題目內容。</p>
+  </section>
+
+  <section>
+    <h2><span class="n">05</span>想向老師確認的三件事</h2>
+    <div class="asks">
+
+      <div class="ask">
+        <h3>一、研究貢獻的定位</h3>
+        <p>同樣的功能,用現成開源 agent 框架(例如 OpenClaw)也能組出來。因此我認為本專題的貢獻應該落在「量化評估與失效模式分析」,以及第 04 節所述的<strong>方法可遷移性</strong>,而非主張系統本身的新穎性。想確認老師是否同意這個定位,若不同意,希望往哪個方向調整。</p>
+      </div>
+
+      <div class="ask">
+        <h3>二、對照組設計是否足夠</h3>
+        <p>目前規劃三組對照:(A) 通用框架開箱即用、(B) 本專題的領域化版本、(C) 雲端 API 作為正確率上限參考。若 B 明顯優於 A,即可用數據支持「通用 agent 直接套用於垂直領域並不足夠」這項論點。想請教這樣的設計是否站得住腳。</p>
+      </div>
+
+      <div class="ask">
+        <h3>三、訪談的可行性與倫理程序</h3>
+        <p>質化評估需要系辦人員與學生受訪者。想請教是否適合由老師代為引介,以及此類使用者研究是否需要送校內 IRB 審查、程序大約需要多久。這會直接影響下學期的時程安排。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">06</span>時程草案</h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>期間</th><th>工作項目</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="when">115-1　9–10月</td><td>檢索改為向量式(embedding + chunking),從根本解決長文件洗榜問題</td></tr>
+          <tr><td class="when">115-1　11–12月</td><td>設計多步驟任務 benchmark(約 30 題,含跨文件題與文件未涵蓋的陷阱題),訂定評分標準</td></tr>
+          <tr><td class="when">115-1　1月</td><td>執行第一輪量化實驗:三組對照 × 多次重複測試,產出期末進度報告</td></tr>
+          <tr><td class="when">115-2　2–3月</td><td>接上雲端 API 對照組並補齊實驗;若系上有 GPU 資源可再加硬體對照</td></tr>
+          <tr><td class="when">115-2　4月</td><td>設計訪談協定,安排系辦人員與學生實際試用並進行半結構式訪談</td></tr>
+          <tr><td class="when">115-2　5–6月</td><td>質化與量化資料分析、論文撰寫、成果發表</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">07</span>需要老師協助的事項</h2>
+    <ul>
+      <li>訪談對象引介:系辦人員 1–2 位、學生 5–8 位。</li>
+      <li>benchmark 題目的領域效度確認 —— 題目是否真的反映系辦實際會遇到的詢問。</li>
+      <li>若系上有可用的 GPU 或 DGX 等級硬體資源,希望能作為本地推論的效能對照。</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>程式碼與完整測試紀錄:<a href="https://github.com/oscarchen29-ux/enterprise-knowledge-agent">github.com/oscarchen29-ux/enterprise-knowledge-agent</a></p>
+    <p>若方向可行,我會依上述時程於開學後兩週內提交正式計畫書。</p>
+  </footer>
+
+</div>
