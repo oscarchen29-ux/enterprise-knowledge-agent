@@ -2,3 +2,13 @@ __pycache__/
 *.pyc
 .venv/
 .env
+
+# 作業系統 / 編輯器產生的雜檔
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Office 開啟檔案時產生的暫存鎖定檔
+~$*.pptx
+~$*.docx
+~$*.xlsx

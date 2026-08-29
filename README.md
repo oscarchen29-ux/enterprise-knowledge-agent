@@ -45,7 +45,7 @@ python agent.py
 - [x] Provider 抽象介面 + Ollama 實作
 - [x] 最小可跑的 planner-executor 迴圈(關鍵字搜尋工具)
 - [ ] 換成向量檢索(embedding + Chroma/Milvus)
-- [ ] 加入自我驗證/反思步驟
+- [x] 加入自我驗證/反思步驟
 - [ ] 接 Claude API 做雲端對照組
 - [ ] 建立多步驟任務 benchmark
 - [ ] 接 DGX Spark 推論服務
