@@ -156,6 +156,61 @@ def build_catalog(path, filename, meta, program, cohort_label):
     return "\n".join(out) + "\n"
 
 
+def build_handbook(path, filename, meta):
+    """《學務處學生手冊》236 頁、16 萬字,是現有最大文件(學則)的 9 倍。
+
+    整份當成一個檔案會壟斷檢索 —— 密度排序下它要嘛永遠命中、要嘛永遠沉底,
+    兩種都沒用。因此依手冊自己的「篇」切開,篇內再以約 12 頁為一塊分段,
+    讓每塊的長度落在跟其他法規文件相當的量級。
+
+    回傳 [(輸出檔名, 內容), ...]。
+    """
+    reader = PdfReader(path)
+    pages = [(i + 1, reader.pages[i].extract_text() or "") for i in range(len(reader.pages))]
+
+    # 找出各篇起始頁。前幾頁是目錄,會連續出現多個篇名,取最後一次出現者為準。
+    marks = []
+    for pno, text in pages:
+        m = re.search(r"([一-鿿]{2,8}篇)", text)
+        if m and (not marks or marks[-1][1] != m.group(1)):
+            marks.append((pno, m.group(1)))
+    starts = []
+    for pno, name in marks:
+        starts = [(p, n) for p, n in starts if n != name]
+        starts.append((pno, name))
+    starts.sort()
+
+    sections = []
+    for idx, (pno, name) in enumerate(starts):
+        end = starts[idx + 1][0] - 1 if idx + 1 < len(starts) else len(pages)
+        if end - pno >= 3:      # 略過目錄裡的零星出現
+            sections.append((name, pno, end))
+
+    out = []
+    CHUNK = 12
+    for name, first, last in sections:
+        for start in range(first, last + 1, CHUNK):
+            stop = min(start + CHUNK - 1, last)
+            body = "\n".join(t for p, t in pages if start <= p <= stop)
+            body = re.sub(r"[ \t]+", " ", body)
+            body = re.sub(r"\n{3,}", "\n\n", body).strip()
+            if len(body) < 200:
+                continue
+            head = "\n".join([
+                f"國立暨南國際大學學務處學生手冊 —— {name}（第 {start}-{stop} 頁）",
+                "",
+                f"【說明】本檔案為《學務處學生手冊》的一部分。原始 PDF 共 {len(pages)} 頁、"
+                f"約 {sum(len(t) for _, t in pages) // 1000} 千字,依手冊自身的分篇與頁段切開,"
+                "避免單一超長文件壓過其他文件的檢索排序。完整內容請見原始 PDF。",
+                "",
+                provenance_block(filename, meta),
+                "",
+                "【內容】",
+            ])
+            out.append((f"學務處學生手冊_{name}_p{start}-{stop}.txt", head + "\n" + body + "\n"))
+    return out
+
+
 def build_regulation(path, filename, meta, title):
     """法規類 PDF -> 條文文字。以「第N條」斷段,其餘壓成連續段落。"""
     text = pdf_text(path)
@@ -220,6 +275,9 @@ def main():
             continue
         if fn.startswith("資工系學士班必選修") or fn.startswith("資工系碩士班必選修") \
                 or fn.startswith("資工系博士班必選修"):
+            continue
+        if fn == "學務處學生手冊.pdf":
+            written.extend(build_handbook(os.path.join(SRC, fn), fn, meta.get(fn)))
             continue
         title = "國立暨南國際大學" + re.sub(r"_\d[\d.\-]*(修正|核定)?$", "",
                                        os.path.splitext(fn)[0])
