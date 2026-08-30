@@ -268,7 +268,7 @@ File "agent.py", line 153, in run_task
 UnicodeEncodeError: 'cp950' codec can't encode character '证'
 ```
 
-**原因**:`证` 是「**证**」,簡體的「證」。agent 會把模型產生的查詢字串印進 log,
+**原因**:那個字碼 `证` 是「**证**」,也就是簡體的「證」。agent 會把模型產生的查詢字串印進 log,
 而模型**很常吐簡體**(這正是整條 pipeline 需要 OpenCC 的原因)。
 只要模型送出「病假证明」這種查詢,**光是把它印出來就會讓整個請求死掉**。
 
