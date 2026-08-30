@@ -1,8 +1,17 @@
 import argparse
 import json
 import re
+import sys
 
 from opencc import OpenCC
+
+# Windows 主控台預設 cp950,印不出簡體字。模型很常吐簡體(這正是要用 OpenCC 的原因),
+# 而 log 裡會直接印出模型產生的查詢字串 —— 只要它送出「病假证明」這種查詢,
+# 光是印出來就會 UnicodeEncodeError,整個請求當掉。輸出一律轉 UTF-8。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from providers.ollama_provider import OllamaProvider
 from tools import TOOLS_SCHEMA, TOOL_FUNCTIONS

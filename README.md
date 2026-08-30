@@ -16,8 +16,17 @@ Provider 抽象層讓之後換成 Claude API 或 NVIDIA DGX Spark 的推論服�
 pip install -r requirements.txt
 ollama serve
 ollama pull qwen2.5:7b
+ollama pull bge-m3            # 檢索用的 embedding 模型
 python agent.py --task "資工系大三的必修有哪些?"
 ```
+
+`index/` 已隨 repo 附上,不需要重建。**只有在改動 `docs/` 之後**才要重跑:
+
+```bash
+python scripts/build_index.py
+```
+
+索引與 `docs/` 不一致時系統會自動偵測並退回純 BM25(會印出提示),不會給出錯誤答案。
 
 換模型之前**先驗相容性**(不是每個模型都能用,見下方「換模型的硬性條件」):
 

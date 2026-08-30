@@ -1,6 +1,9 @@
+import hashlib
+import json
 import math
 import os
 import re
+import urllib.request
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), "docs")
 
@@ -13,6 +16,9 @@ TOP_K = 6                # 回傳幾塊。塊比整份文件小很多,可以多�
 # BM25 參數。k1 控制詞頻飽和速度,b 控制長度正規化強度,兩者都是文獻慣用值。
 BM25_K1 = 1.5
 BM25_B = 0.75
+
+# Reciprocal Rank Fusion 的平滑常數,文獻慣用 60。值越大越平均看待各名次。
+RRF_K = 60
 
 _CHUNK_CACHE = None
 
@@ -83,6 +89,83 @@ def _load_chunks() -> list[dict]:
     return chunks
 
 
+def chunk_fingerprint() -> str:
+    """目前這批塊的指紋,用來判斷向量索引是不是還對得上 docs/。
+
+    索引過期不會報錯,只會讓向量對到錯的塊、答案莫名其妙,所以要能偵測。
+    """
+    digest = hashlib.sha256()
+    for chunk in _load_chunks():
+        digest.update(chunk["file"].encode("utf-8"))
+        digest.update(str(len(chunk["text"])).encode("utf-8"))
+    return digest.hexdigest()[:16]
+
+
+_INDEX = None          # (向量矩陣, meta) 或 False 表示不可用
+_INDEX_WARNED = False
+
+
+def _load_index():
+    """載入向量索引。缺檔或過期時退回純 BM25,不讓檢索整個壞掉。"""
+    global _INDEX, _INDEX_WARNED
+    if _INDEX is not None:
+        return _INDEX
+
+    directory = os.path.join(os.path.dirname(__file__), "index")
+    vectors_path = os.path.join(directory, "embeddings.npy")
+    meta_path = os.path.join(directory, "meta.json")
+
+    def unavailable(reason):
+        global _INDEX_WARNED
+        if not _INDEX_WARNED:
+            print(f"[檢索] 向量索引未啟用({reason}),改用純 BM25。"
+                  f"執行 python scripts/build_index.py 可啟用混合檢索。")
+            _INDEX_WARNED = True
+        return False
+
+    if not (os.path.exists(vectors_path) and os.path.exists(meta_path)):
+        _INDEX = unavailable("索引不存在")
+        return _INDEX
+    try:
+        import numpy as np
+        with open(meta_path, encoding="utf-8") as f:
+            meta = json.load(f)
+        if meta.get("fingerprint") != chunk_fingerprint():
+            _INDEX = unavailable("索引與目前的 docs/ 不一致,需要重建")
+            return _INDEX
+        _INDEX = (np.load(vectors_path), meta)
+    except Exception as exc:  # noqa: BLE001
+        _INDEX = unavailable(f"{type(exc).__name__}: {exc}")
+    return _INDEX
+
+
+def _vector_ranking(query: str) -> list[int] | None:
+    """回傳依語意相似度排序的塊索引。索引不可用時回傳 None。"""
+    index = _load_index()
+    if not index:
+        return None
+    matrix, meta = index
+    try:
+        import numpy as np
+        request = urllib.request.Request(
+            "http://localhost:11434/api/embed",
+            data=json.dumps({"model": meta["model"], "input": [query]},
+                            ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=60) as response:
+            vector = np.asarray(json.load(response)["embeddings"][0], dtype=np.float32)
+    except Exception:  # noqa: BLE001
+        return None      # embedding 服務暫時不可用就退回 BM25,不要讓查詢失敗
+
+    norm = np.linalg.norm(vector)
+    if norm == 0:
+        return None
+    # 索引已在建立時做過 L2 正規化,餘弦相似度就是一次內積
+    scores = matrix @ (vector / norm)
+    return list(np.argsort(-scores))
+
+
 _IDF_CACHE = {}
 
 
@@ -114,7 +197,7 @@ def search_documents(query: str) -> str:
     average_length = sum(len(c["text"]) for c in chunks) / len(chunks)
     scored = []
 
-    for chunk in chunks:
+    for position, chunk in enumerate(chunks):
         text = chunk["text"]
         score = 0.0
         for keyword in keywords:
@@ -133,14 +216,32 @@ def search_documents(query: str) -> str:
         # 權重壓低是因為 110 份裡有 24 份檔名以「資工系」開頭,給太重會讓
         # 「資工系學士班更換導師申請表」這種不相干的檔案擠進前幾名。
         score += 0.3 * sum(_idf(k) for k in keywords if k in chunk["file"])
-        scored.append((score, chunk))
-
-    if not scored:
-        return "找不到相關文件。"
+        scored.append((score, position))
 
     scored.sort(key=lambda item: item[0], reverse=True)
+    # 直接記位置,不要事後用 chunks.index() 反查 —— 那是 O(n) 查找乘上 n 筆結果
+    bm25_order = [position for _, position in scored]
+
+    vector_order = _vector_ranking(query)
+    if vector_order is None:
+        ranked = bm25_order
+    else:
+        # Reciprocal Rank Fusion。BM25 分數與餘弦相似度的尺度完全不同,直接加權
+        # 相加要先做正規化而且很難調;RRF 只看名次,不必管尺度,而且對其中一路
+        # 失準時比較穩健 —— 只要有一路把正確的塊排前面,融合後就還在前面。
+        fused = {}
+        for rank, position in enumerate(bm25_order[:50]):
+            fused[position] = fused.get(position, 0.0) + 1.0 / (RRF_K + rank)
+        for rank, position in enumerate(vector_order[:50]):
+            fused[position] = fused.get(position, 0.0) + 1.0 / (RRF_K + rank)
+        ranked = sorted(fused, key=lambda p: -fused[p])
+
+    if not ranked:
+        return "找不到相關文件。"
+
     parts = []
-    for _, chunk in scored[:TOP_K]:
+    for position in ranked[:TOP_K]:
+        chunk = chunks[position]
         parts.append(f"[{chunk['file']} 第{chunk['index'] + 1}段]\n{chunk['text']}")
     return "\n\n".join(parts)
 
