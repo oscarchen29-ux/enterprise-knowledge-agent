@@ -1,0 +1,44 @@
+國立暨南國際大學大學部學生宿舍冷暖氣設備管理要點
+
+【本檔案出處】
+來源檔案：docs_source/大學部學生宿舍冷暖氣設備管理要點.pdf
+原始網址：https://housing.ncnu.edu.tw/app/index.php?Action=downloadfile&file=WVhSMFlXTm9MemMyTDNCMFlWODBNREJmT0RNM09EZzNYelF4TWpJM0xuQmtaZz09&fname=FHSSRPOKRK44VXHHA404WW14ZSSWOOMKQOUW0420QPQLFG40ZWROFCB4WWOOFGOKRKWWZTMP44A054MKZSXSUWLKB0FGXSHCLPYT00PKNKTS01PO50OOCDGHSS40MPYX50NOUWLOVWB425GGB0MOQKICTX3531SSSSNKYSUWDGTS1050YWQOUT0544EGB4GDIG30VXIC34A0B1IG21MPROVSKPB4NKPO14SSXWGHYWCCXX2104XWROMOQOMO3025DGUWMPWSIHRLFGTSOK30LOFGQO54FCTSNO00UTZX00EG1014ZSHCA0KKPKROFHNKGGYTVSROWS2045A4GGPO24QKLOPOTTZX44JC50TXVWPK30LKDGRKYS00LP353150US3045FGGGA4JGB444CGYTKK00POKP14IGJGLOWSB4JGA1A1&cg=109
+下載時間：2026-08-30T16:22:30+08:00
+SHA-256：6ababbe1fdadfb63...
+轉檔工具：scripts/build_docs.py
+
+【條文】
+國立暨南國際大學大學部學生宿舍冷暖氣設備管理要點 
+111年2月15日學生事務處主管會議審議通過 
+ 
+一、為提昇本校住宿學生宿舍冷暖氣使用品質，確保住宿學生權益，特訂定「國立暨南國
+際大學大學部學生宿舍冷氣設備管理要點」(以下簡稱本要點)。 
+ 
+二、本要點適用範圍只限大學部寢室內裝設冷暖氣設備之學生宿舍。 
+ 
+三、本要點之冷暖氣設備包括學生宿舍寢室內冷暖氣機、室外風扇機、遙控器、電表及計
+費系統。 
+ 
+四、宿舍冷暖氣依使用者付費原則，學期中使用電費由同寢室之住宿生 平均分攤(同學爭
+議部分請自行協調)。暑假、短期住宿冷暖氣費由使用該寢室之同學平均分攤付費。 
+ 
+五、空調使用收費標準：包括使用費及待機耗電費用 
+(一)寢室使用冷暖氣機之收費，依據台電之電費標準表之平均電價及設備維護；每度電 
+價，採浮動價格訂定，於每年一月依總務處公告電價調整之。 
+(二)冷暖氣設備待機時，會有極少量耗電，屬正常現象，費用由住宿生自行吸收。 
+ 
+六、宿舍寢室冷暖氣設備電費儲值之程序、計算基準及退費： 
+(一) 冷暖氣設備用電使用依專用電錶計費，冷暖氣使用前及儲值額度用罄，各寢室應依儲
+值流程辦理繳費儲值，儲值額度自行核對。 
+(二) 冷暖氣設備用電度數及電費計算以 「寢室」為單位。若原寢室人員於學期中因休、
+退、轉學或中途離校者，其所繳之電費，各寢室自行結算攤還。 
+(三)儲值餘額於學年住宿結束日結算 (依本校各年度行事曆公告之學年最後 1日為準)，餘
+額退費比照學雜費退費標準訂定。 
+ 
+七、各寢室學生負有保管維護冷暖氣設備之責任，如有遺失或損壞將依學校規定程序提報
+或修繕。 
+ 
+八、冷暖氣設備若因故意或重大過失所致損壞或遺失，當事者應負修理或賠償之責任， 學
+務處住服組得視損壞情形依宿舍公約及學生獎懲辦理議處。 
+ 
+九、本要點經學生事務處主管會議審議後實施。

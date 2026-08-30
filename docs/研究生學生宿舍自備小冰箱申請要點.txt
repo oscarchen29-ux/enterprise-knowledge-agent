@@ -1,0 +1,44 @@
+國立暨南國際大學研究生學生宿舍自備小冰箱申請要點
+
+【本檔案出處】
+來源檔案：docs_source/研究生學生宿舍自備小冰箱申請要點.pdf
+原始網址：https://housing.ncnu.edu.tw/app/index.php?Action=downloadfile&file=WVhSMFlXTm9MemM0TDNCMFlWOHhNakkxTVY4M05EZ3pOVEV5WHpFd05UWTFMbkJrWmc9PQ==&fname=LOGGROOKWWCGA1YXEDLKSW241430WTRL34UWDCNKVX25XW40DCMK01POWWOOA0OKWW5400HHDG04GDXTMKNKTSGG34B0WSGCNPYTXWA034MKB001USSSYWFCXSLKXTKKDGA0IG14RKHCHC20USB004MPA1GDQPVWWS30STB414A4YSUSA4XW41KKDGFGEGICKOJGGDLOWSROCGNPMLXT04B0ROB4MKLLFG5401SSWWLK4554EDHGNKMODC30A1A1WSJCYWHCNPGDSWCCKPUSFDEGSSOKFCUWNOWWYTZX50XSTXWWMOHC40WSOPRK00MKGGRLCGOONKB0RKPODG54B5TSYW40ZTXXVSJCA0SXRKKODCGC14B0MO10LP51YXDGYSDCEC54GGOOA4USRKPOYT05VSB0A0SXFCOKWTRLWSNOB1RL01VXROA5OKB020EGYS54ROUWKK04POPO&cg=109
+下載時間：2026-08-30T16:22:31+08:00
+SHA-256：26d5826f1333970e...
+轉檔工具：scripts/build_docs.py
+
+【條文】
+國立暨南國際大學研究生宿舍「自備小冰箱」申請要點 
+110 年 10 月 5 日學生事務處主管會議審議通過 
+112 年 9 月 20 日學生事務處主管會議審議修正通過 
+ 
+一、因應同學使用冰箱的實際需求，考量宿舍安全，並落實學生宿舍自治，依實際
+狀況訂定本校研究生宿舍「自備小冰箱」申請要點 (以下簡稱本要點)。 
+二、實施方式： 
+ (一)小冰箱須由學生自行準備。 
+ (二)規格設定：一間寢室以申請放置 1 台小冰箱為限，額定消耗電功率不得超過
+100 瓦，且須為製造日期 10 年內、規格為寬度 50 公分、深度 60 公分及高度
+90 公分以內的節能冰箱。 
+ (三)申請期間及收費標準： 
+ 1、學期制：每學期提出申請者，收費 800 元。 
+ 2、寒暑假：寒假期間，收費 200 元；暑假期間，收費 400 元。 
+ 3、若申請通過後欲取消申請：學期開始上課日後兩週內，將扣除 100 元手續
+費，餘額全數退還；學期開始上課日後逾兩週者，將不予退 費；寒暑假自申
+請日後一週內，將扣除 50 元手續費，餘額 全數退還；寒暑假自申請日後逾
+一週者，將不予退費。 
+三、申請流程： 
+ (一)區分上學期(每年 9 月至次年 1 月)及下學期(2 月至 6 月)，寒暑假申請與每
+年寒暑假住宿申請同步進行。 
+ (二)開學後 2 週內請小冰箱持有人（或代表人）填寫「國立暨南國際大學研究生
+宿舍自備小冰箱申請單」交至宿舍服務中心領取繳費單後，至總務處出納組
+繳費，至服務中心出示繳款証明，切結書由服務中心留存。 
+ (三)請將申請證明張貼於冰箱明顯處，作為核准之憑證及查核之依據。 
+四、罰則： 
+ (一)放置寢室之小冰箱無論插電與否均視同使用，必須填送申 請單。若開學 2 週
+後，經管理員或宿舍幹部依本校「學生宿舍公約及違規處理要點」 (以下簡稱
+宿舍公約)實施安全檢查時，查獲未登記之冰箱，除依照宿舍公約處分外，另
+需補繳當期費用。 
+ (二)如發現超過 1 台以上之小冰箱，超出之小冰箱須於發現後 1 週內搬離，逾期
+未搬離依罰則(一)辦理。若該小冰箱無人認領，將暫存於學生宿舍倉庫， 1 
+週後仍無人認領者，以廢棄物處理。 
+五、本要點經學生事務處主管會議審議後實施。

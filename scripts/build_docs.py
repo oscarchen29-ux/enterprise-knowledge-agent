@@ -20,8 +20,14 @@ import io
 import os
 import re
 import sys
+import unicodedata
 
 from pypdf import PdfReader
+
+# Windows 主控台預設 cp950,遇到 CJK 相容字(例如 U+F9F7)會直接拋
+# UnicodeEncodeError 中斷整個轉檔。輸出一律走 UTF-8,無法表示的字以替代字元帶過。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "docs_source")
@@ -283,6 +289,10 @@ def main():
                                        os.path.splitext(fn)[0])
         body = build_regulation(os.path.join(SRC, fn), fn, meta.get(fn), title)
         written.append((os.path.splitext(fn)[0] + ".txt", body))
+
+    # 部分官方 PDF 的標題含 CJK 相容字(U+F9F7 等),正規化成標準碼位,
+    # 否則同一個字會有兩種表示,檔名比對與檢索都可能對不上。
+    written = [(unicodedata.normalize("NFC", n), b) for n, b in written]
 
     print(f"將產生 {len(written)} 個檔案")
     for name, body in written:

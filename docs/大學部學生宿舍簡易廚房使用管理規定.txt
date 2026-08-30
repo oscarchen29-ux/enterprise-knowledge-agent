@@ -1,0 +1,48 @@
+國立暨南國際大學大學部學生宿舍簡易廚房使用管理規定
+
+【本檔案出處】
+來源檔案：docs_source/大學部學生宿舍簡易廚房使用管理規定.pdf
+原始網址：https://housing.ncnu.edu.tw/app/index.php?Action=downloadfile&file=WVhSMFlXTm9MemMxTDNCMFlWOHpPVGxmTlRjeU1qTmZOREV4TnpRdWNHUm0=&fname=FHSSRPOKRK44VXHHA404WW14ZSSWOOMKQOUW0420QPQLFG40ZWROFCB4WWOOFGOKRKWWZTMP44A0DCGDIG304035USB0MKWSQPMPXWB0YSUS50DGPK54CDOKSS400144RKNO54YSVWB425GGB0MOUSICQPRLMLA0SSNKECFGOO10GH50WWWS4105IGB0MOXTIG30TSMOKLEGFHIG00GDJGB0DCUSWXB4USDCDC50NODCXX2104XWROMOXSMO253534UWMPNPIHRLDGTSNKB4A0EG2054DGPKROPOUT100004FC14XSFG30MKRKB0FHHC21XTXWB5ZWB0VSFCGGHGA0SSWWXWTTZXWWJC50XSVWPK3000WXIC44IC00GDYX31NKEC45540010ST504400TXXXHCVWMOLKSTSW30ICDGB004NP00FDRO50SSB4ZSPOLOKKXWOKPKXWLPYXGGB0KP1414TWUS35OPQKB114QPIDFG40UWQOPPUWQOOK50ST&cg=109
+下載時間：2026-08-30T16:22:31+08:00
+SHA-256：09850e785a22af47...
+轉檔工具：scripts/build_docs.py
+
+【條文】
+國立暨南國際大學大學部學生宿舍簡易廚房使用管理規定 
+111 年 2 月 15 日學生事務處主管會議審議通過 
+ 
+一、 為提升在校住宿生生活機能，維護住宿生使用簡易廚房權益，並落實學生宿舍自治，特訂定
+本規定。 
+二、 實施規定： 
+(一) 簡易廚房開放時間：每學期第二週至第十七週；寒暑假開放時間為假期開始第二週至假期
+結束前一週。 
+(二) 使用時間：每日6:00~22:00，養護時間由各棟棟長及公益服務生討論後公告，期間暫停
+使用。除簡易廚房外，宿舍其他區域禁止烹飪。 
+(三) 廚房養護時間： 
+1. 簡易廚房養護時間由各棟棟長及公益服務生討論後公告，期間暫停使用，由公益服務
+生進行清潔及保養維護。 
+2. 若簡易廚房過於髒亂或所提供之硬體設備遭破壞，將延長養護時間，且在養護時間內
+不得使用。請發揮公德心，勿做害群之馬。 
+3. 廚房養護時間不得因個人特殊原因強行使用，若於養護時間逕自使用，以破壞公物論
+處，請同學配合。 
+(四) 使用注意事項： 
+1. 烹煮時請勿離開現場，勿佔用簡易廚房過久。 
+2. 使用廚房時須放低音量、保持安靜，避免影響他人安寧。 
+3. 洗碗槽禁止洗滌烹煮用具、食材以外之物品；禁止傾倒穢物、食物殘渣，以免堵塞排
+水管。 
+4. 使用完畢應立即回復原狀並打掃清潔，廚餘及其他垃圾應立即自行清除。 
+(五) 物品存放注意事項： 
+1. 簡易廚房內(下方置物櫃)禁止存放違規烹飪電器(請詳閱學生宿舍公約內容)或非烹飪
+電器以外之物品，若不合規定將依宿舍公約記點處理。 
+2. 置物櫃係屬公共空間，需存放烹飪電器(600W 以下)者請自行考量且擺放整齊，不負保
+管責任。 
+(六) 電源使用注意事項： 
+1. 一個插孔一項電器，禁用延長線及多向插座。 
+2. 禁止使用額定消耗功率 600 瓦以上之電器。 
+3. 若發現電源設備故障(插座、水龍頭之損壞)務必通知管理員處理，請勿自行修理、拆
+卸設備，以免發生意外。 
+4. 禁止使用明火類用具，例如:卡式爐(瓦斯爐)。 
+(七) 若發現破壞行為以破壞公物論處，行為者須照價賠償以回復原狀，若無人願意承認將關閉
+該區簡易廚房，進行無限期養護。 
+(八) 竊取別人存放物品者，予以退宿處分，是否報警則由受害人決定。 
+三、 本規定經學生事務處主管會議審議後實施。

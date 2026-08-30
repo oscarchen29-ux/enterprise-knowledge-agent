@@ -1,0 +1,36 @@
+國立暨南國際大學學校衛生委員會設置要點
+
+【本檔案出處】
+來源檔案：docs_source/學校衛生委員會設置要點.pdf
+原始網址：https://health.ncnu.edu.tw/app/index.php?Action=downloadfile&file=WVhSMFlXTm9MekV4TDNCMFlWOHhOVE0yWHpRMk1EWTRPRGRmT0RRNU5qZ3VjR1Jt&fname=LOGGROOKWWCGA1YXEDLKSW241430WTRL34UWDCNKVX25XW40DCMK01POWWOOA0OKWW5400HHDG04GDXTMKNKTSGG34B0WSGCNPYTXWA034MKB001USSSWXFCMKPOCDNLDGA0XWZWZSNKDCWS1434OKLKVXGDQPVWYSDCFCDGIGHG45USRK44XT2544LKKPGDMO3024ICQOROLKRLQPUX04CCDCMK30B4GGPOGHQKGC40LLMPEDLK3024FCMOXW25DGJCSS10GGGDDCA0QK20FDSWECHGA0QKVW00CDHDVSTWDHDH
+下載時間：2026-08-30T16:23:03+08:00
+SHA-256：eed5488b8dc33e22...
+轉檔工具：scripts/build_docs.py
+
+【條文】
+國立暨南國際大學學校衛生委員會設置要點 
+ 
+中華民國103年10月22日第419次行政會議通過 
+中華民國111年3月8日第567次行政會議修正通過 
+ 
+ 一、為促進教職員工生健康，培養健康生活型態，加強推展學校衛生工作，特
+依據「學校衛生法」及「學校餐廳廚房員生消費合作社衛生管理辦法」相
+關規定擬具國立暨南國際大學（以下簡稱本校）學校衛生委員會（以下簡
+稱本委員會）設置要點（以下簡稱本要點） 。 
+ 二、本委員會職掌如下： 
+（一）審議本校衛生政策及法規興革之諮詢指導意見。 
+ （二）審議本校衛生之計畫、方案、措施及評鑑事項。 
+（三）審議本校衛生教育與活動之規劃及研發事項。 
+（四）審議本校健康保健服務之規劃及研發事項。 
+（五）審議本校環境衛生管理之規劃及研發事項。 
+（六）督導與改進本校餐廳食品衛生管理執行情形。 
+（七）其他推展學校衛生之諮詢事項。 
+ 三、本委員會以學務長、總務長、國際事務長、環安衛中心主任、各學院院長、
+學生會會長、各學院各推舉導師 2 人，及學者專家、相關機關代表 1-2 人
+組成，任期一年，得連任之。 
+ 本委員會以學務長為主席，衛生保健組組長擔任執行祕書。 
+ 四、本委員會每學期應至少召開會議一次，必要時得召開臨時會議。 
+五 、 本校年度學校衛生相關工作計畫 ， 應經學校衛生委員會審議通過後 ， 送請各
+相關單位執行。 
+六、本校為加強餐廳衛生管理，膳食衛生管理施行細則另訂之。 
+七、本要點經行政會議通過後公布實施。
