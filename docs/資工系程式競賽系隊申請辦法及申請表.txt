@@ -1,0 +1,55 @@
+國立暨南國際大學資工系程式競賽系隊申請辦法及申請表
+
+【本檔案出處】
+來源檔案：docs_source/資工系程式競賽系隊申請辦法及申請表.pdf
+原始網址：https://www.csie.ncnu.edu.tw/upload/%E6%9A%A8%E5%8D%97%E5%A4%A7%E5%AD%B8%E8%B3%87%E8%A8%8A%E5%B7%A5%E7%A8%8B%E5%AD%B8%E7%B3%BB%E7%A8%8B%E5%BC%8F%E7%AB%B6%E8%B3%BD%E7%B3%BB%E9%9A%8A%E7%94%B3%E8%AB%8B%E8%BE%A6%E6%B3%95.pdf
+下載時間：2026-08-30T14:13:41+08:00
+SHA-256：bb35428a3e5cf69d...
+轉檔工具：scripts/build_docs.py
+
+【條文】
+暨南大學資訊工程學系程式競賽系隊申請辦法 
+2020-05-07 
+1. 目標：培訓本系參加 ICPC(International Collegiate Programming Contest)競賽
+之團隊，並取得好成績。 
+2. 資格：本系大一至大三同學(大三至多錄取 2 位)，並滿足下列至少一項條件
+(依序錄取至多 10 名為原則)： 
+(1) 本系程式設計課程學期成績為班排名前 3 名者 
+(2) 參加 CPE 檢定曾一次通過至少 3 題者 
+(3) 本系一位老師推薦者 
+3. 申請日期：即日起至 2020 年 5 月 28 日截止；於 6 月 5 日前公布錄取名單 
+4. 培訓教材 
+(1) A. Laaksonen, Competitive Programmer’s Handbook, 2018. 
+(2) S. Halim and F. Halin, Competitive Programming 3, LuLu Press, 2013. 
+(3) 劉汝佳, 打下好基礎－程式設計與演算法競賽入門經典, 碁峰出版社, 
+2014 年. 
+(4) T. H. Cormen, C. E. Leiserson, R. L. Rivest, and C. Stein, Introduction to 
+Algorithms, the MIT Press, 2009. 
+ 
+ 
+------------------------------------------------------------------------------------------------------- 
+暨南大學資工系程式競賽系隊申請表 
+姓名 學號 
+符合條件(擇一，依序錄取)： 
+□ 1. 本系程式設計課程學期成績為班排名前 3 名 
+□ 2. 參加 CPE 檢定曾一次通過至少 3 題 
+ □ 3. 系上老師推薦 
+ 推薦老師簽名： 
+本人簽名 
+*請於 2020 年 5 月 28 日前將報名表繳交到系辦 
+ 
+附錄： 
+The 2019 ICPC Asia Taipei-Hsinchu Site Programming Contest 
+Domestic Teams 國內隊伍參賽辦法 
+第一類、參加「ICPC Taiwan Online Programming Contest」且解出一題的隊伍
+中，錄取每校最優一隊，此類限 40 隊。 
+第二類、 「全國大專電腦軟體設計競賽」錄取前 40 名。 
+第三類、 「私立大專院校程式競賽」錄取 10 隊，但每校不得超過兩隊。 
+第四類、 「科技大專院校程式競賽」錄取 10 隊，但每校不得超過兩隊。 
+第五類、以上四類隊伍中，出現重複隊伍或因故放棄參賽者，由同校參與
+「ICPC Taiwan Online Programming Contest」之隊伍依成績擇優遞補，
+直到該校隊伍用罄為止。 
+第六類、如前五類隊伍總數未達 100 隊時，由主辦單位邀請「ICPC Taiwan 
+Online Programming Contest」績優隊伍參賽。 
+第七類、自由參加，以未列在前述規則之大學為優先，並依照報名先後予以排
+序。
