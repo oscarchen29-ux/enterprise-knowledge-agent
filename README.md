@@ -79,7 +79,8 @@ SHA-256 與檔案大小;每個 `.txt` 開頭也帶著同樣的出處資訊。這
 providers/
   base.py                # LLMProvider 抽象介面(OpenAI 風格的訊息格式)
   ollama_provider.py     # 本地 Ollama 實作,走原生 /api/chat
-tools.py                 # 工具:BM25 切塊檢索
+tools.py                 # 工具:BM25 + 向量混合檢索、條件不足時的追問工具
+index/                   # 向量索引(由 scripts/build_index.py 產生)
 agent.py                 # planner-executor 主迴圈 + 自我驗證 + 繁簡後處理
 docs/                    # 知識庫文字檔(由腳本產生,不要手改)
 docs_source/             # 官方 PDF 原始檔 + MANIFEST.tsv 出處紀錄
@@ -134,11 +135,13 @@ CPU;而且在本專案的測試裡,**14B 因工具呼叫格式錯誤而失敗,7B
 
 - [x] Provider 抽象介面 + Ollama 實作(原生 API,可控 `num_ctx`)
 - [x] planner-executor 迴圈 + tool calling,含外洩呼叫救回與保底檢索
-- [x] 自我驗證步驟
+- [x] 自我驗證步驟(已用 ablation 驗證有效:開啟 13/15、關閉 10/15)
 - [x] 知識庫改由官方 PDF 自動轉出,全部可追溯出處
 - [x] BM25 切塊檢索(取代原本回傳整份文件的關鍵字比對)
-- [ ] 依新知識庫重寫 benchmark 題目
-- [ ] 向量檢索(embedding)
+- [x] 向量檢索(bge-m3)+ BM25 混合,以 RRF 融合
+- [x] 條件不足時主動追問(屆別、身分)
+- [x] benchmark 依新知識庫重寫(32 題,推理題 19 / 抽取題 13)
+- [ ] 人工評分,取得答案正確率與幻覺率
 - [ ] 接 Claude API 做雲端對照組
 - [ ] 接 DGX Spark 推論服務
 - [ ] 質化訪談
