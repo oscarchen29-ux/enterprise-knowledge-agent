@@ -1,0 +1,844 @@
+國立暨南國際大學資訊工程學系博士班必選修科目一覽表（110-114學年度入學新生適用）
+
+【適用對象】110-114 學年度入學新生。本系每一入學年度各發布一份科目表,不同屆別的規定可能不同,查詢時務必確認入學學年度。
+
+【本檔案出處】
+來源檔案：docs_source/資工系博士班必選修科目一覽表_110-114.pdf
+原始網址：https://www.csie.ncnu.edu.tw/coursedata/%E5%8D%9A%E5%A3%AB%E7%8F%AD/114%E5%8D%9A%E5%A3%AB%E7%8F%AD%E5%BF%85%E9%81%B8%E4%BF%AE%E7%A7%91%E7%9B%AE%E4%B8%80%E8%A6%BD%E8%A1%A8.pdf
+下載時間：2026-08-30T00:25:01+08:00
+SHA-256：7c585039199be91c...
+轉檔工具：scripts/build_docs.py
+
+【系必修科目（共 4 門、4 學分，含開課年級）】
+課程代號　課程名稱　學分　開課年級
+219001　專題研究（一）　1學分　一上
+219003　專題研究（二）　1學分　一下
+219002　專題討論（一）　1學分　一上
+219004　專題討論（二）　1學分　一下
+
+【博一必修科目】資訊工程學系（資工系）博士班，110-114 學年度入學新生適用
+資工系博一上學期（一上）必修：專題研究（一）(1學分)、專題討論（一）(1學分)
+資工系博一下學期（一下）必修：專題研究（二）(1學分)、專題討論（二）(1學分)
+博一必修合計 4 學分。
+
+【原始 PDF 全文（未經整理，供查核用）】
+課程代號
+Course Code
+ 課 程 名 稱(中文及英文)
+Course Name(Chinese and
+English)
+學分數
+Credits
+修別
+Course type
+(required/elect
+ive)
+開課年級
+Course
+availability
+備                註
+Notes
+219001 專題研究（一）
+Independent Study (1) 1 必
+(R)
+一上
+Doctorate
+1st Semester
+219003 專題研究（二）
+Independent Study (2) 1 必
+(R)
+一下
+Doctorate
+2nd
+Semester
+219002 專題討論（一）
+Seminar (1) 1 必
+(R)
+一上
+Doctorate
+1st Semester
+219004 專題討論（二）
+Seminar (2) 1 必
+(R)
+一下
+Doctorate
+2nd
+Semester
+219102
+資訊擷取
+Data Mining and Information
+Extraction
+3 選
+(E)
+一
+Doctorate
+219094
+智慧型行動裝置軟體設計
+Intelligent Mobile Device
+Programming
+3 選
+(E)
+一
+Doctorate
+219014 計算複雜度
+Computational Complexity 3 選
+(E)
+一
+Doctorate
+219016
+整合式訊源/通道編解碼設計（
+一）
+Joint Source-Channel Coding (I)
+3 選
+(E)
+一
+Doctorate
+219063 樣型識別
+Pattern Recognition 3 選
+(E)
+一
+Doctorate
+219064
+整合式訊源/通道編解碼設計（
+二）
+Joint Source-Channel Coding (II)
+3 選
+(E)
+一
+Doctorate
+219067 智慧型系統實務（一）
+Intelligent System Practice (1) 3 選
+(E)
+一
+Doctorate
+國立暨南國際大學 資訊工程學系博士班必選修科目一覽表
+Doctoral Program Course Catalog of Department of Computer Science and
+Information Engineering, National Chi Nan University
+本表( 110-114 )學年度入學新生適用 Effective for students admitted in Fall, 2021-2025
+最低畢業學分：18學分，逕行修讀博士學位者須修畢本系碩士班以上課程至少 30學
+分。必修課程：專題研究（ 2學分）、專題討論（2學分）。以上不含博士論文（通過學位考試後給 12學
+分）、專題研究、與專題討論之學分。
+Doctoral program requirements: a minimum of 18 required credits plus the PhD dissertation (12 credits), and
+the extra credits earned from research projects and research seminars. Students transferred from other
+programs of the Department (e.g. the master program) to the doctoral program must complete at least 30
+credits from the Department's master program.
+219068 非擬真成像技術
+Non Photo-realistic Rendering 3 選
+(E)
+一
+Doctorate
+先修電腦圖學及高等電圖
+prerequisite: Computer Graphics &
+Advanced Computer Graphics
+219088
+量子資訊科學導論
+ Introduction to Quantum Information
+Science
+3 選
+(E)
+一
+Doctorate
+219069 多媒體資訊分析與檢索
+Multimedia Analysis and Indexing 3 選
+(E)
+一
+Doctorate
+219074 通道編碼與應用
+Applications of Channel Coding 3 選
+(E)
+一
+Doctorate
+219079 Web知識擷取
+Web Knowledge Extraction 3 選
+(E)
+一
+Doctorate
+219085 科技英文(一)
+Technical English(I) 3 選
+(E)
+一
+Doctorate
+219086 科技英文(二)
+Technical English(II) 3 選
+(E)
+一
+Doctorate
+219089 高等量子演算法
+Advanced Quantum Algorithms 3 選
+(E)
+一
+Doctorate
+219090 量子計算與通訊
+Quantum Computing and Communication 3 選
+(E)
+一
+Doctorate
+219093 智慧型系統實務(一)
+Intelligent System Practice (1) 2 選
+(E)
+一
+Doctorate
+219095 行動與雲端運算應用
+Mobile Cloud Computing Applications 3 選
+(E)
+一
+Doctorate
+219097 進階Linux系統管理
+Advanced Linux System Administration 3 選
+(E)
+一
+Doctorate
+219100 行動軟體系統設計
+Deesign of Mobile Software System 3 選
+(E)
+一
+Doctorate
+219101 語言學習與科技
+Language Learning and Technology 3 選
+(E)
+一
+Doctorate
+219103 機器學習
+ Machine Learning 3 選
+(E)
+一
+Doctorate
+219105 行動資訊程式設計
+Mobile Information Programming 3 選
+(E)
+一
+Doctorate
+219108 行動式3D電腦繪圖
+Mobile 3D Computer Graphics 3 選
+(E)
+一
+Doctorate
+需先修電腦圖學及高等電腦圖學
+prerequisite: Computer Graphics &
+Advanced Computer Graphics
+219111 智慧型機器人程式設計
+NXT Programming 3 選
+(E)
+一
+Doctorate
+219112
+3D建模與互動多媒體應用
+3D Modeling and Interactive
+Multimedia Applications
+3 選
+(E)
+一
+Doctorate
+219113
+網際網路電話加值服務
+IP Telephony Service Creation
+Technology
+3 選
+(E)
+一
+Doctorate
+219129 網際網路電話
+IP Telephony 3 選
+(E)
+一
+Doctorate
+219126 網際網路通訊協定第六版 (IPv6)
+Internet Protocol Version 6 3 選
+(E)
+一
+Doctorate
+219120 網路電話品質量測技術
+VoIP Quality Measurement 3 選
+(E)
+一
+Doctorate
+219119
+計算機網路特論
+Special Topics on Computer
+Networks
+3 選
+(E)
+一
+Doctorate
+219070 智慧型系統實務（二）
+Intelligent System Practice (2) 2 選
+(E)
+一
+Doctorate
+219076 智慧型系統實務（三）
+Intelligent System Practice (3) 2 選
+(E)
+一
+Doctorate
+219080 智慧型系統實務（四）
+Intelligent System Practice (4) 2 選
+(E)
+一
+Doctorate
+219092 電子電路設計自動化
+VLSI Electronic Design Automation 3 選
+(E)
+一
+Doctorate
+219099 雲端系統設計
+Design of Cloud Computing System 3 選
+(E)
+一
+Doctorate
+219114
+人工智慧程式交易系統
+Automated Trading System using
+Artificial Intelligence
+3 選
+(E)
+一
+Doctorate
+219115 音樂,大腦,與科技
+Music,Brain,Science and 3 選
+(E)
+一
+Doctorate
+219116
+英文寫作, 口說, 簡報 (一)
+On English Writing, Speaking
+andPresentation (1)
+3 選
+(E)
+一
+Doctorate
+219117
+英文寫作, 口說, 簡報 (二)
+On English Writing, Speaking
+andPresentation (2)
+3 選
+(E)
+一
+Doctorate
+219091 智慧型演化計算
+Intelligent Evolutionary 3 選
+(E)
+一
+Doctorate
+219121
+尖端資訊科技國際課程
+International Studies on Leading
+Information Technologies
+1 選
+(E)
+一
+Doctorate
+219130 安卓程式設計
+Android Programming 3 選
+(E)
+一
+Doctorate
+219122 QNAP應用程式設計
+Linux Programming for QNAP 3 選
+(E)
+一
+Doctorate
+219123
+開源電子原型平台軟硬體整合設
+計與實作
+software / hardware co-design &
+implementation for open-source
+electronics prototyping platform
+3 選
+(E)
+一
+Doctorate
+219125 高等資料壓縮
+Advanced Data Compression 3 選
+(E)
+一
+Doctorate
+219127
+ISMS資訊安全認證實務
+Practice in Information Security
+Management System Certification
+3 選
+(E)
+一
+Doctorate
+219128 數位音樂學習與創作
+Digital Music Learning and Creation 3 選
+(E)
+一
+Doctorate
+219133
+國際資訊科技發展趨勢
+Global Trend of Information
+Technology Development
+2 選
+(E)
+一
+Doctorate
+219134
+尖端資訊科技國際課程（二）
+International Studies on Leading
+Information Technologies(2)
+2 選
+(E)
+一
+Doctorate
+219132 研究所企業實習
+Graduate Enterprise Internship 3 選
+(E)
+一
+Doctorate
+219131 軟體定義網路
+Software-Defined Network 3 選
+(E)
+一
+Doctorate
+219135 交響樂團與數位應用
+Orchestra and Its Digital 2 選
+(E)
+一
+Doctorate
+219136
+音樂科技專題策展
+Capstone Project on Music
+Technology
+2 選
+(E)
+一
+Doctorate
+219138
+音樂, 大腦, 與科技
+Music, Brain, Science and
+Technology
+2 選
+(E)
+一
+Doctorate
+219139 數位音樂學習與創作
+Digital Music Learning and Creation 2 選
+(E)
+一
+Doctorate
+219140 PHP 網頁程式設計
+PHP Web Programming 3 選
+(E)
+一
+Doctorate
+219141 計算智能
+Computational Intelligence 3 選
+(E)
+一
+Doctorate
+219142 大數據系統實務
+Big Data System and Practice 3 選
+(E)
+一
+Doctorate
+219143 深度學習
+Deep Learning 3 選
+(E)
+一
+Doctorate
+219144
+Python網管程式設計
+Python for Network Management
+and System Administration
+3 選
+(E)
+一
+Doctorate
+219145 高等計算智能
+Advanced Computational 3 選
+(E)
+一
+Doctorate
+需先修計算智能
+prerequisite: Computational Intelligence
+219146
+程式練習及訓練與競賽課程
+Programming Practice, Training, and
+Contest Course
+3 選
+(E)
+一
+Doctorate
+219147
+計算機網路特論二
+Special Topics on Computer
+Networks (II)
+3 選
+(E)
+一
+Doctorate
+需先修計算機網路特論
+prerequisite: Special Topics on Computer
+Networks
+219148 SQL程式設計
+SQL Programming 3 選
+(E)
+一
+Doctorate
+219149
+程式練習及訓練與競賽(二)
+Programming Practice, Training, and
+Contest Course (II)
+3 選
+(E)
+一
+Doctorate
+219150 前端程式設計
+Frontend Programming 3 選
+(E)
+一
+Doctorate
+219151 IT科技日文
+IT/Technical Japanese 3 選
+(E)
+一
+Doctorate
+需先修日文一(上)、日文一(下)
+prerequisite: Japanese I(1)、Japanese I(2)
+219152 Python網頁擷取程式設計
+Web Scraping with Python 3 選
+(E)
+一
+Doctorate
+需先修計算機概論
+prerequisite: Introduction to Computer
+Science
+219153
+量子啟發式搜尋演算法
+Quantum-inspired heuristic and
+evolutionary algorithms
+3 選
+(E)
+一
+Doctorate
+219154 命名資料網路
+Named Data Networking 3 選
+(E)
+一
+Doctorate
+需先修計算機網路
+prerequisite: Computer Networks
+219155
+Python機器學習實務
+Machine Learning Practice with
+Python
+3 選
+(E)
+一
+Doctorate
+219156 iOS App 程式開發
+iOS App Programming 3 選
+(E)
+一
+Doctorate
+219157
+FPGA實作深度學習方法
+FPGA Implementation of Deep
+Learning Methods
+3 選
+(E)
+一
+Doctorate
+需先修邏輯設計或邏輯設計與實驗
+prerequisite: Logic Design or Logic Design
+and Laboratory Experiments
+219158 Python 網路程式設計
+Python Network Programming 3 選
+(E)
+一
+Doctorate
+需先修計算機網路
+prerequisite: Computer Networks
+219159
+情境模擬控制系統之軟硬體整合
+應用實務
+Hardware / Software Integration &
+Practice for Situational Simulation
+Control System
+3 選
+(E)
+一
+Doctorate
+219160
+智慧型積木機器人程式設計實務
+EV3 Intelligent Lego Robot
+Programming
+3 選
+(E)
+一
+Doctorate
+219161 音樂程式設計
+Music Programming 3 選
+(E)
+一
+Doctorate
+219162
+Python特洛伊木馬程式設計
+Design Trojan Horses with Python
+Language
+3 選
+(E)
+一
+Doctorate
+需先修Python網路程式設計
+prerequisite: Python Network Programming
+219163
+全球資訊新聞導讀
+Global Information Technology
+News
+3 選
+(E)
+一
+Doctorate
+219164 5G通訊架構之網路切片技術
+Network Slicing in 5G 3 選
+(E)
+一
+Doctorate
+需先修計算機網路
+prerequisite: Computer Networks
+219165
+弗列斯科網頁程式設計
+Flask: Web Development with
+Python
+3 選
+(E)
+一
+Doctorate
+需先修Python程式設計
+prerequisite: Python Programming
+219166 方程式最佳化
+Function Optimization 3 選
+(E)
+一
+Doctorate
+需先修高等計算智能
+prerequisite: Advanced Computational
+Intelligence
+219167 即時串流協議
+Real-Time Streaming Protocol 3 選
+(E)
+一
+Doctorate
+需先修計算機網路 or 電腦網路通信協定
+prerequisite: Computer Networks or
+Computer Network Protocols
+219169 資訊科學特論
+Special Topics in Computer Science 3 選
+(E)
+一
+Doctorate
+219168
+物聯網晶片開發實務
+Practices of Internet of Things Chip
+Development
+3 選
+(E)
+一
+Doctorate
+需先修程式設計、邏輯設計與實驗(一)
+、邏輯設計與實驗(二)
+prerequisite: Programming、Logic Design
+and Laboratory Experiments (1)、Logic
+Design and Laboratory Experiments (2)
+219170
+K8S 微服務管理入門
+Managing Microservices using
+Kubernetes
+3 選
+(E)
+一
+Doctorate
+219171 深度學習實驗
+Deep Learning Lab 3 選
+(E)
+一
+Doctorate
+219172 C語言安全程式設計
+Secure Coding in C and C++ 3 選
+(E)
+一
+Doctorate
+需先修程式設計
+prerequisite: Programming
+219173
+MPI平行程式設計
+Parallel Programming with the
+Message-Passing Interface
+3 選
+(E)
+一
+Doctorate
+需先修程式設計, 計算機網路
+prerequisite: Programming, Computer
+Networks
+219174
+秘密分享原理與應用
+The Principle and Application of
+Secret Sharing
+3 選
+(E)
+一
+Doctorate
+需先修離散數學
+prerequisite: Discrete Mathematics
+219175
+區塊鏈原理與應用
+Principles and Practice of
+Blockchains
+3 選
+(E)
+一
+Doctorate
+219176 網路攻防技術
+Network Attack and Defense 3 選
+(E)
+一
+Doctorate
+219177 Golang程式設計
+Golang Programming 3 選
+(E)
+一
+Doctorate
+219178 Python 開發維運一體化
+Python for DevOps 3 選
+(E)
+一
+Doctorate
+219179 資料中心管理實務
+Data Center Management Practices 3 選
+(E)
+一
+Doctorate
+219180
+機器學習的數學方法
+Mathematical method for machine
+learning
+3 選
+(E)
+一
+Doctorate
+219181 人工智慧導論
+Introduction to Artificial Intelligence 3 選
+(E)
+一
+Doctorate
+219182
+電腦視覺與人機介面
+Computer Vision and Man-machine
+Interface
+3 選
+(E)
+一
+Doctorate
+219183 資料壓縮
+Data Compression 3 選
+(E)
+一
+Doctorate
+219184 電腦圖學
+Computer Graphics 3 選
+(E)
+一
+Doctorate
+219185 Web技術
+WEB Technologies 3 選
+(E)
+一
+Doctorate
+219186 高等演算法（一）
+Advanced Algorithms (I) 3 選
+(E)
+一
+Doctorate
+219187 高等演算法（二）
+Advanced Algorithms (Ⅱ) 3 選
+(E)
+一
+Doctorate
+219188 虛擬實境
+Virtual Reality 3 選
+(E)
+一
+Doctorate
+219189 多媒體通訊
+Multimedia and Communication 3 選
+(E)
+一
+Doctorate
+219190 高等計算機結構
+Advanced Computer Architecture 3 選
+(E)
+一
+Doctorate
+219191 生物計算
+Computational Biology 3 選
+(E)
+一
+Doctorate
+219192 自然語言處理
+Natural Language Processing (NLP) 3 選
+(E)
+一
+Doctorate
+219193 資料庫系統
+Database System 3 選
+(E)
+一
+Doctorate
+219194 高等電腦視覺
+Advanced Computer Vision 3 選
+(E)
+一
+Doctorate
+219195 高等電腦圖學
+Advanced Computer Graphics 3 選
+(E)
+一
+Doctorate
+219196 計算理論
+Theory of Computation 3 選
+(E)
+一
+Doctorate
+219197 平行計算
+Introduction to Parallel Algorithms 3 選
+(E)
+一
+Doctorate
+219198 資訊檢索
+Information Retrieval 3 選
+(E)
+一
+Doctorate
+219199 通訊導論
+Introduction to Communications 3 選
+(E)
+一
+Doctorate
+219200 圖論演算法
+Graph Algorithms 3 選
+(E)
+一
+Doctorate
+219201 完美圖理論
+Perfect Graph Theory 3 選
+(E)
+一
+Doctorate
+219202 錯誤更正碼
+Error Correcting Code 3 選
+(E)
+一
+Doctorate
+219203 編碼理論
+Coding Theory 3 選
+(E)
+一
+Doctorate
+219204 圖形理論
+Graph Theory 3 選
+(E)
+一
+Doctorate
