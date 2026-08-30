@@ -1,3 +1,10 @@
-openai>=1.40.0
+# 繁簡後處理。模型(尤其中國訓練的開源模型)會吐簡體字,prompt 明講也未必有效。
 opencc-python-reimplemented>=0.1.7
+
+# 把 docs_source/ 的官方 PDF 轉成 docs/ 的文字知識庫(scripts/build_docs.py)。
 pypdf>=4.0.0
+
+# 註:不需要 openai 套件。Ollama 的 OpenAI 相容層無法設定 num_ctx
+#（extra_body 傳 options 無效),而預設值 2048 會把檢索到的文件截掉七成,
+# 因此 providers/ollama_provider.py 改用原生 /api/chat,只靠標準函式庫。
+# 詳見 TROUBLESHOOTING.md 第 2.2 節。
