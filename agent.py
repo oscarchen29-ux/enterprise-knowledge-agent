@@ -113,6 +113,25 @@ def run_task(task: str, provider) -> str:
             if not content.strip():
                 print(f"[step {step}] 模型回傳空白內容且未呼叫工具")
                 return "模型未產生有效回答,也沒有查詢任何文件。請重新提問,或把問題描述得更具體。"
+
+            # 保底檢索:模型有時直接憑記憶作答,一次工具都不呼叫,而且答得像模像樣
+            # (實測它會編出《學生手冊》裡不存在的章節編號)。這種答案沒有任何文件
+            # 依據,而且因為 retrieved_context 是空的,自我驗證也會被跳過 ——
+            # 兩道防線同時失效。所以在真的要回答之前,至少強制查一次。
+            #
+            # 這是保底而不是每輪強制:模型自己決定查什麼仍然是主要路徑,只有它
+            # 完全沒查時才介入,agent 的規劃行為得以保留。
+            if not retrieved_context:
+                print(f"[step {step}] 未經查詢即作答,強制檢索一次後重新回答")
+                fallback = TOOL_FUNCTIONS["search_documents"](query=task)
+                retrieved_context.append(fallback)
+                messages.append({
+                    "role": "user",
+                    "content": f"以下是系統查到的相關文件:\n\n{fallback}\n\n"
+                               f"請根據上述文件重新回答原本的問題。文件沒有提到的內容,"
+                               f"請明確說「文件未提及」,不要自行補充。",
+                })
+                continue
             print(f"[step {step}] 草擬回答完成，進入自我驗證")
             verified = verify_answer(content, retrieved_context, provider)
             return _s2tw.convert(verified)

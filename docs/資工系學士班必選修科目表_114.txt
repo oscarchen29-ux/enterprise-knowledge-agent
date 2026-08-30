@@ -37,13 +37,20 @@ SHA-256：b935c8fedfdccd6e...
 210102　作業系統　3學分　三下
 210160　微算機實驗　3學分　三下
 
-【系必修依開課年級整理】
-一上（大一上學期）：資訊科技（一）983005 資訊科技（二）大一體育(上)Physical Education (1) 1僑外生修習「僑外生華語文」可抵通識人文領域課程，不得以「僑外生華語文」抵免中文思辨與表達課程。（上學期依所屬學系分班上課，無特殊原因不得跨班選課，惟未達40人之學系、院學士班班級，則採合併班開課；下學期則依運動項目分班，自由選課。（In the first semester分上、下學期修課，不分學系上課。資訊工程學系、電機工程學系、科技學院學士班及資訊管理學系學生得免修課程，符合免修條件者，仍須以其他課程補足免修之學分數。(First-year students are required to自110學年度起，英文能力分班改為依照本校自辦英檢(OOPT)作依據，分為三級上課：前10%的同學將分配至「跨域專業學術英文(一)：文本解析與書寫(進階)/跨域專業學術英文(二)：思辨與表達(進階)/跨域專業學術英文(三)：跨文化溝通與表達(進階)」上課；中間80%的同學將分配至原班英文上課；後10%的同學將分配至「跨域專業學術英文(一)：文本解析與書寫(基礎)/跨域專業學術英文(二)：思辨與表達(基礎)/跨域專業學術英文(三)：跨文化溝通與表達(基礎)」上課。國立暨南國際大學 資訊工程學系學士班必選修科目一覽表本表( 114 )學年度入學新生適用 Effective for students admitted in Fall, 2025最低畢業學分：128 學分，全校共同課程  16  學分，通識領域課程  15  學分系必修  49  學分，專業選修 42 學分，自由學分 6 學分。 Undergraduate requirements: a minimum壹、全校共同課程 1.School-Wide Curriculum備            註大一體育(下)Physical Education (2) 1特色運動 （Featured Sports） 2二、共同選修課程（各系依共同選修加列課程） B. School-Wide Elective Courses第二外語 （Second Foreign Language）東南亞語言(Southeast Asia Languages)進階語文(Advanced English)其他選修(Other Elective Course)學分數文學與藝術(Literature and Art)歷史哲學與文化(History, Philosophy andAI文創協作(AI Collaboration in Cultural法政與教育(Law, Politics and Education)社經與管理(Society, Economy and資料科學分析(Data Science Analysis)工程與科技(Engineering and Technology)生命與科學(Life and Science)程式設計(Programming)國際連結(International Connection)淨零永續(Net-Zero Sustainability)社會創新(Social Innovation)自然領域Nature 3 至少修習3學分。(Students should attend a total of at特色通識領域3 至少修習3學分。(Students should attend a total of at人文領域Humanities 3 至少修習3學分。(Students should attend a total of at社會領域Society 3 至少修習3學分。(Students should attend a total of at備            註上學期依所屬學系分班上課，無特殊原因不得跨班選課，惟未達40人之學系、院學士班班級，則採合併班開課；下學期則依運動項目分班，自由選課。（In the first semester大二開始，每學期限修一項，畢業前須完成至少2項特色運 動（Students are limited take one course each semester含日文、韓文、法文、德文及西班牙文等。(Including含泰語、越南語、緬甸語、印尼語及馬來語，可抵特色通識領域。(Including Thai, Vietnamese, Burmese, Indonesian貳、通識領域課程（至少15學分） 2.General Education Courses ( 15 credits )通識講座 General Education lecture program 畢業前至少應出席6場。（Students  are required to attend at領域 Field(須修習資訊科技與自主學習課程 )參、系必修（至少49學分） 3.Departmental Required Courses ( 49 credits )課程代號課 程 名 稱(中文及英文)學分數修別開課年級備               註Notes210036 計算機概論(3學分)、微積分（上）(3學分)、離散數學(3學分)
-一下（大一下學期）：微積分（下）(3學分)、程式設計(3學分)、邏輯設計與實驗（一）(3學分)、機率(3學分)
-二上（大二上學期）：資料結構與演算法（一）(3學分)、邏輯設計與實驗（二）(3學分)
-二下（大二下學期）：資料結構與演算法（二）(3學分)、線性代數(3學分)
-三上（大三上學期）：計算機組織與結構(3學分)、系統程式(3學分)、專題（一）(2學分)
-三下（大三下學期）：專題（二）(2學分)、作業系統(3學分)、微算機實驗(3學分)
+【大一必修科目】資訊工程學系（資工系）學士班，114 學年度入學新生適用
+資工系大一上學期（一上）必修：資訊科技（一）983005 資訊科技（二）大一體育(上)Physical Education (1) 1僑外生修習「僑外生華語文」可抵通識人文領域課程，不得以「僑外生華語文」抵免中文思辨與表達課程。（上學期依所屬學系分班上課，無特殊原因不得跨班選課，惟未達40人之學系、院學士班班級，則採合併班開課；下學期則依運動項目分班，自由選課。（In the first semester分上、下學期修課，不分學系上課。資訊工程學系、電機工程學系、科技學院學士班及資訊管理學系學生得免修課程，符合免修條件者，仍須以其他課程補足免修之學分數。(First-year students are required to自110學年度起，英文能力分班改為依照本校自辦英檢(OOPT)作依據，分為三級上課：前10%的同學將分配至「跨域專業學術英文(一)：文本解析與書寫(進階)/跨域專業學術英文(二)：思辨與表達(進階)/跨域專業學術英文(三)：跨文化溝通與表達(進階)」上課；中間80%的同學將分配至原班英文上課；後10%的同學將分配至「跨域專業學術英文(一)：文本解析與書寫(基礎)/跨域專業學術英文(二)：思辨與表達(基礎)/跨域專業學術英文(三)：跨文化溝通與表達(基礎)」上課。國立暨南國際大學 資訊工程學系學士班必選修科目一覽表本表( 114 )學年度入學新生適用 Effective for students admitted in Fall, 2025最低畢業學分：128 學分，全校共同課程  16  學分，通識領域課程  15  學分系必修  49  學分，專業選修 42 學分，自由學分 6 學分。 Undergraduate requirements: a minimum壹、全校共同課程 1.School-Wide Curriculum備            註大一體育(下)Physical Education (2) 1特色運動 （Featured Sports） 2二、共同選修課程（各系依共同選修加列課程） B. School-Wide Elective Courses第二外語 （Second Foreign Language）東南亞語言(Southeast Asia Languages)進階語文(Advanced English)其他選修(Other Elective Course)學分數文學與藝術(Literature and Art)歷史哲學與文化(History, Philosophy andAI文創協作(AI Collaboration in Cultural法政與教育(Law, Politics and Education)社經與管理(Society, Economy and資料科學分析(Data Science Analysis)工程與科技(Engineering and Technology)生命與科學(Life and Science)程式設計(Programming)國際連結(International Connection)淨零永續(Net-Zero Sustainability)社會創新(Social Innovation)自然領域Nature 3 至少修習3學分。(Students should attend a total of at特色通識領域3 至少修習3學分。(Students should attend a total of at人文領域Humanities 3 至少修習3學分。(Students should attend a total of at社會領域Society 3 至少修習3學分。(Students should attend a total of at備            註上學期依所屬學系分班上課，無特殊原因不得跨班選課，惟未達40人之學系、院學士班班級，則採合併班開課；下學期則依運動項目分班，自由選課。（In the first semester大二開始，每學期限修一項，畢業前須完成至少2項特色運 動（Students are limited take one course each semester含日文、韓文、法文、德文及西班牙文等。(Including含泰語、越南語、緬甸語、印尼語及馬來語，可抵特色通識領域。(Including Thai, Vietnamese, Burmese, Indonesian貳、通識領域課程（至少15學分） 2.General Education Courses ( 15 credits )通識講座 General Education lecture program 畢業前至少應出席6場。（Students  are required to attend at領域 Field(須修習資訊科技與自主學習課程 )參、系必修（至少49學分） 3.Departmental Required Courses ( 49 credits )課程代號課 程 名 稱(中文及英文)學分數修別開課年級備               註Notes210036 計算機概論(3學分)、微積分（上）(3學分)、離散數學(3學分)
+資工系大一下學期（一下）必修：微積分（下）(3學分)、程式設計(3學分)、邏輯設計與實驗（一）(3學分)、機率(3學分)
+大一必修合計 21 學分。
+
+【大二必修科目】資訊工程學系（資工系）學士班，114 學年度入學新生適用
+資工系大二上學期（二上）必修：資料結構與演算法（一）(3學分)、邏輯設計與實驗（二）(3學分)
+資工系大二下學期（二下）必修：資料結構與演算法（二）(3學分)、線性代數(3學分)
+大二必修合計 12 學分。
+
+【大三必修科目】資訊工程學系（資工系）學士班，114 學年度入學新生適用
+資工系大三上學期（三上）必修：計算機組織與結構(3學分)、系統程式(3學分)、專題（一）(2學分)
+資工系大三下學期（三下）必修：專題（二）(2學分)、作業系統(3學分)、微算機實驗(3學分)
+大三必修合計 16 學分。
 
 【原始 PDF 全文（未經整理，供查核用）】
 一、共同課程（必修16學分） A. School-Wide Required Courses ( 16 credits )

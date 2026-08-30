@@ -143,19 +143,44 @@ def build_catalog(path, filename, meta, program, cohort_label):
             )
         out.append("")
 
-        # 依年級整理一份,讓「大三必修有哪些」這種問法可以直接命中。
+        # 依年級整理,讓「大三必修有哪些」這種問法可以直接命中。
+        #
+        # 每個年級各自成段而不是全部列在一起:檢索是切塊比對的,四個年級擠在同一塊
+        # 時,查「大三」會被其他年級的內容稀釋 —— 實測排到第 14 名,輸給只是檔名
+        # 有「資工系」的課程地圖。拆開之後每一塊都短而集中,該年級的關鍵字密度才高。
         by_year = {}
         for m in required:
             by_year.setdefault(m.group("year"), []).append(
                 f"{_chinese_name(m.group('name'))}({m.group('credits')}學分)"
             )
-        out.append("【系必修依開課年級整理】")
-        for y in YEAR_ORDER:
-            if y in by_year:
-                grade = {"一": "大一", "二": "大二", "三": "大三", "四": "大四"}[y[0]]
+        # 年級稱呼要看學制。科目表裡的「一上」在學士班是大一上,在碩士班是碩一上、
+        # 博士班是博一上 —— 一律叫「大一」的話,博士班文件會去搶「大一必修」這種
+        # 明顯是問學士班的查詢(實測博士班科目表確實排到第一)。
+        prefix = {"學士班": "大", "碩士班": "碩", "博士班": "博"}.get(program, "大")
+        grades = {n: f"{prefix}{n}" for n in ("一", "二", "三", "四")}
+        for grade_key, grade_name in grades.items():
+            years = [y for y in YEAR_ORDER if y.startswith(grade_key) and y in by_year]
+            if not years:
+                continue
+            # 標題與每一行都帶上系名與屆別。塊是被單獨檢索出來餵給模型的,
+            # 不能假設它看得到檔名 —— 而且不寫進內文的話,查「資工系大三必修」時
+            # 這一塊只命中「大三」「必修」,會輸給 PDF 圖表被抽成關鍵字湯的課程地圖
+            # (那一塊「大一大二大三大四必修」全都有,命中面積大但沒有實質內容)。
+            out.append(
+                f"【{grade_name}必修科目】資訊工程學系（資工系）{program}"
+                f"，{cohort_label} 學年度入學新生適用"
+            )
+            for y in years:
                 sem = "上學期" if y[1] == "上" else "下學期"
-                out.append(f"{y}（{grade}{sem}）：" + "、".join(by_year[y]))
-        out.append("")
+                out.append(
+                    f"資工系{grade_name}{sem}（{y}）必修：" + "、".join(by_year[y])
+                )
+            total = sum(
+                float(m.group("credits")) for m in required
+                if m.group("year").startswith(grade_key)
+            )
+            out.append(f"{grade_name}必修合計 {total:g} 學分。")
+            out.append("")
 
     out.append("【原始 PDF 全文（未經整理，供查核用）】")
     out.append(re.sub(r"\n{3,}", "\n\n", text).strip())
