@@ -77,8 +77,10 @@ def install_probes():
 
     def logged_search(query):
         result = original_search(query)
-        # search_documents 回傳格式為 "[檔名]\n內容",逐份抓出檔名
-        docs = re.findall(r"^\[(.+?)\]$", result, re.M)
+        # 回傳格式為「[檔名 第N段]」加內容(改成切塊檢索後多了段號),這裡只取檔名。
+        # expected_docs 記的是純檔名,連段號一起比會永遠比不中 —— 這個不一致曾讓
+        # 整批 96 次執行的檢索命中率全部顯示成 0%,而實際上是 51%。
+        docs = re.findall(r"^\[(.+?\.txt)(?:\s+第\d+段)?\]$", result, re.M)
         TOOL_LOG.append({"query": query, "returned_docs": docs})
         return result
 

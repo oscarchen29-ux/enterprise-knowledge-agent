@@ -16,3 +16,5 @@ desktop.ini
 # benchmark 執行時的主控台輸出(Windows 下編碼為 cp950,資料以 jsonl 為準)
 benchmark/run_log_*.txt
 benchmark/__pycache__/
+
+benchmark/run_log_v3.txt
