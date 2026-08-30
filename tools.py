@@ -246,7 +246,45 @@ def search_documents(query: str) -> str:
     return "\n\n".join(parts)
 
 
+ASK_MARKER = "__ASK_USER__"
+
+
+def ask_clarification(question: str) -> str:
+    """在缺少關鍵條件時向使用者追問,而不是猜一個答案。
+
+    這個工具不查任何東西,只是把問題往回傳。`agent.py` 看到 ASK_MARKER 就會
+    中止迴圈、把問題交給使用者。
+
+    為什麼需要它:同一個問題在不同屆別/學制下答案不同。實測問「畢業要修幾學分」
+    時,模型檢索到 111~115 五屆的科目表,只好回答「共同課程 15 至 16 學分」——
+    對任何一個具體的學生來說,這個範圍都是錯的。與其給模糊答案,不如問清楚。
+    """
+    return f"{ASK_MARKER}{question}"
+
+
 TOOLS_SCHEMA = [
+    {
+        "type": "function",
+        "function": {
+            "name": "ask_clarification",
+            "description": (
+                "當問題缺少決定答案的關鍵條件時,用這個工具向使用者追問,不要自行猜測或給範圍。"
+                "必須追問的情況:(1)問到學分、必修、畢業條件但沒說入學學年度(不同屆規定不同);"
+                "(2)問到抵免、獎勵但沒說是學士班、碩士班還是博士班;"
+                "(3)說「轉進來」但沒說是轉系生還是轉學生(兩者適用條款不同)。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "description": "要問使用者的問題,一次只問一件事,例如「請問你是哪一學年度入學的?」",
+                    },
+                },
+                "required": ["question"],
+            },
+        },
+    },
     {
         "type": "function",
         "function": {
@@ -265,4 +303,5 @@ TOOLS_SCHEMA = [
 
 TOOL_FUNCTIONS = {
     "search_documents": search_documents,
+    "ask_clarification": ask_clarification,
 }

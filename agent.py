@@ -14,7 +14,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from providers.ollama_provider import OllamaProvider
-from tools import TOOLS_SCHEMA, TOOL_FUNCTIONS
+from tools import ASK_MARKER, TOOLS_SCHEMA, TOOL_FUNCTIONS
 
 # 模型(尤其是中國訓練的開源模型)常會吐出簡體字，就算 prompt 明確要求繁體也未必有效，
 # 用 OpenCC 做後處理轉換比較穩定。用 s2tw(字形+基本詞彙)而非 s2twp，
@@ -26,6 +26,16 @@ SYSTEM_PROMPT = (
     "(例如選課、畢業門檻、獎學金申請、論文格式),你可以呼叫 search_documents 工具查詢"
     "系所規定文件,查到資料後再根據文件內容回答,不要憑空編造規定內容。"
     "務必全程使用繁體中文回答,不要出現簡體字。"
+    "\n\n"
+    # 很多規定依入學學年度或學制而不同,同一個問題對不同的人有不同的正確答案。
+    # 沒有這段指示時,模型會把各屆的數字合併成「15 至 16 學分」這種範圍 ——
+    # 對任何一個具體的學生來說都是錯的。寧可追問,不要給範圍。
+    "重要:很多規定會因為入學學年度或學制而不同。如果缺少判斷所需的條件,"
+    "請呼叫 ask_clarification 工具向使用者追問,不要自行猜測、也不要給出「15 至 16 學分」"
+    "這種涵蓋多屆的範圍。必須追問的情況包括:問到學分或畢業條件卻沒說入學學年度;"
+    "問到抵免或獎勵卻沒說學制;說「轉進來」卻沒說是轉系生還是轉學生。"
+    "\n"
+    "但如果檢索到的文件對所有屆別都一致,就直接回答,不需要追問。"
 )
 
 VERIFY_PROMPT = (
@@ -97,7 +107,45 @@ def verify_answer(draft: str, retrieved_context: list[str], provider) -> str:
     return result["content"] or draft
 
 
+# 只有「答案真的會因為條件不同而不同」的題目才追問,否則每次都反問很煩人。
+# 這裡的兩條規則都對應到實測過的錯誤:
+#
+# 1) 共同課程/通識學分:111、112 級是 15/16,113 級起是 16/15。實測問「畢業要修
+#    幾學分」時模型檢索到五屆的表,回答「共同課程 15 至 16 學分」—— 對任何一個
+#    具體的學生都是錯的。(總學分 128 與系必修 49 各屆相同,所以不觸發追問。)
+#
+# 2) 抵免:轉系生與轉學生適用《學生抵免學分辦法》第三條的不同款,轉學生不受
+#    轉系生的上限限制。實測模型會把轉系生的規定套到轉學生身上。
+#
+# 模型自己也有 ask_clarification 工具可用,但 7B 判斷「我資訊夠不夠」很不可靠,
+# 實測兩題都沒觸發,所以再加一層確定性的檢查。
+_COHORT_HINT = re.compile(r"1\d{2}\s*(級|學年)|入學")
+_CLARIFY_RULES = [
+    (re.compile(r"(共同課程|通識).{0,10}(學分|幾學分)|學分.{0,10}(共同課程|通識)"),
+     _COHORT_HINT,
+     "共同課程與通識的學分數在 113 學年度調整過(111、112 級是共同 15、通識 16;"
+     "113 級起是共同 16、通識 15)。請問你是哪一學年度入學的?"),
+    (re.compile(r"抵免"),
+     re.compile(r"轉系|轉學|重考|在職|碩士|博士|研究所"),
+     "抵免規定會因為身分而不同,轉系生與轉學生適用的條款不一樣。"
+     "請問你是轉系生、轉學生,還是其他情況(例如重考入學、碩博班)?"),
+]
+
+
+def needs_clarification(task: str) -> str | None:
+    """條件不足時回傳要追問的問題,否則回傳 None。"""
+    for topic, disambiguator, question in _CLARIFY_RULES:
+        if topic.search(task) and not disambiguator.search(task):
+            return question
+    return None
+
+
 def run_task(task: str, provider) -> str:
+    question = needs_clarification(task)
+    if question:
+        print("[step -] 問題缺少關鍵條件,先向使用者追問")
+        return question
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": task},
@@ -169,6 +217,12 @@ def run_task(task: str, provider) -> str:
                 print(f"[step {step}] 工具參數格式錯誤: {e}")
                 tool_result = f"工具呼叫失敗,參數格式不正確({e})。請改用正確格式重新呼叫 search_documents(query=...)。"
             else:
+                # 模型判斷條件不足、要向使用者追問。直接把問題交還給使用者,
+                # 不要繼續跑迴圈 —— 缺的資訊只有使用者能補。
+                if isinstance(tool_result, str) and tool_result.startswith(ASK_MARKER):
+                    question = tool_result[len(ASK_MARKER):].strip()
+                    print(f"[step {step}] 條件不足,向使用者追問")
+                    return _s2tw.convert(question)
                 retrieved_context.append(tool_result)
             messages.append({
                 "role": "tool",
