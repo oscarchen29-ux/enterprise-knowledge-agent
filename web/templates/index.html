@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>資工系行政問答(實驗中)</title>
+<style>
+  :root { --line:#d8dce3; --muted:#5b6472; --warn:#8a5a00; --warnbg:#fff8e6; --bg:#fff; --fg:#1a1d23; }
+  @media (prefers-color-scheme: dark) {
+    :root { --line:#39414f; --muted:#9aa4b4; --warn:#ffd483; --warnbg:#3a2f14; --bg:#15181d; --fg:#e8ebf0; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg);
+         font:16px/1.7 -apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif; }
+  main { max-width:720px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:14px; }
+  .warn { background:var(--warnbg); color:var(--warn); border:1px solid currentColor;
+          border-radius:8px; padding:10px 12px; font-size:14px; margin-bottom:16px; }
+  textarea { width:100%; min-height:78px; padding:11px; font:inherit; resize:vertical;
+             border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); }
+  .row { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+  button { font:inherit; padding:9px 18px; border-radius:8px; border:1px solid var(--line);
+           background:var(--fg); color:var(--bg); cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  button.ghost { background:transparent; color:var(--fg); }
+  .examples { font-size:13px; color:var(--muted); margin-top:10px; }
+  .examples b { cursor:pointer; text-decoration:underline; font-weight:400; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:18px; }
+  .answer { white-space:pre-wrap; }
+  .meta { color:var(--muted); font-size:13px; margin-top:10px; }
+  details { margin-top:12px; border-top:1px solid var(--line); padding-top:10px; }
+  summary { cursor:pointer; font-size:14px; }
+  .src { border-left:3px solid var(--line); padding:6px 0 6px 10px; margin:10px 0; }
+  .src b { font-size:13px; }
+  .src p { white-space:pre-wrap; font-size:13px; color:var(--muted); margin:4px 0 0; }
+  .fb { margin-top:14px; border-top:1px solid var(--line); padding-top:12px; font-size:14px; }
+  .clarify { border-left:4px solid var(--warn); }
+  .err { color:#c0392b; }
+  footer { color:var(--muted); font-size:12px; margin-top:28px; text-align:center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>資工系行政問答</h1>
+  <div class="sub">暨大資工系 · 大三專題實驗系統 · 模型 {{ model }}</div>
+
+  <div class="warn">
+    <b>這不是官方系統,而且它會答錯。</b><br>
+    答案由 AI 依據校內公開文件生成,可能遺漏條件或引用錯誤條款。
+    <b>請務必展開「依據的文件」自行核對</b>,並以系辦與教務處公告為準。
+    發現答錯請按「答案有誤」告訴我們 —— 那是這個專題最需要的資料。
+  </div>
+
+  <textarea id="q" placeholder="例如:我是113學年度入學的,大三必修有哪些?"></textarea>
+  <div class="row">
+    <button id="send">送出</button>
+    <span id="status" class="meta"></span>
+  </div>
+  <div class="examples">
+    試試:
+    <b onclick="fill(this)">我是113學年度入學的,大三必修有哪些?</b> ·
+    <b onclick="fill(this)">請3天病假需要什麼證明?</b> ·
+    <b onclick="fill(this)">宿舍床位怎麼申請?</b> ·
+    <b onclick="fill(this)">休學最多可以休多久?</b>
+  </div>
+
+  <div id="out"></div>
+
+  <footer>
+    知識庫為暨大官方公開文件,每份皆可追溯來源。<br>
+    一次只能處理一個問題,同時有人在問時需要排隊。
+  </footer>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function fill(el){ $('#q').value = el.textContent; $('#q').focus(); }
+
+async function ask(){
+  const q = $('#q').value.trim();
+  if(!q) return;
+  $('#send').disabled = true;
+  $('#status').textContent = '查詢中,通常 10-30 秒⋯';
+  $('#out').innerHTML = '';
+  try {
+    const r = await fetch('/api/ask', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question:q})
+    });
+    const d = await r.json();
+    if(!r.ok){ $('#out').innerHTML = `<div class="card err">${esc(d.error||'發生錯誤')}</div>`; return; }
+    render(d, q);
+  } catch(e) {
+    $('#out').innerHTML = `<div class="card err">連線失敗:${esc(e.message)}</div>`;
+  } finally {
+    $('#send').disabled = false;
+    $('#status').textContent = '';
+  }
+}
+
+function render(d, q){
+  if(d.type === 'clarify'){
+    $('#out').innerHTML = `<div class="card clarify">
+      <b>需要多一點資訊才能正確回答</b>
+      <div class="answer" style="margin-top:8px">${esc(d.question)}</div>
+      <div class="meta">請把答案補進上面的問題裡再送出一次。不同屆別、不同身分的規定確實不一樣,
+      給範圍反而每個人都不適用。</div></div>`;
+    return;
+  }
+
+  let srcHtml = '';
+  if(d.sources && d.sources.length){
+    srcHtml = `<details open><summary><b>依據的文件(${d.sources.length} 段)—— 請自行核對</b></summary>` +
+      d.sources.map(s => `<div class="src"><b>${esc(s.file)}${s.segment?' 第'+esc(s.segment)+'段':''}</b>
+        <p>${esc(s.text.slice(0,600))}${s.text.length>600?'⋯':''}</p></div>`).join('') +
+      `</details>`;
+  } else {
+    srcHtml = `<details open><summary class="err"><b>⚠ 這個回答沒有查到任何文件</b></summary>
+      <p class="meta">系統沒有成功檢索到文件,以下內容可能完全來自模型推測,
+      <b>請不要採信</b>,並按「答案有誤」回報。</p></details>`;
+  }
+
+  $('#out').innerHTML = `<div class="card">
+    <div class="answer">${esc(d.answer)}</div>
+    <div class="meta">耗時 ${d.elapsed} 秒${d.queued_ahead?` · 前面排了 ${d.queued_ahead} 人`:''}</div>
+    ${srcHtml}
+    <div class="fb" id="fb">
+      這個答案正確嗎?
+      <div class="row">
+        <button class="ghost" onclick="send('correct')">答案正確</button>
+        <button class="ghost" onclick="send('wrong')">答案有誤</button>
+        <button class="ghost" onclick="send('unclear')">看不懂 / 沒回答到</button>
+      </div>
+      <textarea id="cmt" style="min-height:52px;margin-top:8px"
+        placeholder="哪裡有問題?(選填,但對我們很有幫助)"></textarea>
+    </div></div>`;
+  window._aid = d.answer_id;
+}
+
+async function send(v){
+  await fetch('/api/feedback', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({answer_id: window._aid, verdict: v, comment: $('#cmt').value})
+  });
+  $('#fb').innerHTML = '<b>已送出,謝謝!</b> 你的回報會用來改進這個系統。';
+}
+
+$('#send').onclick = ask;
+$('#q').addEventListener('keydown', e => {
+  if((e.metaKey||e.ctrlKey) && e.key === 'Enter') ask();
+});
+</script>
+</body>
+</html>

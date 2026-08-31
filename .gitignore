@@ -18,3 +18,7 @@ benchmark/run_log_*.txt
 benchmark/__pycache__/
 
 benchmark/run_log_v3.txt
+
+# 使用者回報含學生真實提問,屬個人資料,不進版控。
+# 這是專題的質化資料來源,請自行備份到不公開的位置。
+web/feedback.jsonl
