@@ -53,6 +53,7 @@ _LEAK_MARKERS = ("search_documents", "tool_call", '{"name"')
 
 # 側錄緩衝。probe 只安裝一次,每次執行前由 run_one() 清空。
 TOOL_LOG = []
+CLARIFY_LOG = []
 RAW_SINK = []
 
 
@@ -87,12 +88,23 @@ def install_probes():
     # agent.py 用 `from tools import TOOL_FUNCTIONS` 綁定的是同一個 dict 物件,
     # 因此改 dict 內容即可生效,不需要動到原始碼。
     tools.TOOL_FUNCTIONS["search_documents"] = logged_search
+
+    # 追問也必須側錄。只側錄 search_documents 的話,模型判斷條件不足而改呼叫
+    # ask_clarification 的執行會看起來像「一個工具都沒呼叫」,被誤計成靜默失敗。
+    original_ask = tools.ask_clarification
+
+    def logged_ask(question):
+        CLARIFY_LOG.append(question)
+        return original_ask(question)
+
+    tools.TOOL_FUNCTIONS["ask_clarification"] = logged_ask
     agent._s2tw = _RecordingConverter(agent._s2tw, RAW_SINK)
 
 
 def run_one(question, provider):
     """跑單一題目一次,回傳量測結果。"""
     TOOL_LOG.clear()
+    CLARIFY_LOG.clear()
     RAW_SINK.clear()
     buffer = io.StringIO()
 
@@ -125,9 +137,15 @@ def run_one(question, provider):
         "tool_call_count": len(TOOL_LOG),
         "tool_queries": [c["query"] for c in TOOL_LOG],
         "tool_arg_error": "工具參數格式錯誤" in stdout_log,
-        # 該查文件卻一次都沒查 —— 靜默失敗,不會報錯但答案沒有文件依據
-        "no_tool_call": len(TOOL_LOG) == 0,
-        # 把工具呼叫當成純文字吐出來,是 no_tool_call 最常見的成因
+        # 沒有呼叫 search_documents。這本身不算失敗 —— 模型也可能是判斷條件不足、
+        # 改呼叫 ask_clarification 把問題交還給使用者,那是設計中的正常行為。
+        "no_search_call": len(TOOL_LOG) == 0,
+        "asked_clarification": bool(CLARIFY_LOG),
+        # 真正的靜默失敗:既沒查文件也沒追問,直接憑模型記憶作答。
+        # 舊版把這個指標寫成 len(TOOL_LOG) == 0,連追問一起算進去,量出 21% 的
+        # 失敗率;扣掉追問後實際是 3%。追問必須排除,否則會高估四到五倍。
+        "silent_failure": len(TOOL_LOG) == 0 and not CLARIFY_LOG,
+        # 把工具呼叫當成純文字吐出來,是完全沒呼叫到工具最常見的成因
         "tool_call_leaked_as_text": any(m in answer for m in _LEAK_MARKERS),
         "hit_max_steps": answer.startswith("已達最大步驟數"),
         # --- 檢索 ---
@@ -210,7 +228,8 @@ def main():
                 "\n".join(f"- {p}" for p in q["gold_points"]),
                 r["answer"],
                 "是" if r["retrieval_hit_all"] else ("部分" if r["retrieval_hit_any"] else "否"),
-                "沒查(靜默失敗)" if r["no_tool_call"] else "有查",
+                "追問(未作答)" if r["asked_clarification"]
+                else ("沒查(靜默失敗)" if r["silent_failure"] else "有查"),
                 r["latency_sec"],
                 "", len(q["gold_points"]), "", "", "",
             ])
@@ -225,15 +244,22 @@ def main():
     print("=" * 52)
     # 「有沒有真的去查文件」比「有沒有報錯」重要 —— 靜默失敗不會報錯,
     # 但答案完全沒有文件依據,是最危險的一種失效。
-    print(f"有實際呼叫工具      : {sum(1 for r in results if not r['no_tool_call']) / n:.1%}")
-    print(f"  靜默失敗(沒查就答): {sum(1 for r in results if r['no_tool_call']) / n:.1%}")
-    print(f"  其中呼叫外洩成文字: {sum(1 for r in results if r['no_tool_call'] and r['tool_call_leaked_as_text'])}")
+    print(f"有查文件              : {sum(1 for r in results if not r['no_search_call']) / n:.1%}")
+    print(f"  向使用者追問(未作答): {sum(1 for r in results if r['asked_clarification']) / n:.1%}")
+    print(f"  靜默失敗(沒查也沒問): {sum(1 for r in results if r['silent_failure']) / n:.1%}")
+    print(f"    其中呼叫外洩成文字: {sum(1 for r in results if r['silent_failure'] and r['tool_call_leaked_as_text'])}")
     print(f"工具參數格式錯誤    : {sum(1 for r in results if r['tool_arg_error'])}")
     print(f"程式崩潰次數        : {sum(1 for r in results if r['error'])}")
     print(f"達最大步驟數未完成  : {sum(1 for r in results if r['hit_max_steps'])}")
-    if ans:
-        print(f"檢索全命中率(可答題): {sum(1 for r in ans if r['retrieval_hit_all']) / len(ans):.1%}")
-        print(f"檢索部分命中率      : {sum(1 for r in ans if r['retrieval_hit_any']) / len(ans):.1%}")
+    # 檢索命中率的分母只能是「可答、而且真的發動了檢索」的執行。把追問和靜默
+    # 失敗算進分母,量到的是「模型有沒有去查」與「查得準不準」兩件事的混合,
+    # 檢索本身的品質會被壓低十幾個百分點。
+    searched = [r for r in ans if not r["no_search_call"]]
+    if searched:
+        print(f"檢索全命中率(可答且有查, n={len(searched)}): "
+              f"{sum(1 for r in searched if r['retrieval_hit_all']) / len(searched):.1%}")
+        print(f"檢索部分命中率        : "
+              f"{sum(1 for r in searched if r['retrieval_hit_any']) / len(searched):.1%}")
     print(f"後處理前含簡體字    : {sum(1 for r in results if r['raw_had_simplified']) / n:.1%}")
     print(f"後處理後仍含簡體字  : {sum(1 for r in results if r['final_had_simplified']) / n:.1%}  (應為 0%)")
     print(f"平均延遲            : {sum(r['latency_sec'] for r in results) / n:.1f} 秒")
@@ -248,8 +274,8 @@ def main():
         rows = [r for r in results if r["category"] == cat]
         if not rows:
             continue
-        hit_rows = [r for r in rows if r["expected_docs"]]
-        searched = sum(1 for r in rows if not r["no_tool_call"]) / len(rows)
+        hit_rows = [r for r in rows if r["expected_docs"] and not r["no_search_call"]]
+        searched = sum(1 for r in rows if not r["no_search_call"]) / len(rows)
         hit = (sum(1 for r in hit_rows if r["retrieval_hit_all"]) / len(hit_rows)) if hit_rows else None
         simp = sum(1 for r in rows if r["raw_had_simplified"]) / len(rows)
         lat = sum(r["latency_sec"] for r in rows) / len(rows)
