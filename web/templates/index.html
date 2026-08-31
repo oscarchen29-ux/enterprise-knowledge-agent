@@ -5,193 +5,218 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>資工系行政問答(實驗中)</title>
 <style>
-  :root { --line:#d8dce3; --muted:#5b6472; --warn:#8a5a00; --warnbg:#fff8e6; --bg:#fff; --fg:#1a1d23; }
-  @media (prefers-color-scheme: dark) {
-    :root { --line:#39414f; --muted:#9aa4b4; --warn:#ffd483; --warnbg:#3a2f14; --bg:#15181d; --fg:#e8ebf0; }
+  :root{
+    --bg:#fff; --fg:#1a1d23; --muted:#5b6472; --line:#e2e5ea;
+    --user:#e8eefc; --bot:#f6f7f9; --warn:#8a5a00; --warnbg:#fff8e6; --err:#c0392b;
   }
-  * { box-sizing:border-box; }
-  body { margin:0; padding:16px; background:var(--bg); color:var(--fg);
-         font:16px/1.7 -apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif; }
-  main { max-width:720px; margin:0 auto; }
-  h1 { font-size:20px; margin:0 0 4px; }
-  .sub { color:var(--muted); font-size:14px; margin-bottom:14px; }
-  .warn { background:var(--warnbg); color:var(--warn); border:1px solid currentColor;
-          border-radius:8px; padding:10px 12px; font-size:14px; margin-bottom:16px; }
-  textarea { width:100%; min-height:78px; padding:11px; font:inherit; resize:vertical;
-             border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); }
-  .row { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
-  button { font:inherit; padding:9px 18px; border-radius:8px; border:1px solid var(--line);
-           background:var(--fg); color:var(--bg); cursor:pointer; }
-  button:disabled { opacity:.5; cursor:default; }
-  button.ghost { background:transparent; color:var(--fg); }
-  .examples { font-size:13px; color:var(--muted); margin-top:10px; }
-  .examples b { cursor:pointer; text-decoration:underline; font-weight:400; }
-  .card { border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:18px; }
-  .answer { white-space:pre-wrap; }
-  .meta { color:var(--muted); font-size:13px; margin-top:10px; }
-  details { margin-top:12px; border-top:1px solid var(--line); padding-top:10px; }
-  summary { cursor:pointer; font-size:14px; }
-  .src { border-left:3px solid var(--line); padding:6px 0 6px 10px; margin:10px 0; }
-  .src b { font-size:13px; }
-  .src p { white-space:pre-wrap; font-size:13px; color:var(--muted); margin:4px 0 0; }
-  .fb { margin-top:14px; border-top:1px solid var(--line); padding-top:12px; font-size:14px; }
-  .clarify { border-left:4px solid var(--warn); }
-  .err { color:#c0392b; }
-  footer { color:var(--muted); font-size:12px; margin-top:28px; text-align:center; }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#15181d; --fg:#e8ebf0; --muted:#9aa4b4; --line:#2c333d;
+           --user:#22304a; --bot:#1d2229; --warn:#ffd483; --warnbg:#3a2f14; --err:#ff8a7a; }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--fg); display:flex; flex-direction:column;
+       font:16px/1.65 -apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+
+  header{border-bottom:1px solid var(--line); padding:10px 16px; flex:none}
+  .hwrap{max-width:760px; margin:0 auto; display:flex; align-items:center; gap:10px}
+  .htitle{font-weight:700}
+  .hsub{color:var(--muted); font-size:13px}
+  .hbtn{margin-left:auto; font-size:13px; color:var(--muted); background:none; border:1px solid var(--line);
+        border-radius:999px; padding:4px 12px; cursor:pointer}
+
+  .banner{background:var(--warnbg); color:var(--warn); font-size:13px; padding:8px 16px;
+          border-bottom:1px solid var(--line); flex:none}
+  .banner div{max-width:760px; margin:0 auto}
+
+  #thread{flex:1; overflow-y:auto; padding:18px 16px 8px}
+  .inner{max-width:760px; margin:0 auto}
+
+  .msg{display:flex; margin-bottom:16px}
+  .msg.me{justify-content:flex-end}
+  .bubble{max-width:88%; padding:11px 14px; border-radius:14px; white-space:pre-wrap; word-break:break-word}
+  .me .bubble{background:var(--user); border-bottom-right-radius:4px}
+  .bot .bubble{background:var(--bot); border-bottom-left-radius:4px; max-width:100%; width:100%}
+  .bot.ask .bubble{background:var(--warnbg); color:var(--warn); border-left:3px solid currentColor}
+
+  .tools{margin-top:10px; padding-top:9px; border-top:1px solid var(--line); font-size:13px; color:var(--muted)}
+  details summary{cursor:pointer}
+  .src{border-left:3px solid var(--line); padding:5px 0 5px 10px; margin:8px 0}
+  .src b{font-size:12.5px; color:var(--fg)}
+  .src p{white-space:pre-wrap; font-size:12.5px; margin:3px 0 0}
+  .nosrc{color:var(--err)}
+  .fbrow{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:8px}
+  .fbrow button{font:inherit; font-size:13px; padding:4px 11px; border-radius:999px;
+                border:1px solid var(--line); background:transparent; color:var(--fg); cursor:pointer}
+  .dots span{display:inline-block; width:6px; height:6px; margin-right:3px; border-radius:50%;
+             background:var(--muted); animation:b 1.2s infinite}
+  .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+  @keyframes b{0%,60%,100%{opacity:.25} 30%{opacity:1}}
+
+  footer{flex:none; border-top:1px solid var(--line); padding:10px 16px 14px; background:var(--bg)}
+  .fwrap{max-width:760px; margin:0 auto}
+  .inputrow{display:flex; gap:8px; align-items:flex-end}
+  textarea{flex:1; min-height:46px; max-height:150px; padding:11px 13px; font:inherit; resize:none;
+           border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--fg)}
+  #send{font:inherit; padding:11px 20px; border-radius:12px; border:none;
+        background:var(--fg); color:var(--bg); cursor:pointer}
+  #send:disabled{opacity:.4; cursor:default}
+  .hint{color:var(--muted); font-size:12px; margin-top:6px; text-align:center}
+  .chips{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px}
+  .chips b{font-weight:400; font-size:13px; color:var(--muted); border:1px solid var(--line);
+           border-radius:999px; padding:4px 11px; cursor:pointer}
 </style>
 </head>
 <body>
-<main>
-  <h1>資工系行政問答</h1>
-  <div class="sub">暨大資工系 · 大三專題實驗系統 · 模型 {{ model }}</div>
 
-  <div class="warn">
-    <b>這不是官方系統,而且它會答錯。</b><br>
-    答案由 AI 依據校內公開文件生成,可能遺漏條件或引用錯誤條款。
-    <b>請務必展開「依據的文件」自行核對</b>,並以系辦與教務處公告為準。
-    發現答錯請按「答案有誤」告訴我們 —— 那是這個專題最需要的資料。
-  </div>
+<header><div class="hwrap">
+  <span class="htitle">資工系行政問答</span>
+  <span class="hsub">實驗系統 · {{ model }}</span>
+  <button class="hbtn" onclick="reset()">新對話</button>
+</div></header>
 
-  <textarea id="q" placeholder="例如:我是113學年度入學的,大三必修有哪些?"></textarea>
-  <div class="row">
-    <button id="send">送出</button>
-    <span id="status" class="meta"></span>
-  </div>
-  <div class="examples">
-    試試:
-    <b onclick="fill(this)">我是113學年度入學的,大三必修有哪些?</b> ·
-    <b onclick="fill(this)">請3天病假需要什麼證明?</b> ·
-    <b onclick="fill(this)">宿舍床位怎麼申請?</b> ·
+<div class="banner"><div>
+  <b>這不是官方系統,而且它會答錯。</b>
+  請展開每則回答下方的「依據的文件」自行核對,並以系辦與教務處公告為準。答錯請按「答案有誤」告訴我們。
+</div></div>
+
+<div id="thread"><div class="inner" id="msgs"></div></div>
+
+<footer><div class="fwrap">
+  <div class="chips" id="chips">
+    <b onclick="fill(this)">我是113學年度入學的,大三必修有哪些?</b>
+    <b onclick="fill(this)">請3天病假需要什麼證明?</b>
+    <b onclick="fill(this)">宿舍床位怎麼申請?</b>
     <b onclick="fill(this)">休學最多可以休多久?</b>
   </div>
-
-  <div id="out"></div>
-
-  <footer>
-    知識庫為暨大官方公開文件,每份皆可追溯來源。<br>
-    一次只能處理一個問題,同時有人在問時需要排隊。
-  </footer>
-</main>
+  <div class="inputrow">
+    <textarea id="q" rows="1" placeholder="問一個系上或學校的行政問題⋯"></textarea>
+    <button id="send">送出</button>
+  </div>
+  <div class="hint">一次只處理一個問題,同時有人在問時需要排隊 · Enter 送出,Shift+Enter 換行</div>
+</div></footer>
 
 <script>
 const $ = s => document.querySelector(s);
+const msgs = $('#msgs'), thread = $('#thread');
+
+// 只存使用者問過的問題,不存答案 —— 實測帶著上一個答案會讓模型整段複述它,
+// 而且答案本身可能是錯的,帶下去等於讓錯誤延續。
+let history = [];
+let busy = false;
+
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-function fill(el){ $('#q').value = el.textContent; $('#q').focus(); }
+function fill(el){ $('#q').value = el.textContent; $('#q').focus(); autosize(); }
+function scroll(){ thread.scrollTop = thread.scrollHeight; }
+
+function add(cls, html){
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  d.innerHTML = '<div class="bubble">' + html + '</div>';
+  msgs.appendChild(d); scroll();
+  return d;
+}
+
+function reset(){
+  history = []; msgs.innerHTML = ''; $('#chips').style.display = 'flex'; $('#q').focus();
+}
+
+function autosize(){
+  const t = $('#q'); t.style.height='auto'; t.style.height = Math.min(t.scrollHeight,150)+'px';
+}
 
 async function ask(){
+  if(busy) return;
   const q = $('#q').value.trim();
   if(!q) return;
-  $('#send').disabled = true;
-  $('#status').textContent = '查詢中,通常 10-30 秒⋯';
-  $('#out').innerHTML = '';
-  try {
+  busy = true; $('#send').disabled = true;
+  $('#chips').style.display = 'none';
+  $('#q').value = ''; autosize();
+
+  add('me', esc(q));
+  const holder = add('bot',
+    '<span class="dots"><span></span><span></span><span></span></span> 查詢中,通常 10-30 秒⋯');
+
+  try{
     const r = await fetch('/api/ask', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question:q, history: window._hist || null})
+      body: JSON.stringify({question:q, history:history})
     });
     const d = await r.json();
-    if(!r.ok){ $('#out').innerHTML = `<div class="card err">${esc(d.error||'發生錯誤')}</div>`; return; }
-    render(d, q);
-  } catch(e) {
-    $('#out').innerHTML = `<div class="card err">連線失敗:${esc(e.message)}</div>`;
-  } finally {
-    $('#send').disabled = false;
-    $('#status').textContent = '';
+    if(!r.ok){
+      holder.querySelector('.bubble').innerHTML =
+        '<span class="nosrc">' + esc(d.error||'發生錯誤') + '</span>';
+      return;
+    }
+    history.push(q);                        // 送出成功才記進脈絡
+    if(history.length > 4) history.shift();
+    renderBot(holder, d);
+  }catch(e){
+    holder.querySelector('.bubble').innerHTML =
+      '<span class="nosrc">連線失敗:' + esc(e.message) + '</span>';
+  }finally{
+    busy = false; $('#send').disabled = false; $('#q').focus(); scroll();
   }
 }
 
-function render(d, q){
+function renderBot(node, d){
+  const b = node.querySelector('.bubble');
+
   if(d.type === 'clarify'){
-    $('#out').innerHTML = `<div class="card clarify">
-      <b>需要多一點資訊才能正確回答</b>
-      <div class="answer" style="margin-top:8px">${esc(d.question)}</div>
-      <textarea id="reply" style="min-height:52px;margin-top:10px"
-        placeholder="在這裡回答,例如:我是113學年度入學的"></textarea>
-      <div class="row">
-        <button onclick="followup()">補上後再問一次</button>
-        <span class="meta">原問題:${esc(d.original||'')}</span>
-      </div>
-      <div class="meta" style="margin-top:8px">不同屆別、不同身分的規定確實不一樣,
-      給一個涵蓋多屆的範圍反而每個人都不適用,所以寧可先問清楚。</div></div>`;
-    window._orig = d.original || '';
-    $('#reply').focus();
-    // 補充內容通常很短,直接 Enter 送出比較順手(Shift+Enter 換行)
-    $('#reply').addEventListener('keydown', e => {
-      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); followup(); }
-    });
-    return;
+    node.className = 'msg bot ask';
+    b.innerHTML = esc(d.question) +
+      '<div class="tools">回答之後我就能查了 —— 不同屆別、不同身分的規定確實不一樣,' +
+      '給一個涵蓋多屆的範圍反而每個人都不適用。</div>';
+    scroll(); return;
   }
 
-  let srcHtml = '';
+  // 出處是安全機制,不是裝飾:這個系統最危險的錯是「引用了真文件、答案卻是錯的」,
+  // 使用者只有看得到原文才擋得住,所以預設展開而不是收起來。
+  let src;
   if(d.sources && d.sources.length){
-    srcHtml = `<details open><summary><b>依據的文件(${d.sources.length} 段)—— 請自行核對</b></summary>` +
-      d.sources.map(s => `<div class="src"><b>${esc(s.file)}${s.segment?' 第'+esc(s.segment)+'段':''}</b>
-        <p>${esc(s.text.slice(0,600))}${s.text.length>600?'⋯':''}</p></div>`).join('') +
-      `</details>`;
-  } else {
-    srcHtml = `<details open><summary class="err"><b>⚠ 這個回答沒有查到任何文件</b></summary>
-      <p class="meta">系統沒有成功檢索到文件,以下內容可能完全來自模型推測,
-      <b>請不要採信</b>,並按「答案有誤」回報。</p></details>`;
+    src = '<details open><summary>依據的文件(' + d.sources.length + ' 段)—— 請自行核對</summary>' +
+      d.sources.map(function(s){
+        return '<div class="src"><b>' + esc(s.file) +
+               (s.segment ? ' 第' + esc(s.segment) + '段' : '') + '</b><p>' +
+               esc(s.text.slice(0,500)) + (s.text.length>500?'⋯':'') + '</p></div>';
+      }).join('') + '</details>';
+  }else{
+    src = '<div class="nosrc"><b>⚠ 這則回答沒有查到任何文件</b><br>' +
+          '內容可能完全來自模型推測,請不要採信,並按「答案有誤」回報。</div>';
   }
 
-  $('#out').innerHTML = `<div class="card">
-    <div class="answer">${esc(d.answer)}</div>
-    <div class="meta">耗時 ${d.elapsed} 秒${d.queued_ahead?` · 前面排了 ${d.queued_ahead} 人`:''}</div>
-    ${srcHtml}
-    <div class="fb" id="fb">
-      這個答案正確嗎?
-      <div class="row">
-        <button class="ghost" onclick="send('correct')">答案正確</button>
-        <button class="ghost" onclick="send('wrong')">答案有誤</button>
-        <button class="ghost" onclick="send('unclear')">看不懂 / 沒回答到</button>
-      </div>
-      <textarea id="cmt" style="min-height:52px;margin-top:8px"
-        placeholder="哪裡有問題?(選填,但對我們很有幫助)"></textarea>
-    </div></div>`;
-  window._aid = d.answer_id;
-  // 只記問題不記答案 —— 帶著上一個答案會讓模型整段複述它,而且答案本身可能是錯的
-  window._hist = {question: q};
-  showContext();
+  const id = d.answer_id;
+  b.innerHTML = esc(d.answer) +
+    '<div class="tools">' + src +
+    '<div class="fbrow" id="fb-' + id + '">' +
+      '<button onclick="fb(\'' + id + '\',\'correct\')">答案正確</button>' +
+      '<button onclick="fb(\'' + id + '\',\'wrong\')">答案有誤</button>' +
+      '<button onclick="fb(\'' + id + '\',\'unclear\')">看不懂</button>' +
+      '<span style="margin-left:auto">' + d.elapsed + ' 秒' +
+      (d.queued_ahead ? ' · 排隊 ' + d.queued_ahead + ' 人' : '') + '</span>' +
+    '</div></div>';
+  scroll();
 }
 
-// 讓使用者看得到目前是接在哪一題後面問 —— 不然「阿大一呢」為什麼會被聽懂
-// 就變成黑魔法,而且他也無從察覺該清掉舊脈絡。
-function showContext(){
-  let bar = document.querySelector('#ctx');
-  if(!bar){
-    bar = document.createElement('div');
-    bar.id = 'ctx'; bar.className = 'meta';
-    bar.style.cssText = 'margin-top:8px;padding:6px 10px;border:1px dashed var(--line);border-radius:8px';
-    document.querySelector('.examples').after(bar);
+async function fb(id, verdict){
+  const row = document.querySelector('#fb-' + id);
+  let comment = '';
+  if(verdict !== 'correct'){
+    comment = prompt('哪裡有問題?(可留空,但寫下來對我們很有幫助)') || '';
   }
-  if(!window._hist){ bar.remove(); return; }
-  bar.innerHTML = `接續提問中(可以直接問「那大一呢」)—— 上一題:
-    ${esc(window._hist.question.slice(0,40))}${window._hist.question.length>40?'⋯':''}
-    <b style="cursor:pointer;text-decoration:underline" onclick="clearCtx()">清除,重新開始</b>`;
-}
-function clearCtx(){ window._hist = null; showContext(); }
-
-// 把補充內容接回原問題重新送出。系統本身是無狀態的(每次都重跑整個流程),
-// 所以「接續對話」實際上就是組出一個資訊完整的新問題。
-function followup(){
-  const extra = ($('#reply').value || '').trim();
-  if(!extra) { $('#reply').focus(); return; }
-  $('#q').value = `${window._orig}(補充:${extra})`;
-  ask();
-}
-
-async function send(v){
   await fetch('/api/feedback', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({answer_id: window._aid, verdict: v, comment: $('#cmt').value})
+    body: JSON.stringify({answer_id:id, verdict:verdict, comment:comment})
   });
-  $('#fb').innerHTML = '<b>已送出,謝謝!</b> 你的回報會用來改進這個系統。';
+  row.innerHTML = '<span>已回報,謝謝!你的意見會用來改進這個系統。</span>';
 }
 
 $('#send').onclick = ask;
-$('#q').addEventListener('keydown', e => {
-  if((e.metaKey||e.ctrlKey) && e.key === 'Enter') ask();
+$('#q').addEventListener('input', autosize);
+$('#q').addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); ask(); }
 });
+$('#q').focus();
 </script>
 </body>
 </html>

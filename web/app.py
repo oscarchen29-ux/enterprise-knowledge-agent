@@ -118,14 +118,21 @@ def _with_context(question: str, history: dict | None) -> str:
 
     只帶問題就夠了 —— 前一題的「114 學年度入學」交代了身分,「必修」交代了主題,
     接續提問只負責提供改變的部分(大一)。
+
+    改成聊天介面之後,history 是「先前的提問清單」而不是單一問題。只取最近兩則:
+    行政問答的脈絡衰減很快(問完必修再問宿舍,必修那題就沒用了),帶太多只會稀釋
+    檢索用的關鍵字。
     """
     if not history:
         return question
-    previous_q = (history.get("question") or "").strip()
-    if not previous_q:
+    if isinstance(history, dict):          # 舊格式,保留相容
+        history = [history.get("question") or ""]
+    previous = [str(h).strip() for h in history if str(h).strip()][-2:]
+    if not previous:
         return question
+    joined = "」、「".join(previous)
     return (
-        f"使用者上一個問題是:「{previous_q}」\n"
+        f"使用者先前問過:「{joined}」\n"
         f"現在他接著問:「{question}」\n\n"
         f"請把這兩句合起來理解使用者真正想問什麼,然後只回答接續提問。"
         f"上一個問題裡若已交代身分或入學屆別,接續提問一樣適用,"
