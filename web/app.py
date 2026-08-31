@@ -29,12 +29,14 @@ import time
 import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from flask import Flask, jsonify, render_template, request  # noqa: E402
 
 import agent  # noqa: E402
+from normalize import normalize  # noqa: E402
 import tools  # noqa: E402
 from providers.ollama_provider import OllamaProvider  # noqa: E402
 
@@ -51,6 +53,12 @@ _WAITING_LOCK = threading.Lock()
 _PROVIDER = None
 _SOURCES = []           # 側錄本次查詢取回的片段
 _ANSWERS = {}           # answer_id -> 回報時要一起存的內容
+_FILES = {}             # file_id -> 使用者上傳的檔案文字
+
+# 上傳限制。8000 字約 12k tokens,加上檢索回來的內容仍在 16384 的 num_ctx 之內;
+# 超過的部分截掉並告知使用者,好過默默塞爆 context(那正是本專案踩過的坑)。
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+MAX_EXTRACT_CHARS = 8000
 
 
 def _install_source_probe():
@@ -86,19 +94,6 @@ def _provider():
 @app.route("/")
 def index():
     return render_template("index.html", model=app.config["MODEL"])
-
-
-# 台灣口語很常用「阿」「啊」當句首發語詞,意思等於「那」——「阿大一呢」就是
-# 「那大一呢」。但中國訓練的開源模型不認得這個用法,會把它讀成名字的一部分:
-# 實測連問三次「阿大一呢」,模型都反問「請問您要問的是阿大一的必修課程嗎?」。
-#
-# 這不是檢索或推理的問題,是繁體中文在地用語的問題,而且學生打字時一定會這樣寫。
-# 只處理句首、且後面接得上內容的情況,避免誤傷「阿拉伯數字」這類詞。
-_COLLOQUIAL_PREFIX = re.compile(r"^[阿啊][\s,,]*(?=[那這大碩博一二三四五六七八九十研學我要想有能可])")
-
-
-def _normalize(question: str) -> str:
-    return _COLLOQUIAL_PREFIX.sub("那", question.strip(), count=1)
 
 
 def _with_context(question: str, history: dict | None) -> str:
@@ -147,11 +142,67 @@ def _with_context(question: str, history: dict | None) -> str:
     )
 
 
+def _extract_text(filename: str, data: bytes) -> str:
+    """從上傳的檔案取出純文字。只支援 PDF 與純文字 —— Word/Excel 需要額外套件,
+    而學生最常有的成績單、課表、通知單多半是 PDF 或直接複製貼上。"""
+    lower = filename.lower()
+    if lower.endswith(".pdf"):
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(data))
+        return "\n".join((page.extract_text() or "") for page in reader.pages)
+    for encoding in ("utf-8", "utf-8-sig", "cp950", "big5"):
+        try:
+            return data.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return data.decode("utf-8", "replace")
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload():
+    """接收檔案、抽出文字、暫存在記憶體裡等後續提問引用。
+
+    刻意不寫到磁碟:上傳的多半是成績單這類個人資料,留在記憶體裡、程式一關就沒了,
+    比留下一堆檔案安全。代價是重開伺服器後要重新上傳,對試用來說可以接受。
+    """
+    if "file" not in request.files:
+        return jsonify({"error": "沒有收到檔案"}), 400
+    f = request.files["file"]
+    data = f.read(MAX_UPLOAD_BYTES + 1)
+    if len(data) > MAX_UPLOAD_BYTES:
+        return jsonify({"error": "檔案太大,請上傳 5MB 以內的檔案"}), 400
+    if not data:
+        return jsonify({"error": "檔案是空的"}), 400
+
+    try:
+        text = _extract_text(f.filename or "upload", data)
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"error": f"讀不到內容({type(exc).__name__})。"
+                                f"目前只支援 PDF 與純文字;掃描成圖片的 PDF 也讀不出來。"}), 400
+
+    text = (text or "").strip()
+    if len(text) < 20:
+        return jsonify({"error": "抽不出文字。如果是掃描的 PDF(圖片),"
+                                "請改成貼上文字內容。"}), 400
+
+    truncated = len(text) > MAX_EXTRACT_CHARS
+    text = text[:MAX_EXTRACT_CHARS]
+    file_id = uuid.uuid4().hex[:12]
+    _FILES[file_id] = {"name": f.filename or "檔案", "text": text}
+    if len(_FILES) > 50:
+        for key in list(_FILES)[:-50]:
+            _FILES.pop(key, None)
+
+    return jsonify({"file_id": file_id, "name": f.filename, "chars": len(text),
+                    "truncated": truncated})
+
+
 @app.route("/api/ask", methods=["POST"])
 def ask():
     payload = request.json or {}
-    question = _normalize(payload.get("question") or "")
+    question = normalize(payload.get("question") or "")
     history = payload.get("history") or None
+    attached = _FILES.get(payload.get("file_id") or "")
     if not question:
         return jsonify({"error": "請輸入問題"}), 400
     if len(question) > 300:
@@ -171,7 +222,15 @@ def ask():
     try:
         with _MODEL_LOCK:
             _SOURCES.clear()
-            answer = agent.run_task(_with_context(question, history), _provider())
+            task = _with_context(question, history)
+            if attached:
+                # 檔案放在最前面,問題放最後 —— 模型對結尾的指示比較敏感,
+                # 把「要回答什麼」留在最後可以避免它改去摘要整份檔案。
+                task = (f"【使用者上傳的檔案:{attached['name']}】\n"
+                        f"{attached['text']}\n\n"
+                        f"以上是使用者提供的個人文件。請結合這份文件與你查到的校方規定回答。"
+                        f"文件裡沒有、規定裡也沒有的內容,不要自行推測。\n\n{task}")
+            answer = agent.run_task(task, _provider())
             sources = list(_SOURCES)
     except Exception as exc:  # noqa: BLE001
         app.logger.exception("run_task failed")
@@ -199,6 +258,11 @@ def ask():
     return jsonify({
         "type": "answer",
         "answer_id": answer_id,
+        "asked": question,          # 前端的「整理成筆記」要知道原本問的是什麼
+        # 帶檔案的回答風險更高:實測給它一份成績單問「還差多少學分」,
+        # 它先說沒看到已修學分、又拿大一必修學分去算,得出錯誤的差額。
+        # 純規定查詢答錯還能靠出處核對,個人資料的計算沒有出處可對。
+        "used_file": bool(attached),
         "answer": answer,
         "sources": sources,
         "searched": bool(sources),

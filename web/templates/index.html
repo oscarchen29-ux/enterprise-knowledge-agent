@@ -65,6 +65,11 @@
   .chips{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px}
   .chips b{font-weight:400; font-size:13px; color:var(--muted); border:1px solid var(--line);
            border-radius:999px; padding:4px 11px; cursor:pointer}
+  .clip{font:inherit; font-size:19px; line-height:1; padding:11px 13px; border-radius:12px;
+        border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer}
+  #att{display:none; font-size:13px; color:var(--muted); margin-bottom:8px;
+       border:1px solid var(--line); border-radius:8px; padding:6px 10px}
+  #att b{cursor:pointer; text-decoration:underline; margin-left:8px}
 </style>
 </head>
 <body>
@@ -89,7 +94,11 @@
     <b onclick="fill(this)">宿舍床位怎麼申請?</b>
     <b onclick="fill(this)">休學最多可以休多久?</b>
   </div>
+  <div id="att"></div>
   <div class="inputrow">
+    <input type="file" id="file" accept=".pdf,.txt,.md,.csv" style="display:none">
+    <button class="clip" title="附上檔案(成績單、課表等,PDF 或純文字)"
+            onclick="document.getElementById('file').click()">📎</button>
     <textarea id="q" rows="1" placeholder="問一個系上或學校的行政問題⋯"></textarea>
     <button id="send">送出</button>
   </div>
@@ -140,7 +149,7 @@ async function ask(){
   try{
     const r = await fetch('/api/ask', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question:q, history:history})
+      body: JSON.stringify({question:q, history:history, file_id:fileId})
     });
     const d = await r.json();
     if(!r.ok){
@@ -149,6 +158,7 @@ async function ask(){
       return;
     }
     history.push(q);                        // 送出成功才記進脈絡
+    clearFile();                            // 檔案只跟著這一次提問
     if(history.length > 4) history.shift();
     renderBot(holder, d);
   }catch(e){
@@ -193,7 +203,14 @@ function renderBot(node, d){
   }
 
   const id = d.answer_id;
-  b.innerHTML = esc(d.answer) +
+  // 用到上傳檔案的回答另外警告:這類問題通常牽涉計算(還差幾學分、退多少錢),
+  // 而模型的算術很不可靠,又沒有出處可以核對計算過程。
+  const fileWarn = d.used_file
+    ? '<div class="nosrc" style="margin-top:8px"><b>⚠ 這則回答用到你上傳的檔案</b><br>' +
+      '涉及個人資料的計算(還差幾學分、退費金額等)特別容易算錯,而且沒有出處可以核對。' +
+      '請務必自己重算一次,或直接問系辦。</div>'
+    : '';
+  b.innerHTML = esc(d.answer) + fileWarn +
     '<div class="tools">' + src +
     '<div class="fbrow" id="fb-' + id + '">' +
       '<button onclick="fb(\'' + id + '\',\'correct\')">答案正確</button>' +
@@ -216,6 +233,40 @@ async function fb(id, verdict){
     body: JSON.stringify({answer_id:id, verdict:verdict, comment:comment})
   });
   row.innerHTML = '<span>已回報,謝謝!你的意見會用來改進這個系統。</span>';
+}
+
+// 附上檔案讓學生可以問「我的成績單在這,還差多少學分」這種問題 —— 這類問題
+// 光靠校方規定答不出來,一定要有學生自己的資料。檔案只存在伺服器記憶體裡,
+// 不寫磁碟(多半是成績單這種個人資料)。
+let fileId = null;
+$('#file').addEventListener('change', async function(){
+  const f = this.files[0]; if(!f) return;
+  const box = $('#att');
+  box.style.display = 'block';
+  box.innerHTML = '讀取「' + esc(f.name) + '」中⋯';
+  const fd = new FormData(); fd.append('file', f);
+  try{
+    const r = await fetch('/api/upload', {method:'POST', body:fd});
+    const d = await r.json();
+    if(!r.ok){ box.innerHTML = '<span class="nosrc">' + esc(d.error) + '</span>' +
+        '<b onclick="clearFile()">移除</b>'; fileId = null; return; }
+    fileId = d.file_id;
+    box.innerHTML = '📎 已附上「' + esc(d.name) + '」(' + d.chars + ' 字' +
+      (d.truncated ? ',超過長度上限,只讀取前面部分' : '') + ')<b onclick="clearFile()">移除</b>';
+  }catch(e){
+    box.innerHTML = '<span class="nosrc">上傳失敗</span><b onclick="clearFile()">移除</b>';
+    fileId = null;
+  }
+  this.value = '';
+});
+function clearFile(){ fileId = null; $('#att').style.display='none'; $('#att').innerHTML=''; }
+
+// 把剛才的回答整理成筆記。做成快捷鍵而不是另一個功能:它本質上就是再問一次,
+// 只是換個輸出格式,沒必要為此多寫一條後端路徑。
+function toNotes(q){
+  $('#q').value = '把「' + q + '」這題的答案整理成條列式筆記,' +
+                  '保留學分數、期限、單位名稱等具體數字,不要加入文件沒有的內容。';
+  ask();
 }
 
 $('#send').onclick = ask;
