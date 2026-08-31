@@ -22,3 +22,13 @@ benchmark/run_log_v3.txt
 # 使用者回報含學生真實提問,屬個人資料,不進版控。
 # 這是專題的質化資料來源,請自行備份到不公開的位置。
 web/feedback.jsonl
+
+# 課程繳交用的產物與論文導讀教材,與本系統無關,只留在本機。
+# repo 的定位是「給使用者」與「開發日誌」兩件事。
+*.pptx
+proposal.html
+paper_figs/
+assets_attention.png
+assets_flow.png
+assets_demo_success.png
+assets_demo_failure.png
