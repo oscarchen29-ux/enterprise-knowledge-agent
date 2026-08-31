@@ -146,6 +146,61 @@ def needs_clarification(task: str) -> str | None:
     return None
 
 
+# 上面擋的是「該追問卻沒追問」,下面擋的是反過來的「不該追問卻追問」。
+#
+# 7B 判斷「我資訊夠不夠」兩個方向都不準。benchmark v3 裡 B01、F04 兩題三次執行
+# 全部以追問收尾、從未給出答案:
+#
+#   F04「我是轉學生,大二轉進資工系,最多可以抵免多少學分?」
+#       -> 模型問「請問您是轉系生還是轉學生呢?」。題目第一句就寫了。
+#   B01「我是轉系生,轉入資工系三年級,最多可以抵免多少學分?畢業總共要修滿多少?」
+#       -> 模型問「請問您是哪一學年度入學的呢?」。題目確實沒說,但抵免上限與
+#          畢業總學分各屆相同(128 學分、系必修 49),屆別不影響答案。
+#
+# 追問本身是對的設計 —— 給「15 至 16 學分」這種涵蓋多屆的範圍更糟。問題在於
+# 模型是照 SYSTEM_PROMPT 和工具描述裡的關鍵字在觸發,沒有真的檢查「這個條件
+# 題目給了沒有」以及「這個條件會不會改變答案」。所以在追問送回使用者之前,
+# 用確定性的規則把這兩種多餘的追問駁回,讓迴圈繼續去查文件。
+
+# 只有共同課程與通識的學分數會因入學屆別而不同(113 學年度調整過)。畢業總學分、
+# 系必修學分、抵免上限各屆一致,問屆別問不出差別。
+_COHORT_SENSITIVE = re.compile(r"共同課程|通識")
+# 模型問的是哪一類條件
+_ASKS_COHORT = re.compile(r"學年度|入學年|哪一屆|哪一級|入學時間")
+_ASKS_TRANSFER_KIND = re.compile(r"轉系.{0,6}轉學|轉學.{0,6}轉系")
+_ASKS_PROGRAM = re.compile(r"學士.{0,8}碩士|碩士.{0,8}博士|哪一個?學制|大學部.{0,8}研究所")
+# 抵免上限是依「轉入年級」訂的(學則:轉入二年級以一年級應修學分總數為原則,
+# 轉入三年級以一、二年級為原則),跟原本就讀哪個系無關。模型問過這個。
+_ASKS_ORIGIN_DEPT = re.compile(r"哪一個?(科)?系|原(本的)?(科)?系|原就讀|從哪個系")
+_ASKS_CREDIT_CAP = re.compile(r"抵免")
+_HAS_ENTRY_YEAR = re.compile(r"大[一二三四]|[一二三四1234]\s*年級")
+# 題目裡已經給了對應條件的證據
+_HAS_TRANSFER_KIND = re.compile(r"轉系|轉學|重考")
+_HAS_PROGRAM = re.compile(r"學士|大學部|大[一二三四]|碩士|博士|研究所|在職專班")
+
+
+def redundant_clarification(question: str, task: str) -> str | None:
+    """模型想追問但其實不必問時,回傳駁回的理由;該問則回傳 None。
+
+    理由字串會回饋給模型當作工具結果,所以要寫成模型看得懂的一句話。
+    """
+    if _ASKS_TRANSFER_KIND.search(question) and _HAS_TRANSFER_KIND.search(task):
+        return f"使用者已經在問題中說明了身分別({_HAS_TRANSFER_KIND.search(task).group()}生)。"
+    if _ASKS_PROGRAM.search(question) and _HAS_PROGRAM.search(task):
+        return f"使用者已經在問題中說明了學制({_HAS_PROGRAM.search(task).group()})。"
+    if (_ASKS_ORIGIN_DEPT.search(question) and _ASKS_CREDIT_CAP.search(task)
+            and _HAS_ENTRY_YEAR.search(task)):
+        return ("抵免學分的上限是依轉入年級決定的,與原本就讀的科系無關,"
+                f"而使用者已經說明了轉入年級({_HAS_ENTRY_YEAR.search(task).group()})。")
+    if _ASKS_COHORT.search(question):
+        if _COHORT_HINT.search(task):
+            return "使用者已經在問題中說明了入學學年度。"
+        if not _COHORT_SENSITIVE.search(task):
+            return ("入學學年度不影響這一題的答案 —— 只有共同課程與通識的學分數會因屆別"
+                    "而不同,畢業總學分、系必修學分與抵免上限各屆一致。")
+    return None
+
+
 def run_task(task: str, provider) -> str:
     global LAST_WAS_CLARIFICATION
     LAST_WAS_CLARIFICATION = False
@@ -175,11 +230,19 @@ def run_task(task: str, provider) -> str:
                 content = ""
 
         if not tool_calls:
-            # 模型既沒查文件、也沒產生任何內容。原本會回傳空字串,使用者看到一片空白,
-            # 可能誤以為「系統查不到就是沒這條規定」,比明講失敗更危險。
+            # 模型既沒查文件、也沒產生任何內容。回傳空字串會讓使用者誤以為
+            # 「系統查不到就是沒這條規定」,比明講失敗更危險。
+            #
+            # 但這裡原本是直接回傳失敗訊息,連底下的保底檢索都不做 —— 那是錯的。
+            # 空白回應比「憑記憶作答」更該保底:沒有任何內容需要保留,重試的
+            # 成本只有一次檢索。benchmark v3 剩下的靜默失敗(C01、D05、B01)
+            # 全部走這條路,佔全部執行的 3%,而且它們並不是查不到資料。
+            # 所以只有在「已經餵過文件、仍然給不出東西」時才放棄。
             if not content.strip():
                 print(f"[step {step}] 模型回傳空白內容且未呼叫工具")
-                return "模型未產生有效回答,也沒有查詢任何文件。請重新提問,或把問題描述得更具體。"
+                if retrieved_context:
+                    return ("模型未產生有效回答。已經查到相關文件但無法整理成答案,"
+                            "請重新提問,或把問題描述得更具體。")
 
             # 保底檢索:模型有時直接憑記憶作答,一次工具都不呼叫,而且答得像模像樣
             # (實測它會編出《學生手冊》裡不存在的章節編號)。這種答案沒有任何文件
@@ -231,10 +294,22 @@ def run_task(task: str, provider) -> str:
                 # 不要繼續跑迴圈 —— 缺的資訊只有使用者能補。
                 if isinstance(tool_result, str) and tool_result.startswith(ASK_MARKER):
                     question = tool_result[len(ASK_MARKER):].strip()
-                    print(f"[step {step}] 條件不足,向使用者追問")
-                    LAST_WAS_CLARIFICATION = True
-                    return _s2tw.convert(question)
-                retrieved_context.append(tool_result)
+                    redundant = redundant_clarification(question, task)
+                    if redundant is None:
+                        print(f"[step {step}] 條件不足,向使用者追問")
+                        LAST_WAS_CLARIFICATION = True
+                        return _s2tw.convert(question)
+                    # 多餘的追問。不要交還給使用者,改把理由回饋給模型,讓它繼續查。
+                    # 這裡不進 retrieved_context —— 它不是文件內容,放進去會讓
+                    # 自我驗證步驟拿它當作依據。
+                    print(f"[step {step}] 駁回多餘的追問:{redundant}")
+                    tool_result = (
+                        f"不需要追問。{redundant}"
+                        "請直接呼叫 search_documents 查詢相關規定並回答,"
+                        "不要再呼叫 ask_clarification。"
+                    )
+                else:
+                    retrieved_context.append(tool_result)
             messages.append({
                 "role": "tool",
                 "tool_call_id": call["id"],
