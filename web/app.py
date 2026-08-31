@@ -227,6 +227,31 @@ def feedback():
     return jsonify({"ok": True})
 
 
+@app.route("/admin/feedback")
+def admin_feedback():
+    """在瀏覽器上看回報。必須用 --admin-token 啟動,而且網址要帶對 token。
+
+    預設關閉是刻意的:網頁會透過內網穿透開給全系使用,而回報裡有學生的真實提問,
+    不能讓任何人打開網址就看得到。沒設 token 時這個路徑一律回 404,連存在都不透露。
+    """
+    token = app.config.get("ADMIN_TOKEN")
+    if not token or request.args.get("token") != token:
+        return "Not Found", 404
+
+    rows = []
+    if os.path.exists(FEEDBACK_PATH):
+        with io.open(FEEDBACK_PATH, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        rows.append(json.loads(line))
+                    except ValueError:
+                        pass
+    rows.reverse()          # 新的在上面
+    return render_template("feedback.html", rows=rows, total=len(rows))
+
+
 @app.route("/api/health")
 def health():
     return jsonify({
@@ -242,13 +267,21 @@ if __name__ == "__main__":
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--model", default="qwen2.5:7b")
+    parser.add_argument("--admin-token", default=None,
+                        help="設了才會開放 /admin/feedback?token=... 檢視回報;不設就完全關閉")
     args = parser.parse_args()
 
     app.config["MODEL"] = args.model
+    app.config["ADMIN_TOKEN"] = args.admin_token
     _install_source_probe()
 
     print(f"知識庫 {len(tools._load_chunks())} 塊,向量索引 "
           f"{'已載入' if tools._load_index() else '未啟用(僅 BM25)'}")
     print(f"模型 {args.model}    http://{args.host}:{args.port}")
+    if args.admin_token:
+        print(f"回報檢視  http://{args.host}:{args.port}/admin/feedback?token={args.admin_token}")
+    else:
+        print("回報檢視  未開放(要開放請加 --admin-token,或用 "
+              "python scripts/show_feedback.py 在本機看)")
     # threaded=True 讓排隊中的請求不會卡住整個伺服器,實際的模型呼叫仍由鎖串行化
     app.run(host=args.host, port=args.port, threaded=True)

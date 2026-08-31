@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>使用者回報({{ total }} 筆)</title>
+<style>
+  :root{ --bg:#fff; --fg:#1a1d23; --muted:#5b6472; --line:#e2e5ea;
+         --ok:#1e7a44; --bad:#c0392b; --warn:#8a5a00; --card:#f6f7f9; }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#15181d; --fg:#e8ebf0; --muted:#9aa4b4; --line:#2c333d;
+           --ok:#5fd08a; --bad:#ff8a7a; --warn:#ffd483; --card:#1d2229; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; padding:20px 16px; background:var(--bg); color:var(--fg);
+       font:15px/1.6 -apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+  main{max-width:820px; margin:0 auto}
+  h1{font-size:19px; margin:0 0 4px}
+  .sub{color:var(--muted); font-size:13px; margin-bottom:18px}
+  .tabs{display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap}
+  .tabs b{font-weight:400; font-size:13px; border:1px solid var(--line); border-radius:999px;
+          padding:4px 12px; cursor:pointer}
+  .tabs b.on{background:var(--fg); color:var(--bg); border-color:var(--fg)}
+  .item{background:var(--card); border-radius:10px; padding:13px 15px; margin-bottom:12px}
+  .tag{font-size:12px; font-weight:700; padding:2px 9px; border-radius:999px; border:1px solid currentColor}
+  .correct .tag{color:var(--ok)} .wrong .tag{color:var(--bad)} .unclear .tag{color:var(--warn)}
+  .when{color:var(--muted); font-size:12px; margin-left:8px}
+  .q{font-weight:600; margin:8px 0 4px}
+  .cmt{border-left:3px solid var(--bad); padding-left:10px; margin:8px 0; font-size:14px}
+  .a{color:var(--muted); font-size:13.5px; white-space:pre-wrap; margin-top:6px}
+  .src{color:var(--muted); font-size:12px; margin-top:8px}
+  .empty{color:var(--muted); padding:40px 0; text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <h1>使用者回報</h1>
+  <div class="sub">
+    共 {{ total }} 筆 · 資料只存在這台機器的 <code>web/feedback.jsonl</code>,未上傳、未進版控。<br>
+    這些是真實學生的提問,請當作個人資料處理。
+  </div>
+
+  <div class="tabs">
+    <b class="on" onclick="show(this,'all')">全部</b>
+    <b onclick="show(this,'wrong')">答案有誤</b>
+    <b onclick="show(this,'unclear')">看不懂</b>
+    <b onclick="show(this,'correct')">答案正確</b>
+  </div>
+
+  {% if not rows %}
+    <div class="empty">還沒有任何回報。網頁被實際使用之後才會出現。</div>
+  {% endif %}
+
+  {% for r in rows %}
+  <div class="item {{ r.verdict }}" data-v="{{ r.verdict }}">
+    <span class="tag">{% if r.verdict == 'correct' %}正確{% elif r.verdict == 'wrong' %}有誤{% else %}看不懂{% endif %}</span>
+    <span class="when">{{ r.time }}</span>
+    <div class="q">{{ r.question }}</div>
+    {% if r.comment %}<div class="cmt">使用者說:{{ r.comment }}</div>{% endif %}
+    <div class="a">{{ r.answer[:400] }}{% if r.answer and r.answer|length > 400 %}⋯{% endif %}</div>
+    <div class="src">依據:{{ r.sources|join('、') if r.sources else '(沒有查到文件)' }}</div>
+  </div>
+  {% endfor %}
+</main>
+<script>
+function show(btn, v){
+  document.querySelectorAll('.tabs b').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.querySelectorAll('.item').forEach(function(it){
+    it.style.display = (v === 'all' || it.dataset.v === v) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
