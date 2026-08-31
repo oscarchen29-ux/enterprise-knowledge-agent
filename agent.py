@@ -49,6 +49,12 @@ VERIFY_PROMPT = (
 
 MAX_STEPS = 5
 
+# run_task 回傳的是字串,呼叫端無從分辨那是答案還是追問 —— 網頁層曾因此把
+# 模型的追問當成一般答案顯示,還套上「這個回答沒有查到任何文件」的警告,
+# 對使用者是誤導。改回傳型別會動到 CLI 與 benchmark,所以用一個模組層旗標:
+# 每次 run_task 開頭清掉,走到追問路徑時設起來,呼叫端讀它即可。
+LAST_WAS_CLARIFICATION = False
+
 # 模型有時不走 OpenAI 相容 API 的 tool_calls 欄位,而是把呼叫請求當成一般文字吐在
 # content 裡(常伴隨無意義的 token,例如「 Closet」「portun」)。Ollama 的相容層不會
 # 幫忙解析,結果 result["tool_calls"] 是空的,這一輪就被誤判成「模型不需要查文件」,
@@ -141,9 +147,13 @@ def needs_clarification(task: str) -> str | None:
 
 
 def run_task(task: str, provider) -> str:
+    global LAST_WAS_CLARIFICATION
+    LAST_WAS_CLARIFICATION = False
+
     question = needs_clarification(task)
     if question:
         print("[step -] 問題缺少關鍵條件,先向使用者追問")
+        LAST_WAS_CLARIFICATION = True
         return question
 
     messages = [
@@ -222,6 +232,7 @@ def run_task(task: str, provider) -> str:
                 if isinstance(tool_result, str) and tool_result.startswith(ASK_MARKER):
                     question = tool_result[len(ASK_MARKER):].strip()
                     print(f"[step {step}] 條件不足,向使用者追問")
+                    LAST_WAS_CLARIFICATION = True
                     return _s2tw.convert(question)
                 retrieved_context.append(tool_result)
             messages.append({

@@ -99,7 +99,7 @@ def ask():
     # 條件不足時直接回追問,不佔用模型 —— 這條路不需要排隊
     clarify = agent.needs_clarification(question)
     if clarify:
-        return jsonify({"type": "clarify", "question": clarify})
+        return jsonify({"type": "clarify", "question": clarify, "original": question})
 
     global _WAITING
     with _WAITING_LOCK:
@@ -118,6 +118,14 @@ def ask():
     finally:
         with _WAITING_LOCK:
             _WAITING -= 1
+
+    # 模型自己呼叫 ask_clarification 時也是追問,不是答案。這條路徑沒有被
+    # needs_clarification 攔下來(確定性規則只涵蓋屆別與抵免身分兩種情況),
+    # 若不分辨,網頁會把追問當答案顯示、還套上「沒有查到任何文件」的紅字警告 ——
+    # 對使用者是誤導,而且沒有地方可以回答。
+    if agent.LAST_WAS_CLARIFICATION:
+        return jsonify({"type": "clarify", "question": answer, "original": question,
+                        "elapsed": round(time.time() - started, 1)})
 
     answer_id = uuid.uuid4().hex[:12]
     _ANSWERS[answer_id] = {"question": question, "answer": answer,
