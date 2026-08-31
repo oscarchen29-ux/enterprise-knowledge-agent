@@ -87,7 +87,7 @@ async function ask(){
   try {
     const r = await fetch('/api/ask', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question:q})
+      body: JSON.stringify({question:q, history: window._hist || null})
     });
     const d = await r.json();
     if(!r.ok){ $('#out').innerHTML = `<div class="card err">${esc(d.error||'發生錯誤')}</div>`; return; }
@@ -149,7 +149,27 @@ function render(d, q){
         placeholder="哪裡有問題?(選填,但對我們很有幫助)"></textarea>
     </div></div>`;
   window._aid = d.answer_id;
+  // 只記問題不記答案 —— 帶著上一個答案會讓模型整段複述它,而且答案本身可能是錯的
+  window._hist = {question: q};
+  showContext();
 }
+
+// 讓使用者看得到目前是接在哪一題後面問 —— 不然「阿大一呢」為什麼會被聽懂
+// 就變成黑魔法,而且他也無從察覺該清掉舊脈絡。
+function showContext(){
+  let bar = document.querySelector('#ctx');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'ctx'; bar.className = 'meta';
+    bar.style.cssText = 'margin-top:8px;padding:6px 10px;border:1px dashed var(--line);border-radius:8px';
+    document.querySelector('.examples').after(bar);
+  }
+  if(!window._hist){ bar.remove(); return; }
+  bar.innerHTML = `接續提問中(可以直接問「那大一呢」)—— 上一題:
+    ${esc(window._hist.question.slice(0,40))}${window._hist.question.length>40?'⋯':''}
+    <b style="cursor:pointer;text-decoration:underline" onclick="clearCtx()">清除,重新開始</b>`;
+}
+function clearCtx(){ window._hist = null; showContext(); }
 
 // 把補充內容接回原問題重新送出。系統本身是無狀態的(每次都重跑整個流程),
 // 所以「接續對話」實際上就是組出一個資訊完整的新問題。

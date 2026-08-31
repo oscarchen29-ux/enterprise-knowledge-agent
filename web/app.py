@@ -88,9 +88,63 @@ def index():
     return render_template("index.html", model=app.config["MODEL"])
 
 
+# 台灣口語很常用「阿」「啊」當句首發語詞,意思等於「那」——「阿大一呢」就是
+# 「那大一呢」。但中國訓練的開源模型不認得這個用法,會把它讀成名字的一部分:
+# 實測連問三次「阿大一呢」,模型都反問「請問您要問的是阿大一的必修課程嗎?」。
+#
+# 這不是檢索或推理的問題,是繁體中文在地用語的問題,而且學生打字時一定會這樣寫。
+# 只處理句首、且後面接得上內容的情況,避免誤傷「阿拉伯數字」這類詞。
+_COLLOQUIAL_PREFIX = re.compile(r"^[阿啊][\s,,]*(?=[那這大碩博一二三四五六七八九十研學我要想有能可])")
+
+
+def _normalize(question: str) -> str:
+    return _COLLOQUIAL_PREFIX.sub("那", question.strip(), count=1)
+
+
+def _with_context(question: str, history: dict | None) -> str:
+    """把上一輪問答接到接續提問前面,組成一個資訊完整的問題。
+
+    系統本身是無狀態的 —— 每次請求都重跑整個檢索與生成流程。使用者卻會很自然地
+    追問「阿大一呢」,那句話單獨看沒有意義:實測檢索其實找對了科目表裡的
+    【大一必修科目】那一段,但模型看不懂在問什麼,回答「文件未提及」。
+
+    只帶上一輪(不是整段對話):兩輪以上的歷史會稀釋檢索用的關鍵字,而行政問答
+    多半是一問一答加一兩句追問,帶太多反而更糟。
+
+    **只帶上一輪的問題,不帶上一輪的答案。** 一開始兩者都帶,結果模型把前一個答案
+    整段複述:問完「114 級大三必修」再問「阿大一呢」,它照抄大三的清單。前一個答案
+    在 context 裡份量太重,會蓋過真正的新問題。而且答案本身可能就是錯的,帶著它等於
+    讓錯誤延續下去。
+
+    只帶問題就夠了 —— 前一題的「114 學年度入學」交代了身分,「必修」交代了主題,
+    接續提問只負責提供改變的部分(大一)。
+    """
+    if not history:
+        return question
+    previous_q = (history.get("question") or "").strip()
+    if not previous_q:
+        return question
+    return (
+        f"使用者上一個問題是:「{previous_q}」\n"
+        f"現在他接著問:「{question}」\n\n"
+        f"請把這兩句合起來理解使用者真正想問什麼,然後只回答接續提問。"
+        f"上一個問題裡若已交代身分或入學屆別,接續提問一樣適用,"
+        f"不要改用別屆的規定,也不要列出多屆並陳。"
+        f"不要重複上一個問題的答案 —— 使用者要問的是新的那一部分。"
+        # 沒有這句時,模型會在資訊已經足夠的情況下還去呼叫 ask_clarification,
+        # 反問「請問您是想知道 114 學年度大一的必修課程嗎?」—— 它自己都把條件
+        # 講出來了,還要使用者再確認一次,等於白跑一趟。SYSTEM_PROMPT 鼓勵追問
+        # 是為了第一次提問,接續提問時使用者已經交代過了,不該再問。
+        f"使用者已經在上一個問題裡交代過條件了,不要再呼叫 ask_clarification 追問,"
+        f"直接查文件並回答。"
+    )
+
+
 @app.route("/api/ask", methods=["POST"])
 def ask():
-    question = (request.json or {}).get("question", "").strip()
+    payload = request.json or {}
+    question = _normalize(payload.get("question") or "")
+    history = payload.get("history") or None
     if not question:
         return jsonify({"error": "請輸入問題"}), 400
     if len(question) > 300:
@@ -110,7 +164,7 @@ def ask():
     try:
         with _MODEL_LOCK:
             _SOURCES.clear()
-            answer = agent.run_task(question, _provider())
+            answer = agent.run_task(_with_context(question, history), _provider())
             sources = list(_SOURCES)
     except Exception as exc:  # noqa: BLE001
         app.logger.exception("run_task failed")
