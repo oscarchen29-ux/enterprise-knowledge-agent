@@ -13,11 +13,17 @@ CHUNK_SIZE = 600
 CHUNK_OVERLAP = 120      # 讓被切在邊界上的句子在兩塊裡都出現,避免答案剛好被切斷
 TOP_K = 6                # 回傳幾塊。塊比整份文件小很多,可以多給幾塊而不爆 context
 
-# BM25 參數。k1 控制詞頻飽和速度,b 控制長度正規化強度,兩者都是文獻慣用值。
+# BM25 參數。k1 控制詞頻飽和速度,b 控制長度正規化強度。
+# 取值依 Manning, Raghavan & Schütze, Introduction to Information Retrieval (2008)
+# 第 11.4.3 節:k1 慣用 1.2–2.0,b 慣用 0.75(Lucene/Elasticsearch 的 b 預設也是
+# 0.75,但 k1 預設是 1.2)。**未針對本專案資料做過參數搜尋**,這兩個值是直接沿用
+# 慣例。要調的話成本很低:檢索是純演算法,不必跑模型,用 benchmark 的
+# expected_docs 掃一遍參數空間即可。
 BM25_K1 = 1.5
 BM25_B = 0.75
 
-# Reciprocal Rank Fusion 的平滑常數,文獻慣用 60。值越大越平均看待各名次。
+# Reciprocal Rank Fusion 的平滑常數。60 出自 Cormack, Clarke & Büttcher, SIGIR 2009
+# 提出 RRF 的那篇論文,後續實作多沿用。值越大越平均看待各名次。
 RRF_K = 60
 
 _CHUNK_CACHE = None
