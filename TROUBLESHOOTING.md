@@ -54,7 +54,8 @@ python scripts/check_model.py <模型名稱>
 | `think: false` | 6.7 秒 | 25 |
 
 (各跑一次。)從網頁問一整題,思考開著超過 300 秒沒有回應;關掉後 67 秒答完。
-現在可以用 `OllamaProvider(think=False)` 或 benchmark 的 `--think off` 關掉,但**預設不改**,
+現在可以用 `OllamaProvider(think=False)`、benchmark 的 `--think off`,或網頁的
+`python web/app.py --model gemma4:31b --think off` 關掉,但**預設不改**,
 因為關掉思考會不會讓答案變差還沒評估過。
 
 ### 四個硬性條件

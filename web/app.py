@@ -87,7 +87,7 @@ def _install_source_probe():
 def _provider():
     global _PROVIDER
     if _PROVIDER is None:
-        _PROVIDER = OllamaProvider(model=app.config["MODEL"])
+        _PROVIDER = OllamaProvider(model=app.config["MODEL"], think=app.config.get("THINK"))
     return _PROVIDER
 
 
@@ -331,17 +331,21 @@ if __name__ == "__main__":
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--model", default="qwen2.5:7b")
+    # 會思考的模型(如 gemma4:31b)思考開著時,網頁問一整題超過 300 秒沒回應,關掉後 67 秒;
+    # 見 TROUBLESHOOTING.md 第一節第 4 點。default 不送這個參數,由 Ollama 決定
+    parser.add_argument("--think", choices=["default", "on", "off"], default="default")
     parser.add_argument("--admin-token", default=None,
                         help="設了才會開放 /admin/feedback?token=... 檢視回報;不設就完全關閉")
     args = parser.parse_args()
 
     app.config["MODEL"] = args.model
+    app.config["THINK"] = {"default": None, "on": True, "off": False}[args.think]
     app.config["ADMIN_TOKEN"] = args.admin_token
     _install_source_probe()
 
     print(f"知識庫 {len(tools._load_chunks())} 塊,向量索引 "
           f"{'已載入' if tools._load_index() else '未啟用(僅 BM25)'}")
-    print(f"模型 {args.model}    http://{args.host}:{args.port}")
+    print(f"模型 {args.model}  思考 {args.think}    http://{args.host}:{args.port}")
     if args.admin_token:
         print(f"回報檢視  http://{args.host}:{args.port}/admin/feedback?token={args.admin_token}")
     else:
