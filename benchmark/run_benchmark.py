@@ -140,11 +140,16 @@ def run_one(question, provider):
         # 沒有呼叫 search_documents。這本身不算失敗 —— 模型也可能是判斷條件不足、
         # 改呼叫 ask_clarification 把問題交還給使用者,那是設計中的正常行為。
         "no_search_call": len(TOOL_LOG) == 0,
-        "asked_clarification": bool(CLARIFY_LOG),
+        # 模型呼叫 ask_clarification 不等於追問真的送到使用者手上:多餘的追問會被
+        # agent.redundant_clarification() 駁回,模型接著查文件作答。舊版用
+        # bool(CLARIFY_LOG) 判斷,2026-09-11 那批 24 次呼叫裡 23 次其實被駁回,
+        # 把 1% 的真實追問報成 25%。改以 agent 自己設的旗標為準。
+        "returned_clarification": agent.LAST_WAS_CLARIFICATION,
+        "clarification_calls": len(CLARIFY_LOG),
         # 真正的靜默失敗:既沒查文件也沒追問,直接憑模型記憶作答。
         # 舊版把這個指標寫成 len(TOOL_LOG) == 0,連追問一起算進去,量出 21% 的
         # 失敗率;扣掉追問後實際是 3%。追問必須排除,否則會高估四到五倍。
-        "silent_failure": len(TOOL_LOG) == 0 and not CLARIFY_LOG,
+        "silent_failure": len(TOOL_LOG) == 0 and not agent.LAST_WAS_CLARIFICATION,
         # 把工具呼叫當成純文字吐出來,是完全沒呼叫到工具最常見的成因
         "tool_call_leaked_as_text": any(m in answer for m in _LEAK_MARKERS),
         "hit_max_steps": answer.startswith("已達最大步驟數"),
@@ -168,7 +173,14 @@ def main():
     parser.add_argument("--category", default=None,
                         help="只跑單一類別 (multi_hop/unanswerable/cross_doc/procedural/single_doc/conditional)")
     parser.add_argument("--limit", type=int, default=None, help="只跑前 N 題,用於快速冒煙測試")
+    parser.add_argument("--ids", default=None,
+                        help="只跑指定題號,逗號分隔(例如 F06,F07)。用來補跑中途失敗的題目。")
     parser.add_argument("--out", default=HERE, help="輸出目錄")
+    parser.add_argument("--base-url", default="http://localhost:11434",
+                        help="生成答案用哪一台的 Ollama。檢索用的 bge-m3 固定走本機,所以指到別台時,"
+                             "不同模型之間比較的是同一套檢索結果。")
+    parser.add_argument("--think", choices=("default", "on", "off"), default="default",
+                        help="思考型模型要不要先推理。default 不送這個欄位,維持 Ollama 的預設行為。")
     args = parser.parse_args()
 
     with io.open(os.path.join(HERE, "questions.json"), encoding="utf-8") as f:
@@ -177,6 +189,9 @@ def main():
     questions = bank["questions"]
     if args.category:
         questions = [q for q in questions if q["category"] == args.category]
+    if args.ids:
+        wanted = {i.strip() for i in args.ids.split(",") if i.strip()}
+        questions = [q for q in questions if q["id"] in wanted]
     if args.limit:
         questions = questions[: args.limit]
 
@@ -185,10 +200,13 @@ def main():
         return
 
     install_probes()
-    provider = OllamaProvider(model=args.model)
+    think = {"default": None, "on": True, "off": False}[args.think]
+    provider = OllamaProvider(model=args.model, base_url=args.base_url, think=think)
 
     stamp = time.strftime("%Y%m%d_%H%M%S")
-    tag = f"{args.model.replace(':', '-')}_{stamp}"
+    # 思考開關會改變速度,也可能改變答案,所以寫進檔名,免得事後分不出是哪一組
+    think_tag = "" if args.think == "default" else f"_think-{args.think}"
+    tag = f"{args.model.replace(':', '-')}{think_tag}_{stamp}"
     jsonl_path = os.path.join(args.out, f"results_raw_{tag}.jsonl")
     csv_path = os.path.join(args.out, f"scoring_sheet_{tag}.csv")
 
@@ -228,7 +246,7 @@ def main():
                 "\n".join(f"- {p}" for p in q["gold_points"]),
                 r["answer"],
                 "是" if r["retrieval_hit_all"] else ("部分" if r["retrieval_hit_any"] else "否"),
-                "追問(未作答)" if r["asked_clarification"]
+                "追問(未作答)" if r["returned_clarification"]
                 else ("沒查(靜默失敗)" if r["silent_failure"] else "有查"),
                 r["latency_sec"],
                 "", len(q["gold_points"]), "", "", "",
@@ -245,7 +263,7 @@ def main():
     # 「有沒有真的去查文件」比「有沒有報錯」重要 —— 靜默失敗不會報錯,
     # 但答案完全沒有文件依據,是最危險的一種失效。
     print(f"有查文件              : {sum(1 for r in results if not r['no_search_call']) / n:.1%}")
-    print(f"  向使用者追問(未作答): {sum(1 for r in results if r['asked_clarification']) / n:.1%}")
+    print(f"  向使用者追問(未作答): {sum(1 for r in results if r['returned_clarification']) / n:.1%}")
     print(f"  靜默失敗(沒查也沒問): {sum(1 for r in results if r['silent_failure']) / n:.1%}")
     print(f"    其中呼叫外洩成文字: {sum(1 for r in results if r['silent_failure'] and r['tool_call_leaked_as_text'])}")
     print(f"工具參數格式錯誤    : {sum(1 for r in results if r['tool_arg_error'])}")

@@ -19,10 +19,17 @@ DEFAULT_NUM_CTX = 16384
 class OllamaProvider(LLMProvider):
     def __init__(self, model: str = "qwen2.5:7b",
                  base_url: str = "http://localhost:11434",
-                 num_ctx: int = DEFAULT_NUM_CTX):
+                 num_ctx: int = DEFAULT_NUM_CTX,
+                 think: bool | None = None):
         self.model = model
         self.base_url = base_url.rstrip("/").removesuffix("/v1")
         self.num_ctx = num_ctx
+        # 思考型模型(例如 gemma4:31b)預設會先產生一段推理再回答。這段推理這裡從來
+        # 不讀,時間卻照花:實測 agent 第一步,思考開著 29.4 秒、產生 176 個 token,
+        # think=False 只要 6.7 秒、25 個 token(各跑一次)。
+        # None 表示不送這個欄位、維持 Ollama 預設行為。不支援思考的模型(qwen2.5:7b)
+        # 收到 False 不會報錯。關掉思考會不會讓答案變差還沒評估過,所以預設不改。
+        self.think = think
 
     @staticmethod
     def _to_native(messages: list[dict]) -> list[dict]:
@@ -81,6 +88,8 @@ class OllamaProvider(LLMProvider):
         }
         if tools:
             payload["tools"] = tools
+        if self.think is not None:
+            payload["think"] = self.think
 
         request = urllib.request.Request(
             f"{self.base_url}/api/chat",

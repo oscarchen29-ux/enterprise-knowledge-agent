@@ -9,8 +9,10 @@
 1. 檔名比對:切塊檢索後 returned_docs 變成「檔名.txt 第N段」,而 expected_docs
    是純檔名,直接比會全部落空。這裡把段號去掉再比。
 2. 追問被誤計成靜默失敗:舊版執行器只側錄 search_documents,模型改呼叫
-   ask_clarification 的執行會顯示成「一個工具都沒呼叫」。舊檔沒有
-   asked_clarification 欄位,改從 stdout_log 認。
+   ask_clarification 的執行會顯示成「一個工具都沒呼叫」。
+3. 被駁回的追問被誤計成追問:模型呼叫了 ask_clarification、但被判定為多餘
+   而繼續作答的執行,仍被算成「追問(未作答)」。一律從 stdout_log 判斷是否
+   真的把追問交還給使用者。
 
 用法:
     python benchmark/recompute_metrics.py benchmark/results_raw_qwen2.5-7b_20260830_233537.jsonl
@@ -44,12 +46,17 @@ def load(jsonl_path: Path, bank_path: Path):
     bank = {q["id"]: q for q in json.loads(bank_path.read_text(encoding="utf-8"))["questions"]}
 
     for r in rows:
-        # 新版執行器直接有這兩個欄位;舊檔沒有,從 stdout_log 回推。
-        if "asked_clarification" not in r:
-            r["asked_clarification"] = "ask_clarification" in r.get("stdout_log", "")
+        # 「追問」要算的是真的交還給使用者、這次沒有作答的執行。只看有沒有呼叫過
+        # ask_clarification,會把被駁回的多餘追問也算進去(2026-09-11 那批 24 次
+        # 呼叫裡 23 次被駁回)。新檔有 returned_clarification;沒有的一律從
+        # stdout_log 判斷 —— 舊檔的 asked_clarification 意思是「呼叫過工具」,不能信。
+        log = r.get("stdout_log", "")
+        if "returned_clarification" not in r:
+            r["returned_clarification"] = ("條件不足,向使用者追問" in log
+                                           or "問題缺少關鍵條件" in log)
         if "no_search_call" not in r:
             r["no_search_call"] = not r["returned_docs"]
-        r["silent_failure"] = r["no_search_call"] and not r["asked_clarification"]
+        r["silent_failure"] = r["no_search_call"] and not r["returned_clarification"]
 
         got = {_basename(d) for d in r["returned_docs"]}
         exp = set(r["expected_docs"])
@@ -81,7 +88,7 @@ def rewrite_csv(path: Path, rows, bank):
         if r is None:
             continue
         hit = "是" if r["hit_all"] else ("部分" if r["hit_any"] else "否")
-        searched = ("追問(未作答)" if r["asked_clarification"]
+        searched = ("追問(未作答)" if r["returned_clarification"]
                     else "沒查(靜默失敗)" if r["silent_failure"] else "有查")
         if (line[i_hit], line[i_searched]) != (hit, searched):
             changed += 1
@@ -114,7 +121,7 @@ def main():
     print("| 指標 | 數值 |")
     print("|---|---|")
     print(f"| 有查文件 | {pct(sum(not r['no_search_call'] for r in rows), n)} |")
-    print(f"| 向使用者追問(未作答) | {pct(sum(r['asked_clarification'] for r in rows), n)} |")
+    print(f"| 向使用者追問(未作答) | {pct(sum(r['returned_clarification'] for r in rows), n)} |")
     print(f"| **靜默失敗(沒查也沒問)** | **{pct(sum(r['silent_failure'] for r in rows), n)}** |")
     print(f"| 程式崩潰 | {sum(1 for r in rows if r['error'])} 次 |")
     print(f"| 達最大步驟數未完成 | {sum(1 for r in rows if r['hit_max_steps'])} 次 |")
@@ -141,7 +148,7 @@ def main():
         hv = [r for r in v if r["expected_docs"] and not r["no_search_call"]]
         print(f"| `{cat}` | {'推理' if cat in INFERENCE else '抽取'} | {len(v)} "
               f"| {pct(sum(not r['no_search_call'] for r in v), len(v))} "
-              f"| {pct(sum(r['asked_clarification'] for r in v), len(v))} "
+              f"| {pct(sum(r['returned_clarification'] for r in v), len(v))} "
               f"| {pct(sum(r['hit_all'] for r in hv), len(hv))} "
               f"| {pct(sum(r['hit_any'] for r in hv), len(hv))} "
               f"| {sum(r['latency_sec'] for r in v) / len(v):.1f} |")
@@ -162,7 +169,7 @@ def main():
     print("\n**每次執行都以追問收尾、從未給出答案**:\n")
     for qid in sorted({r["id"] for r in rows}):
         v = [r for r in rows if r["id"] == qid]
-        if v and all(r["asked_clarification"] for r in v):
+        if v and all(r["returned_clarification"] for r in v):
             print(f"- `{qid}` {len(v)}/{len(v)} 次")
 
 
