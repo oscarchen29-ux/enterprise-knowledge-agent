@@ -162,6 +162,10 @@ def run_one(question, provider):
         "raw_had_simplified": _has_simplified(raw_answer),
         "final_had_simplified": _has_simplified(answer),
         "stdout_log": stdout_log,
+        # 每次呼叫模型的時間拆解(讀輸入 / 生成),見 agent.MODEL_CALLS
+        "model_calls": [dict(c) for c in agent.MODEL_CALLS],
+        # 只有 --verify verdict 會印出「查核通過」;rewrite 模式一律是 False
+        "verify_passed": "[verify] 查核通過" in stdout_log,
     }
 
 
@@ -181,6 +185,8 @@ def main():
                              "不同模型之間比較的是同一套檢索結果。")
     parser.add_argument("--think", choices=("default", "on", "off"), default="default",
                         help="思考型模型要不要先推理。default 不送這個欄位,維持 Ollama 的預設行為。")
+    parser.add_argument("--verify", choices=("rewrite", "verdict"), default="rewrite",
+                        help="自我驗證方式。rewrite 每次重寫整個答案;verdict 全部有依據時只回「通過」並沿用草稿。")
     args = parser.parse_args()
 
     with io.open(os.path.join(HERE, "questions.json"), encoding="utf-8") as f:
@@ -201,12 +207,14 @@ def main():
 
     install_probes()
     think = {"default": None, "on": True, "off": False}[args.think]
+    agent.VERIFY_MODE = args.verify
     provider = OllamaProvider(model=args.model, base_url=args.base_url, think=think)
 
     stamp = time.strftime("%Y%m%d_%H%M%S")
     # 思考開關會改變速度,也可能改變答案,所以寫進檔名,免得事後分不出是哪一組
     think_tag = "" if args.think == "default" else f"_think-{args.think}"
-    tag = f"{args.model.replace(':', '-')}{think_tag}_{stamp}"
+    verify_tag = "" if args.verify == "rewrite" else f"_verify-{args.verify}"
+    tag = f"{args.model.replace(':', '-')}{think_tag}{verify_tag}_{stamp}"
     jsonl_path = os.path.join(args.out, f"results_raw_{tag}.jsonl")
     csv_path = os.path.join(args.out, f"scoring_sheet_{tag}.csv")
 
@@ -281,6 +289,15 @@ def main():
     print(f"後處理前含簡體字    : {sum(1 for r in results if r['raw_had_simplified']) / n:.1%}")
     print(f"後處理後仍含簡體字  : {sum(1 for r in results if r['final_had_simplified']) / n:.1%}  (應為 0%)")
     print(f"平均延遲            : {sum(r['latency_sec'] for r in results) / n:.1f} 秒")
+    calls = [c for r in results for c in r["model_calls"] if c.get("output_sec") is not None]
+    if calls:
+        print("模型時間拆解(全部執行加總):")
+        for label, is_verify in (("  agent 迴圈", False), ("  自我驗證  ", True)):
+            picked = [c for c in calls if (c["stage"] == "verify") == is_verify]
+            if picked:
+                print(f"{label}: {len(picked)} 次呼叫 | 讀輸入 {sum(c['prompt_sec'] or 0 for c in picked):.0f} 秒 "
+                      f"/ {sum(c['prompt_tokens'] or 0 for c in picked)} token | 生成 "
+                      f"{sum(c['output_sec'] for c in picked):.0f} 秒 / {sum(c['output_tokens'] or 0 for c in picked)} token")
 
     # 分類拆解。抽取題與推理題量的是不同東西,合併成單一數字會失去意義,
     # 詳見 benchmark/README.md「抽取題 vs 推理題」。

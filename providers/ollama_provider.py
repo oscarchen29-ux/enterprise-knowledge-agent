@@ -16,6 +16,10 @@ from providers.base import LLMProvider
 DEFAULT_NUM_CTX = 16384
 
 
+def _seconds(nanoseconds):
+    return None if nanoseconds is None else round(nanoseconds / 1e9, 3)
+
+
 class OllamaProvider(LLMProvider):
     def __init__(self, model: str = "qwen2.5:7b",
                  base_url: str = "http://localhost:11434",
@@ -123,4 +127,12 @@ class OllamaProvider(LLMProvider):
             # 讓 benchmark 能記錄實際吃進去的 token 數,避免再次發生
             # 「以為文件送進去了、其實被截斷」這種無聲失敗。
             "prompt_tokens": result.get("prompt_eval_count"),
+            # 一次請求分兩段計時:讀輸入(prompt_eval_*)與逐 token 生成(eval_*)。
+            # 讀輸入主要吃運算能力;生成每個 token 都要把整份權重讀一遍,主要吃記憶體頻寬。
+            # 要判斷換機器或改程式哪個有用,得先知道時間花在哪一段。
+            # Ollama 回傳的單位是奈秒;思考開著時 eval_count 也包含思考的 token。
+            "prompt_sec": _seconds(result.get("prompt_eval_duration")),
+            "output_tokens": result.get("eval_count"),
+            "output_sec": _seconds(result.get("eval_duration")),
+            "total_sec": _seconds(result.get("total_duration")),
         }

@@ -47,6 +47,21 @@ VERIFY_PROMPT = (
     "只要輸出修正後的最終回答文字，全部使用繁體中文，不要加說明或前言。"
 )
 
+# 上面的 rewrite 模式要求查核員「輸出修正後的最終回答」,等於每個答案完整生成兩遍。
+# 生成是逐 token 進行的,寫兩遍時間就大約兩倍,而多數草稿其實不需要修改。
+# verdict 模式讓查核員在全部有依據時只回「通過」,只有要改時才重寫。
+# 簡體字不必交給查核員:run_task 回傳前一律會經過 OpenCC 轉換。
+# 查核員會不會因此放過該刪的主張,要重新跑 benchmark 評分才知道,所以預設仍是 rewrite。
+VERIFY_PROMPT_VERDICT = (
+    "你是事實查核員。以下是查到的原始文件內容，以及助理草擬的回答。"
+    "請逐項檢查回答中的每一項主張是否有文件依據：\n"
+    "- 若每一項主張都有文件依據，只輸出「通過」兩個字，不要輸出任何其他內容。\n"
+    "- 若有任何主張在文件中找不到根據，請輸出修正後的完整最終回答：刪除該主張或改成「文件未提及」，"
+    "有文件支持的部分保留原意。全部使用繁體中文，不要加說明或前言。"
+)
+VERIFY_MODE = "rewrite"
+_VERDICT_PASS = re.compile(r"^[「『]?通過[」』]?[。！!.]?$")
+
 MAX_STEPS = 5
 
 # run_task 回傳的是字串,呼叫端無從分辨那是答案還是追問 —— 網頁層曾因此把
@@ -54,6 +69,21 @@ MAX_STEPS = 5
 # 對使用者是誤導。改回傳型別會動到 CLI 與 benchmark,所以用一個模組層旗標:
 # 每次 run_task 開頭清掉,走到追問路徑時設起來,呼叫端讀它即可。
 LAST_WAS_CLARIFICATION = False
+
+# 每次呼叫模型各花多少時間。一次請求分兩段:讀完整個輸入(prompt_*)、再逐 token
+# 生成(output_*),兩段受限於不同的硬體條件,混在總延遲裡看不出瓶頸在哪。
+# stage 是 step0、step1…(agent 迴圈)或 verify(自我驗證)。每次 run_task 開頭清空。
+MODEL_CALLS = []
+
+
+def _generate(provider, messages, stage, tools=None):
+    result = provider.generate(messages, tools=tools)
+    MODEL_CALLS.append({
+        "stage": stage,
+        **{key: result.get(key) for key in
+           ("prompt_tokens", "prompt_sec", "output_tokens", "output_sec", "total_sec")},
+    })
+    return result
 
 # 模型有時不走 OpenAI 相容 API 的 tool_calls 欄位,而是把呼叫請求當成一般文字吐在
 # content 裡(常伴隨無意義的 token,例如「 Closet」「portun」)。Ollama 的相容層不會
@@ -105,12 +135,24 @@ def verify_answer(draft: str, retrieved_context: list[str], provider) -> str:
     if not retrieved_context:
         return draft
 
+    prompt = VERIFY_PROMPT_VERDICT if VERIFY_MODE == "verdict" else VERIFY_PROMPT
     messages = [
-        {"role": "system", "content": VERIFY_PROMPT},
+        {"role": "system", "content": prompt},
         {"role": "user", "content": f"【原始文件內容】\n{chr(10).join(retrieved_context)}\n\n【草擬回答】\n{draft}"},
     ]
-    result = provider.generate(messages)
-    return result["content"] or draft
+    result = _generate(provider, messages, "verify")
+    if VERIFY_MODE != "verdict":
+        return result["content"] or draft
+
+    content = (result["content"] or "").strip()
+    if not content:
+        return draft
+    # 只看第一行:模型偶爾會在「通過」後面補一句理由,那句理由不該變成給使用者的答案
+    if _VERDICT_PASS.match(content.splitlines()[0].strip()):
+        print("[verify] 查核通過,沿用草稿")
+        return draft
+    print("[verify] 查核後改寫")
+    return content
 
 
 # 只有「答案真的會因為條件不同而不同」的題目才追問,否則每次都反問很煩人。
@@ -212,6 +254,7 @@ def redundant_clarification(question: str, task: str) -> str | None:
 def run_task(task: str, provider) -> str:
     global LAST_WAS_CLARIFICATION
     LAST_WAS_CLARIFICATION = False
+    MODEL_CALLS.clear()
 
     question = needs_clarification(task)
     if question:
@@ -226,7 +269,7 @@ def run_task(task: str, provider) -> str:
     retrieved_context = []
 
     for step in range(MAX_STEPS):
-        result = provider.generate(messages, tools=TOOLS_SCHEMA)
+        result = _generate(provider, messages, f"step{step}", tools=TOOLS_SCHEMA)
         tool_calls = result["tool_calls"]
         content = result["content"] or ""
 
