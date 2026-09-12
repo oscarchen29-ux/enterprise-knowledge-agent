@@ -334,18 +334,24 @@ if __name__ == "__main__":
     # 會思考的模型(如 gemma4:31b)思考開著時,網頁問一整題超過 300 秒沒回應,關掉後 67 秒;
     # 見 TROUBLESHOOTING.md 第一節第 4 點。default 不送這個參數,由 Ollama 決定
     parser.add_argument("--think", choices=["default", "on", "off"], default="default")
+    # 自我驗證方式。rewrite 每次都把整段答案重寫一遍,gemma4:31b 實測佔全部時間 36%;
+    # verdict 在每項主張都有依據時只回「通過」並沿用草稿,96 次重跑平均一題 113.6 秒降到
+    # 75.7 秒,通過 48 對 51、含幻覺都是 6 筆,品質差異在樣本誤差內。見 benchmark/RESULTS.md。
+    parser.add_argument("--verify", choices=["rewrite", "verdict"], default="rewrite")
     parser.add_argument("--admin-token", default=None,
                         help="設了才會開放 /admin/feedback?token=... 檢視回報;不設就完全關閉")
     args = parser.parse_args()
 
     app.config["MODEL"] = args.model
     app.config["THINK"] = {"default": None, "on": True, "off": False}[args.think]
+    agent.VERIFY_MODE = args.verify
     app.config["ADMIN_TOKEN"] = args.admin_token
     _install_source_probe()
 
     print(f"知識庫 {len(tools._load_chunks())} 塊,向量索引 "
           f"{'已載入' if tools._load_index() else '未啟用(僅 BM25)'}")
-    print(f"模型 {args.model}  思考 {args.think}    http://{args.host}:{args.port}")
+    print(f"模型 {args.model}  思考 {args.think}  驗證 {args.verify}"
+          f"    http://{args.host}:{args.port}")
     if args.admin_token:
         print(f"回報檢視  http://{args.host}:{args.port}/admin/feedback?token={args.admin_token}")
     else:
