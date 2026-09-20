@@ -1,4 +1,6 @@
-# 校系行政助理 Agent — 專題進度報告
+# 校系行政助理 Agent:本地端中文行政法規問答的檢索設計與量化評估
+
+專題進度報告
 
 **大三專題** | 場景:國立暨南國際大學資訊工程學系
 GitHub: https://github.com/oscarchen29-ux/enterprise-knowledge-agent
