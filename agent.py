@@ -367,6 +367,29 @@ def run_task(task: str, provider) -> str:
                 "content": tool_result,
             })
 
+    # 步數用盡不代表沒有資料可用。實測「我是轉系生,轉入資工系三年級,最多可以抵免
+    # 多少學分?」時,模型連查 9 次都在找一個知識庫裡根本不存在的數字 —— 科目表只
+    # 列各年級的必修學分,沒有列「應修學分總數」—— 然後撞到上限,使用者拿到的是
+    # 一句「任務未完成」,而手上明明有 9 次檢索的結果。
+    #
+    # 而且那題的標準答案本來就不需要那個數字:講出「以不超過該系一、二年級科目表
+    # 規定應修學分總數為原則」這條原則、加上畢業 128 學分,就已經答對了。
+    #
+    # 這跟「完全沒查就作答」是同一類問題,處理方式也一樣是保底:那邊強制檢索一次
+    # 再答,這邊強制用已經查到的資料作答。不給工具,避免它又跑去查。
+    if retrieved_context:
+        print(f"[step {MAX_STEPS}] 步數用盡,改用已查到的文件強制作答")
+        messages.append({
+            "role": "user",
+            "content": "已達查詢次數上限,不要再呼叫任何工具。請根據前面已經查到的文件"
+                       "回答原本的問題:先寫出文件明確記載的部分(原則、門檻、金額、"
+                       "學分數),文件沒有記載的數字就明講文件未列出,不要再嘗試查詢。",
+        })
+        result = _generate(provider, messages, "forced-final", tools=None)
+        content = (result["content"] or "").strip()
+        if content:
+            verified = verify_answer(content, retrieved_context, provider)
+            return _s2tw.convert(verified)
     return "已達最大步驟數,任務未完成。"
 
 
