@@ -53,9 +53,7 @@ Architecture
 Data Structures and Algorithms (Ⅱ) 3 必 二下
 210102 作業系統
 Operating Systems 3 必 三下
-備註:依本校「學生修讀輔系辦法」
-
-第四條，學生之主系與輔系科目若有重複，學分不得重複列計。
+備註:依本校「學生修讀輔系辦法」第四條，學生之主系與輔系科目若有重複，學分不得重複列計。
 學生得修習本系開設的其他專業必修或選修科目以補足輔系學分，並經系主任同意簽名確認。
 國立暨南國際大學資訊工程學系輔系科目一覽表
 Departmental Minor Course Catalog of Department of Computer

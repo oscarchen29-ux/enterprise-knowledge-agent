@@ -1,7 +1,7 @@
 {
   "model": "bge-m3",
   "dimensions": 1024,
-  "chunk_count": 817,
-  "fingerprint": "9087901f746d06d6",
-  "built_at": "2026-09-20T17:39:19"
+  "chunk_count": 821,
+  "fingerprint": "2ce5acc2a2f158c9",
+  "built_at": "2026-09-20T18:11:49"
 }

@@ -401,13 +401,70 @@ def _all_fee_rows(layout_text, label):
     return found
 
 
+_ARTICLE = re.compile(r"\s*(第\s*([零一二三四五六七八九十百]{1,6})\s*條)")
+_DIGITS = "零一二三四五六七八九"
+
+
+def _cn_number(text):
+    """中文數字轉阿拉伯數字,只處理條號會用到的範圍(一~九百九十九)。"""
+    text = text.strip()
+    if not text:
+        return -1
+    if text == "十":
+        return 10
+    if "百" in text:
+        head, _, tail = text.partition("百")
+        value = (_DIGITS.index(head) if head in _DIGITS else 1) * 100
+        if tail.startswith("十"):
+            value += 10
+            tail = tail[1:]
+        elif len(tail) > 1 and tail[0] in _DIGITS:
+            value += _DIGITS.index(tail[0]) * 10
+            tail = tail[1:]
+        if tail and tail[0] in _DIGITS:
+            value += _DIGITS.index(tail[0])
+        return value
+    if "十" in text:
+        head, _, tail = text.partition("十")
+        return ((_DIGITS.index(head) if head in _DIGITS else 1) * 10
+                + (_DIGITS.index(tail[0]) if tail and tail[0] in _DIGITS else 0))
+    return _DIGITS.index(text[0]) if text[0] in _DIGITS else -1
+
+
+def _split_articles(text):
+    """在每一條條文前斷段,但不要在「句中引用」前面斷。
+
+    原本的寫法是看到「第N條」就換段,結果把引用也切開:
+        第一條 本辦法依據本校學則
+        (空行)
+        第三十八條第四項之規定訂定之。
+    一句話被拆成兩段,而且「第三十八條」會被後續程式誤認成一條新條文。
+    全庫 41 份法規共 185 處被這樣切斷,其中 25 處真的落在不同的 chunk,
+    使得「依據哪一條」與條號分屬兩塊,檢索時拿到其中一塊也讀不懂。
+
+    判斷依據:真正的條文起頭是連號的(第一條、第二條、第三條……),
+    句中引用則不連號。因此只有號碼等於「上一條 + 1」時才斷段。
+    """
+    pieces, last, cursor = [], 0, 0
+    for match in _ARTICLE.finditer(text):
+        number = _cn_number(match.group(2))
+        if number != last + 1:
+            continue
+        pieces.append(text[cursor:match.start()])
+        pieces.append("\n\n" + match.group(1))
+        cursor = match.end()
+        last = number
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
 def build_regulation(path, filename, meta, title):
     """法規類 PDF -> 條文文字。以「第N條」斷段,其餘壓成連續段落。"""
     text = pdf_text(path)
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text).strip()
     # 讓每一條自成一段,檢索片段時比較不會把兩條黏在一起
-    text = re.sub(r"\s*(第\s*[一二三四五六七八九十百]+\s*條)", r"\n\n\1", text)
+    text = _split_articles(text)
     text = re.sub(r"\n{3,}", "\n\n", text).strip()
 
     return "\n".join([
