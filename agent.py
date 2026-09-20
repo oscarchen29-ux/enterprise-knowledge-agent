@@ -373,13 +373,18 @@ def run_task(task: str, provider) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="qwen2.5:7b")
+    # 命令列原本沒有這個選項,只有 web/app.py 有,結果同一個模型從兩個入口跑會得到
+    # 不同行為:網頁是 --think off,命令列則沿用模型預設。gemma4:12b 與 qwen3.8 這類
+    # 模型的思考預設是開的,單題實測跑到 6 分鐘以上,量出來的延遲不能拿來跟網頁比。
+    parser.add_argument("--think", choices=["default", "on", "off"], default="default")
     parser.add_argument(
         "--task",
         default="我是轉系生,轉入資工系三年級,最多可以抵免多少學分?畢業總共需要修滿多少學分?",
     )
     args = parser.parse_args()
 
-    provider = OllamaProvider(model=args.model)
+    think = {"default": None, "on": True, "off": False}[args.think]
+    provider = OllamaProvider(model=args.model, think=think)
     answer = run_task(args.task, provider)
     print("\n=== 最終回答 ===")
     print(answer)
