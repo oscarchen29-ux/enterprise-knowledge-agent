@@ -451,9 +451,13 @@ RRF 只看名次、不看分數差距,一邊很確定而另一邊很不確定時
 BM25 排第 4、向量排第 39,RRF 合併後掉到第 9,超出 TOP_K=6。
 
 PoliChat(Wojtasik et al., ICCS 2025 Workshops,波蘭大學法規問答)的做法不是融合,
-而是「單一檢索器 + 重排序」,最佳組合為 BM25 + bge-reranker-v2-m3,NDCG@10 76.39、
-Acc@5 91.00。該論文也報告 BM25 在長文件上勝過向量檢索 —— 與本專案的消融結果
-(段落層級 BM25 70.8% vs 向量 62.5%)以及 bge-m3 論文的 MLDR 中文結果方向一致。
+而是「單一檢索器 + 重排序」。在 512-token 段落上,最佳組合為 multilingual-e5-large +
+bge-reranker-v2-m3(NDCG@10 82.03、Acc@5 95.00,也是他們實際上線的設定);重排序讓
+BM25、bge-m3、e5-large 三種檢索器的 NDCG@10 都提升 17~28 分。在 4K-token 長段落上,
+BM25 反而是最好的第一階段檢索器(Recall@100 93.91 vs bge-m3 89.41),最佳組合為
+BM25 + bge-reranker-v2-m3(NDCG@10 76.39、Acc@5 91.00)。「BM25 勝過向量檢索」只在
+長段落成立 —— 與本專案的消融結果(段落層級 BM25 70.8% vs 向量 62.5%)以及 bge-m3
+論文的 MLDR 中文結果方向一致,但不能說成 PoliChat 整體結論。
 
 ### 方法
 
