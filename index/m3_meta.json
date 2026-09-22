@@ -1,0 +1,7 @@
+{
+  "model": "BAAI/bge-m3",
+  "dimensions": 1024,
+  "chunk_count": 821,
+  "fingerprint": "2ce5acc2a2f158c9",
+  "built_at": "2026-09-23T00:55:50"
+}

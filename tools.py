@@ -26,6 +26,17 @@ BM25_B = 0.75
 # 提出 RRF 的那篇論文,後續實作多沿用。值越大越平均看待各名次。
 RRF_K = 60
 
+# bge-m3 自己的 dense + sparse 混合檢索(scripts/build_m3_index.py 建索引)。
+# 分數 = 0.2·dense + 0.8·sparse,權重沿用 bge-m3 論文在長文件測試集 MLDR 上的
+# Dense+Sparse 設定(Chen et al., ACL Findings 2024, 4.3 節),**不是用本專案資料調出來的**。
+# 用網格搜尋在 benchmark 查詢上挑出的權重,換一批查詢就掉 5~7 個百分點;這組論文
+# 權重在沒參與挑選的查詢上仍比 BM25+RRF 好,所以採用它。數據見 benchmark/RESULTS.md。
+# 需要 PyTorch 與 FlagEmbedding;沒有時自動退回上面的 BM25 + 向量 RRF。
+# 環境變數 RETRIEVAL=rrf 可強制使用舊方式(對照實驗用)。
+M3_MODEL = "BAAI/bge-m3"
+M3_DENSE_WEIGHT = 0.2
+M3_SPARSE_WEIGHT = 0.8
+
 _CHUNK_CACHE = None
 
 
@@ -145,6 +156,106 @@ def _load_index():
     return _INDEX
 
 
+_M3_ENCODER = None
+_M3_INDEX = None       # (dense 矩陣, sparse 倒排表) 或 False 表示不可用
+_M3_WARNED = False
+
+
+def m3_encoder():
+    """載入 bge-m3(FlagEmbedding)。約 2.2 GB,只載入一次;第一次會從 Hugging Face 下載。"""
+    global _M3_ENCODER
+    if _M3_ENCODER is None:
+        from FlagEmbedding import BGEM3FlagModel
+        try:
+            import torch
+            use_fp16 = torch.cuda.is_available()   # CPU 上 fp16 反而慢且不穩
+        except ImportError:
+            use_fp16 = False
+        _M3_ENCODER = BGEM3FlagModel(M3_MODEL, use_fp16=use_fp16)
+    return _M3_ENCODER
+
+
+def _load_m3_index():
+    """載入 bge-m3 dense + sparse 索引。缺套件、缺檔或過期時回傳 False,由呼叫端退回 RRF。"""
+    global _M3_INDEX, _M3_WARNED
+    if _M3_INDEX is not None:
+        return _M3_INDEX
+
+    def unavailable(reason):
+        global _M3_WARNED
+        if not _M3_WARNED:
+            print(f"[檢索] bge-m3 dense+sparse 未啟用({reason}),改用 BM25 + 向量 RRF。")
+            _M3_WARNED = True
+        return False
+
+    if os.environ.get("RETRIEVAL", "").lower() == "rrf":
+        _M3_INDEX = False      # 明確要求舊方式,不算異常,不印警告
+        return _M3_INDEX
+    directory = os.path.join(os.path.dirname(__file__), "index")
+    paths = [os.path.join(directory, name) for name in ("m3_dense.npy", "m3_sparse.json", "m3_meta.json")]
+    if not all(os.path.exists(p) for p in paths):
+        _M3_INDEX = unavailable("索引不存在,執行 python scripts/build_m3_index.py")
+        return _M3_INDEX
+    try:
+        import importlib.util
+        if importlib.util.find_spec("FlagEmbedding") is None:
+            _M3_INDEX = unavailable("未安裝 FlagEmbedding / PyTorch")
+            return _M3_INDEX
+        import numpy as np
+        with open(paths[2], encoding="utf-8") as f:
+            meta = json.load(f)
+        if meta.get("fingerprint") != chunk_fingerprint():
+            _M3_INDEX = unavailable("索引與目前的 docs/ 不一致,需要重建")
+            return _M3_INDEX
+        with open(paths[1], encoding="utf-8") as f:
+            sparse = json.load(f)
+        # 倒排表:token -> [(塊位置, 權重)]。查詢時只走問題裡有的 token,
+        # 不必把 821 塊的權重字典逐一比對。
+        inverted = {}
+        for position, weights in enumerate(sparse):
+            for token, weight in weights.items():
+                inverted.setdefault(token, []).append((position, weight))
+        _M3_INDEX = (np.load(paths[0]), inverted)
+    except Exception as exc:  # noqa: BLE001
+        _M3_INDEX = unavailable(f"{type(exc).__name__}: {exc}")
+    return _M3_INDEX
+
+
+def _m3_ranking(query: str) -> list[int] | None:
+    """bge-m3 論文式 1 的混合分數:w1·s_dense + w2·s_lex(不含 multi-vector)。
+
+    s_dense 是正規化後的內積;s_lex 只加總問題與段落共同出現的 token 的權重乘積。
+    multi-vector 不用:在本專案資料上加入它反而掉分(64.6% vs 76.0%),
+    與論文 MLDR 中文欄 All 40.0 < Dense+Sparse 42.0 的現象一致。
+    """
+    index = _load_m3_index()
+    if not index:
+        return None
+    dense, inverted = index
+    try:
+        import numpy as np
+        encoded = m3_encoder().encode([query], max_length=256, return_dense=True,
+                                      return_sparse=True, return_colbert_vecs=False)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[檢索] bge-m3 編碼失敗({type(exc).__name__}: {exc}),改用 BM25 + 向量 RRF。")
+        return None
+    vector = np.asarray(encoded["dense_vecs"][0], dtype=np.float32)
+    scores = M3_DENSE_WEIGHT * (dense @ (vector / np.linalg.norm(vector)))
+    for token, weight in encoded["lexical_weights"][0].items():
+        for position, passage_weight in inverted.get(token, ()):
+            scores[position] += M3_SPARSE_WEIGHT * weight * passage_weight
+    return [int(p) for p in np.argsort(-scores)]
+
+
+def retrieval_mode() -> str:
+    """目前實際使用的檢索方式,給啟動訊息與實驗紀錄用。"""
+    if _load_m3_index():
+        return f"bge-m3 dense+sparse ({M3_DENSE_WEIGHT}:{M3_SPARSE_WEIGHT})"
+    if _load_index():
+        return "BM25 + 向量 RRF"
+    return "僅 BM25"
+
+
 def _vector_ranking(query: str) -> list[int] | None:
     """回傳依語意相似度排序的塊索引。索引不可用時回傳 None。"""
     index = _load_index()
@@ -190,13 +301,10 @@ def _idf(keyword: str) -> float:
     return _IDF_CACHE[keyword]
 
 
-def search_documents(query: str) -> str:
-    """在 docs 資料夾裡用關鍵字比對,回傳最相關的文件片段。
+def _rrf_ranking(query: str) -> list[int]:
+    """BM25 與 Ollama 向量兩路以 RRF 合併的排名;向量索引不可用時只用 BM25。
 
-    先前是回傳「整份文件」,在文件數擴充到 110 份之後出現兩個問題:一是命中密度
-    會系統性偏袒短法規(1KB 的修業規則命中兩次,密度就贏過 20KB 科目表命中十次),
-    查「大三必修」時科目表根本進不了前三名;二是三份全文動輒上萬字,大幅超出
-    模型實際能吃的長度。改成切塊後,每塊長度相近,密度比較才有意義。
+    沒有 bge-m3 dense+sparse 索引(或 RETRIEVAL=rrf)時使用。
     """
     chunks = _load_chunks()
     keywords = set(_extract_keywords(query))
@@ -241,6 +349,23 @@ def search_documents(query: str) -> str:
         for rank, position in enumerate(vector_order[:50]):
             fused[position] = fused.get(position, 0.0) + 1.0 / (RRF_K + rank)
         ranked = sorted(fused, key=lambda p: -fused[p])
+    return ranked
+
+
+def search_documents(query: str) -> str:
+    """回傳與問題最相關的 TOP_K 個文件片段。
+
+    先前是回傳「整份文件」,在文件數擴充到 110 份之後出現兩個問題:一是命中密度
+    會系統性偏袒短法規(1KB 的修業規則命中兩次,密度就贏過 20KB 科目表命中十次),
+    查「大三必修」時科目表根本進不了前三名;二是三份全文動輒上萬字,大幅超出
+    模型實際能吃的長度。改成切塊後,每塊長度相近,密度比較才有意義。
+
+    排名優先用 bge-m3 dense+sparse,不可用時退回 BM25 + 向量 RRF。
+    """
+    chunks = _load_chunks()
+    ranked = _m3_ranking(query)
+    if ranked is None:
+        ranked = _rrf_ranking(query)
 
     if not ranked:
         return "找不到相關文件。"

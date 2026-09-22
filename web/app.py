@@ -348,8 +348,7 @@ if __name__ == "__main__":
     app.config["ADMIN_TOKEN"] = args.admin_token
     _install_source_probe()
 
-    print(f"知識庫 {len(tools._load_chunks())} 塊,向量索引 "
-          f"{'已載入' if tools._load_index() else '未啟用(僅 BM25)'}")
+    print(f"知識庫 {len(tools._load_chunks())} 塊,檢索方式 {tools.retrieval_mode()}")
     print(f"模型 {args.model}  思考 {args.think}  驗證 {args.verify}"
           f"    http://{args.host}:{args.port}")
     if args.admin_token:
