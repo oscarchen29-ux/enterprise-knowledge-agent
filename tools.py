@@ -26,6 +26,10 @@ BM25_B = 0.75
 # 提出 RRF 的那篇論文,後續實作多沿用。值越大越平均看待各名次。
 RRF_K = 60
 
+# 檢索結果的多樣性:前幾個名額保留給還沒出現過的檔名。跨文件題目失敗的機制是
+# 「前 6 段被同一份文件佔滿」,詳見 _diversify 的說明與 benchmark/RESULTS.md。
+DISTINCT_FILES = 4
+
 # bge-m3 自己的 dense + sparse 混合檢索(scripts/build_m3_index.py 建索引)。
 # 分數 = 0.2·dense + 0.8·sparse,權重沿用 bge-m3 論文在長文件測試集 MLDR 上的
 # Dense+Sparse 設定(Chen et al., ACL Findings 2024, 4.3 節),**不是用本專案資料調出來的**。
@@ -352,6 +356,46 @@ def _rrf_ranking(query: str) -> list[int]:
     return ranked
 
 
+def _diversify(ranked: list[int]) -> list[int]:
+    """前 DISTINCT_FILES 個名額只給還沒出現過的檔名,其餘名額按原排名補。
+
+    為什麼需要:跨文件題目的失敗機制是「前 6 段被同一份文件佔滿」。實測 G08
+    (一年內三次大過,需要操行成績考評辦法與學生獎懲辦法兩份)的前 6 段有 4 段
+    來自同一份《學務處學生手冊》,第二份文件根本進不來。benchmark 從 8 月記錄的
+    「cross_doc 部分命中 83~94%、全命中僅 17%」也是同一個現象。
+
+    重放 304 個 benchmark 查詢的實測(需要兩份以上文件的題目,132 次執行):
+
+        保證數 1(等於不做)  跨文件題 38.6%  單文件題 90.8%  對照組段落 73.9%
+        保證數 4            跨文件題 44.7%  單文件題 91.2%  對照組段落 73.9%
+        每份文件最多 1 段    跨文件題 54.5%  單文件題 92.3%  對照組段落 65.0%
+
+    取 4:跨文件題拿到六成的改善,而段落層級完全沒有付出代價。硬性「每份最多一段」
+    雖然跨文件題最好,但答案有時就在同一份文件的第 2、3 段,段落層級會掉 8.9 個百分點。
+
+    MMR(Carbonell & Goldstein, 1998)也測過,λ=0.5 時跨文件題只到 47.7%,
+    因為它用段落內容的向量相似度判斷重複,抓不到「來自同一份文件」這個結構訊號 ——
+    本專案的重複主要發生在跨文件(學生手冊與各單項辦法大量重述同樣規定)。
+    """
+    chunks = _load_chunks()
+    chosen, seen, deferred = [], set(), []
+    for position in ranked:
+        if len(chosen) >= DISTINCT_FILES:
+            break
+        name = chunks[position]["file"]
+        if name in seen:
+            deferred.append(position)
+            continue
+        chosen.append(position)
+        seen.add(name)
+    for position in deferred + [p for p in ranked if p not in chosen and p not in deferred]:
+        if len(chosen) >= TOP_K:
+            break
+        if position not in chosen:
+            chosen.append(position)
+    return chosen
+
+
 def search_documents(query: str) -> str:
     """回傳與問題最相關的 TOP_K 個文件片段。
 
@@ -360,7 +404,8 @@ def search_documents(query: str) -> str:
     查「大三必修」時科目表根本進不了前三名;二是三份全文動輒上萬字,大幅超出
     模型實際能吃的長度。改成切塊後,每塊長度相近,密度比較才有意義。
 
-    排名優先用 bge-m3 dense+sparse,不可用時退回 BM25 + 向量 RRF。
+    排名優先用 bge-m3 dense+sparse,不可用時退回 BM25 + 向量 RRF,
+    最後用 _diversify 保證前幾個名額來自不同文件。
     """
     chunks = _load_chunks()
     ranked = _m3_ranking(query)
@@ -369,6 +414,7 @@ def search_documents(query: str) -> str:
 
     if not ranked:
         return "找不到相關文件。"
+    ranked = _diversify(ranked)
 
     parts = []
     for position in ranked[:TOP_K]:
