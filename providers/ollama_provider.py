@@ -1,7 +1,13 @@
 import json
+import time
+import urllib.error
 import urllib.request
 
 from providers.base import LLMProvider
+
+# 連線中斷時重試幾次、每次間隔幾秒(第 n 次等 RETRY_WAIT_SEC × n 秒)。
+RETRY_LIMIT = 4
+RETRY_WAIT_SEC = 5
 
 # Ollama 的 num_ctx 預設是 2048,而且無論模型本身支援多長都一樣 ——
 # qwen2.5:7b 支援 32768,實際卻只吃 2048。檢索一次回傳 4~9k tokens 的情況下,
@@ -83,6 +89,37 @@ class OllamaProvider(LLMProvider):
 
         return native
 
+    def _post(self, payload: dict) -> dict:
+        """送出請求;連線類的錯誤重試,其他錯誤直接拋出。
+
+        模型跑在另一台機器(Jetson)時,連線會經過 SSH 通道。通道短暫中斷會讓
+        urlopen 立刻拋 ConnectionResetError / URLError,而 benchmark 把整題記成崩潰 ——
+        2026-09-23 的第一輪就因此掉了最後三題,第二輪 32 題全滅。重試讓短暫斷線
+        只損失幾秒,不會毀掉整批結果。
+
+        不重試 HTTP 錯誤(HTTPError):那是請求本身有問題(例如格式錯、模型不存在),
+        重送幾次也一樣,只會拖時間。
+        """
+        request = urllib.request.Request(
+            f"{self.base_url}/api/chat",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        for attempt in range(RETRY_LIMIT):
+            try:
+                with urllib.request.urlopen(request, timeout=600) as response:
+                    return json.load(response)
+            except urllib.error.HTTPError:
+                raise
+            except (urllib.error.URLError, ConnectionError, TimeoutError, OSError) as exc:
+                if attempt == RETRY_LIMIT - 1:
+                    raise
+                wait = RETRY_WAIT_SEC * (attempt + 1)
+                print(f"[模型] 連線失敗({type(exc).__name__}),{wait} 秒後重試 "
+                      f"({attempt + 1}/{RETRY_LIMIT - 1})", flush=True)
+                time.sleep(wait)
+        raise RuntimeError("unreachable")
+
     def generate(self, messages: list[dict], tools: list[dict] | None = None) -> dict:
         payload = {
             "model": self.model,
@@ -95,13 +132,7 @@ class OllamaProvider(LLMProvider):
         if self.think is not None:
             payload["think"] = self.think
 
-        request = urllib.request.Request(
-            f"{self.base_url}/api/chat",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-        )
-        with urllib.request.urlopen(request, timeout=600) as response:
-            result = json.load(response)
+        result = self._post(payload)
 
         message = result.get("message", {})
         tool_calls = []
