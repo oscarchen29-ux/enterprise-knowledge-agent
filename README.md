@@ -27,10 +27,30 @@ python agent.py --task "資工系大三的必修有哪些?"
 `index/` 已隨 repo 附上,不需要重建。**只有在改動 `docs/` 之後**才要重跑:
 
 ```bash
-python scripts/build_index.py
+python scripts/build_index.py        # Ollama 版向量索引(BM25 + 向量 RRF 用)
+python scripts/build_m3_index.py     # bge-m3 dense+sparse 索引(需要 PyTorch,見下)
 ```
 
-索引與 `docs/` 不一致時系統會自動偵測並退回純 BM25(會印出提示),不會給出錯誤答案。
+### 檢索方式
+
+預設使用 **bge-m3 的 dense + sparse 混合**(權重 0.2 : 0.8,取自 bge-m3 論文在長文件
+測試集 MLDR 的設定)。Ollama 的 `/api/embed` 只提供 dense 向量,sparse 詞權重要用官方
+套件 FlagEmbedding 才拿得到,因此這個模式需要額外安裝 PyTorch 與 FlagEmbedding
+(見 `requirements.txt` 的選用區塊)。
+
+沒有這兩個套件、索引不存在、或索引與 `docs/` 不一致時,系統會自動退回
+**BM25 + 向量 RRF**(會印出提示),不會給出錯誤答案。設環境變數 `RETRIEVAL=rrf`
+可強制使用舊方式,用於對照實驗。
+
+以 benchmark 紀錄中模型實際寫出的查詢重放(`benchmark/compare_retrieval_modes.py`),
+含答案的段落進入前 6 段的比率:
+
+| 查詢來源 | BM25 + 向量 RRF | bge-m3 dense+sparse |
+|---|---|---|
+| gemma4:31b 的查詢(挑權重時看過) | 65.6% | 76.0% |
+| qwen2.5:7b、gemma think-on 的查詢(沒看過) | 70.7% | 73.9% |
+
+樣本只有 16 題(段落層級)與 26 題(文件層級),詳細數字與限制見 `benchmark/RESULTS.md`。
 
 ### 網頁介面
 
@@ -151,7 +171,7 @@ SHA-256 與檔案大小;每個 `.txt` 開頭也帶著同樣的出處資訊。這
 providers/
   base.py                # LLMProvider 抽象介面(OpenAI 風格的訊息格式)
   ollama_provider.py     # 本地 Ollama 實作,走原生 /api/chat
-tools.py                 # 工具:BM25 + 向量混合檢索、條件不足時的追問工具
+tools.py                 # 工具:bge-m3 dense+sparse 檢索(可退回 BM25 + 向量 RRF)、條件不足時的追問工具
 index/                   # 向量索引(由 scripts/build_index.py 產生)
 agent.py                 # planner-executor 主迴圈 + 自我驗證 + 繁簡後處理
 docs/                    # 知識庫文字檔(由腳本產生,不要手改)
@@ -211,8 +231,9 @@ CPU;而且在本專案的測試裡,**14B 因工具呼叫格式錯誤而失敗,7B
 - [x] 知識庫改由官方 PDF 自動轉出,全部可追溯出處
 - [x] BM25 切塊檢索(取代原本回傳整份文件的關鍵字比對)
 - [x] 向量檢索(bge-m3)+ BM25 混合,以 RRF 融合
+- [x] 改用 bge-m3 自己的 dense + sparse 混合檢索(0.2 : 0.8),缺套件時自動退回 RRF
 - [x] 條件不足時主動追問(屆別、身分)
-- [x] benchmark 依新知識庫重寫(32 題,推理題 19 / 抽取題 13)
+- [x] benchmark 依新知識庫重寫;v3.2 擴充為 42 題,其中推論題 15 題
 - [ ] 人工評分,取得答案正確率與幻覺率
 - [ ] 接 Claude API 做雲端對照組
 - [ ] 接 DGX Spark 推論服務
