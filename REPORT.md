@@ -1,4 +1,8 @@
-# 校系行政助理 Agent:本地端中文行政法規問答的檢索設計與量化評估
+# 專題報告:校系行政助理 Agent
+
+> 這份是**給人讀的敘事報告**(動機、架構、發現、限制)。
+> 安裝與操作看 [README.md](README.md),逐次量測數字看 [benchmark/RESULTS.md](benchmark/RESULTS.md)。
+
 
 專題進度報告
 

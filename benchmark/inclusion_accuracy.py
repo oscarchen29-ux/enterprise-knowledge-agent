@@ -15,7 +15,7 @@
 
 用法:
 
-    python benchmark/inclusion_accuracy.py results_raw_xxx.jsonl [results_raw_yyy.jsonl ...]
+    python benchmark/inclusion_accuracy.py benchmark/runs/results_raw_xxx.jsonl [...]
     python benchmark/inclusion_accuracy.py --field aa results.jsonl   # 比較同一批的不同欄位
 
 輸出每個檔案的整體命中率與逐題明細,方便兩種設定並排比較。
@@ -113,7 +113,7 @@ def score(records: list[dict], bank: dict, field: str = "answer"):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("files", nargs="+", help="run_benchmark 產生的 results_raw_*.jsonl")
+    parser.add_argument("files", nargs="+", help="run_benchmark 產生的 benchmark/runs/results_raw_*.jsonl")
     parser.add_argument("--field", default="answer", help="要評分的欄位(預設 answer)")
     parser.add_argument("--questions", default=os.path.join(HERE, "questions.json"))
     parser.add_argument("--detail", action="store_true", help="印出每題缺哪些數字")

@@ -14,6 +14,37 @@ Provider 抽象層讓之後換成 Claude API 或 NVIDIA DGX Spark 的推論服�
 > 這個專案踩過的坑大多是「不會報錯但結果是錯的」那一類 —— 尤其是
 > **換模型**:換一個更大、榜單更漂亮的模型很可能反而不能跑,而且失敗是無聲的。
 
+## 專案結構
+
+```
+agent.py              ReAct 迴圈。模型自己決定查什麼、何時反問、答完自我查核
+tools.py              兩個工具:search_documents(檢索)、ask_clarification(反問)
+providers/            模型供應者抽象層。換 Ollama / Claude API / DGX 不用動 agent 邏輯
+scripts/              建知識庫與索引(build_docs.py、build_index.py、build_m3_index.py)
+web/                  Flask 網頁介面
+
+docs/                 知識庫:110 份官方法規轉成的純文字,821 段。檢索只讀這裡
+docs_source/          來源 PDF 原件。每個 docs/ 檔都帶著來源網址、下載時間與 SHA-256
+docs_raw/             PDF 未經整理的逐字內容,供人工查核用,不進索引
+index/                產生物:BM25/向量索引與 bge-m3 的 dense+sparse 索引
+
+forms/                行政程序的標註標準答案(Agent 讀不到,只有評分程式讀)
+benchmark/            評測程式、題庫、RESULTS.md
+benchmark/runs/       每次執行的原始產物(jsonl 與評分表)
+archive/              已被取代但有紀錄價值的舊文件
+```
+
+四份說明文件的分工:
+
+| 檔案 | 寫給誰 | 內容 |
+|---|---|---|
+| `README.md` | 要安裝或部署的人 | 怎麼跑起來、架構、換模型的硬性條件 |
+| `REPORT.md` | 要了解專題的人 | 動機、發現、限制的敘事報告 |
+| `TROUBLESHOOTING.md` | 要修改程式的人 | 踩過的坑,尤其是「不會報錯但結果是錯的」那一類 |
+| `benchmark/RESULTS.md` | 要查數字的人 | 依日期排列的逐次量測紀錄,每個數字都可回查 |
+
+---
+
 ## 快速開始
 
 ```bash

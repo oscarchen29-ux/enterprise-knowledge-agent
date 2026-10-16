@@ -15,7 +15,7 @@
    真的把追問交還給使用者。
 
 用法:
-    python benchmark/recompute_metrics.py benchmark/results_raw_qwen2.5-7b_20260830_233537.jsonl
+    python benchmark/recompute_metrics.py benchmark/runs/results_raw_qwen2.5-7b_20260830_233537.jsonl
     python benchmark/recompute_metrics.py <jsonl> --rewrite-csv <csv>   # 重寫評分表的自動欄位
 """
 

@@ -1,8 +1,8 @@
 """Benchmark 執行器。
 
 跑完後產出兩個檔案:
-  results_raw_*.jsonl   —— 每次執行的完整紀錄(含逐步 log),給程式分析用
-  scoring_sheet_*.csv   —— 待人工評分的表格,用 Excel 開(已加 BOM)
+  runs/results_raw_*.jsonl   —— 每次執行的完整紀錄(含逐步 log),給程式分析用
+  runs/scoring_sheet_*.csv   —— 待人工評分的表格,用 Excel 開(已加 BOM)
 
 本腳本只自動量測「可以客觀判定」的指標(工具呼叫、檢索命中、簡體字、延遲),
 答案正確率與幻覺率一律留給人工評分 —— 用 LLM 當裁判會引入另一層不確定性,
@@ -179,7 +179,8 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="只跑前 N 題,用於快速冒煙測試")
     parser.add_argument("--ids", default=None,
                         help="只跑指定題號,逗號分隔(例如 F06,F07)。用來補跑中途失敗的題目。")
-    parser.add_argument("--out", default=HERE, help="輸出目錄")
+    parser.add_argument("--out", default=os.path.join(HERE, "runs"),
+                        help="輸出目錄(預設 benchmark/runs/,執行產物與程式分開放)")
     parser.add_argument("--base-url", default="http://localhost:11434",
                         help="生成答案用哪一台的 Ollama。檢索用的 bge-m3 固定走本機,所以指到別台時,"
                              "不同模型之間比較的是同一套檢索結果。")
@@ -215,6 +216,7 @@ def main():
     think_tag = "" if args.think == "default" else f"_think-{args.think}"
     verify_tag = "" if args.verify == "rewrite" else f"_verify-{args.verify}"
     tag = f"{args.model.replace(':', '-')}{think_tag}{verify_tag}_{stamp}"
+    os.makedirs(args.out, exist_ok=True)
     jsonl_path = os.path.join(args.out, f"results_raw_{tag}.jsonl")
     csv_path = os.path.join(args.out, f"scoring_sheet_{tag}.csv")
 

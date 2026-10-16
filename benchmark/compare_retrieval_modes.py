@@ -71,7 +71,7 @@ def _strip(text):
 def load_runs(names, bank):
     runs = []
     for name in names:
-        for line in io.open(B / name, encoding="utf-8"):
+        for line in io.open(B / "runs" / name, encoding="utf-8"):
             if not line.strip():
                 continue
             record = json.loads(line)
