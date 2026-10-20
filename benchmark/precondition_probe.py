@@ -122,6 +122,141 @@ def load_documents(cfg):
     return "\n".join(parts)
 
 
+def retrieve_documents(opening):
+    """retrieval 模式:不指定文件,用學生的開場白從全部 110 份 821 段裡檢索。
+
+    為什麼要有這個對照:
+    full 模式等於**事先把正確的那一份法規交給模型**,但真實使用時沒有人會先挑好 ——
+    使用者只說「我多益考了870分」,系統得自己在 110 份法規裡找到
+    《學生參與英語能力檢測獎勵要點》。兩者的差距就是「文件選擇」這一步的代價。
+
+    tau-bench(arXiv:2406.12045)把整份 domain policy 直接放進 system prompt,
+    所以這一步在它的設定裡**不存在**。這是本專案與它最主要的結構差異。
+
+    注意:單一法規其實很短(英語 2358 字、宿舍 1008 字,都遠小於 16384 的 context),
+    所以兩組的差距**不是來自 context 裝不下**,而是來自在多份文件中找對那一份。
+    """
+    if ROOT not in sys.path:          # tools.py 在專案根目錄,不在 benchmark/
+        sys.path.insert(0, ROOT)
+    import tools                      # 延後匯入:full 模式不需要載入 bge-m3
+    return "【檢索到的法規段落】\n" + tools.search_documents(opening) + "\n"
+
+
+def retrieve_multi_aspect(opening, cfg):
+    """aspect 模式:不只用使用者的原話查一次,而是針對每個「前置條件類型」各查一次。
+
+    2026-10-20 的診斷:檢索撈不到「與使用者問句語意無關、但必須告知」的條文。
+    實測單一查詢的命中情形(英語檢測獎勵,目標是寫著申請期限的第 4 段):
+
+        使用者原話「我多益考了870分,可以申請獎勵嗎?」  -> 撈到第 1,2,3 段,**沒有第 4 段**
+        任務式「英語能力檢測獎勵的申請規定、期限與應檢附文件」-> 撈到第 1,2,**4** 段
+        只問期限「英語檢測獎勵申請期限 截止 逾時」       -> 撈到第 1,3,**4** 段
+        原話 + 任務黏成一句                              -> 撈回第 1,2,3 段,**又漏了**
+
+    最後一行是關鍵:**把多個面向黏成一個長查詢沒有用,會互相稀釋,必須分開查。**
+
+    面向不是任意挑的,就是 forms/*.json 裡 preconditions 的「類型」欄位
+    (成績門檻 / 排除條件 / 期限 / 應檢附文件 / 受理單位)。也就是說,
+    人工標註時已經寫出了「一項行政程序有哪幾種前置條件」,這裡只是把它
+    當成查詢的面向清單。
+
+    這是**固定面向**版本,查什麼由人寫死,換一個領域就要重寫 —— 它的用途是
+    當上界,回答「這條路最多能補回多少」。讓模型自己決定要查哪些面向
+    才是 RQ1 要研究的問題。
+    """
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    import tools
+
+    chunks = tools._load_chunks()
+    seen, blocks = set(), []
+    for label, query in [("使用者的問題", opening)] + cfg["aspects"]:
+        ranked = tools._m3_ranking(query) or tools._rrf_ranking(query)
+        if not ranked:
+            continue
+        ranked = tools._diversify(ranked)
+        picked = []
+        for pos in ranked[:cfg.get("aspect_top_k", 3)]:
+            if pos in seen:               # 不同面向撈到同一段就不重複貼
+                continue
+            seen.add(pos)
+            c = chunks[pos]
+            picked.append(f"[{c['file']} 第{c['index'] + 1}段]\n{c['text']}")
+        if picked:
+            blocks.append(f"〈查詢:{label}〉\n" + "\n\n".join(picked))
+    return "【檢索到的法規段落】\n" + "\n\n".join(blocks) + "\n" if blocks else "找不到相關文件。"
+
+
+def retrieve_whole_documents(opening, max_docs=1):
+    """doc 模式:先用檢索決定是「哪幾份」法規,再把那幾份整份放進提示。
+
+    為什麼需要這個中間模式:
+    2026-10-20 的 full vs retrieval 對照顯示,檢索模式的告知完整率掉 17 到 22 個
+    百分點,而且惡化集中在少數幾項 —— 英語的 P4(申請期限)從漏 0 次變成漏 4 次、
+    宿舍的 D7(保障生依級別分配)從漏 1 次變成漏 6 次。共同點是這些條文與使用者
+    的問題語意無關:學生問「我多益870能申請嗎」,檢索撈回成績門檻那幾段,
+    但期限寫在第四點,撈不到。
+
+    也就是說,檢索的查詢對齊的是「使用者問什麼」,任務需要的卻是
+    「法規還規定了什麼」,兩者系統性不一致。
+
+    doc 模式把問題從「選對段落」降級成「選對文件」:段落只用來投票決定文件,
+    決定之後整份讀入,所以同一份法規裡與問題語意無關的條文也會進到提示。
+    單一法規很短(英語 2358 字、宿舍 1008 字),整份放得進 16384 的 context。
+    選錯文件仍然會錯,所以這不是把檢索問題消掉,只是換一個層級。
+    """
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    import tools
+
+    chunks = tools._load_chunks()
+    ranked = tools._m3_ranking(opening)
+    if ranked is None:
+        ranked = tools._rrf_ranking(opening)
+    if not ranked:
+        return "找不到相關文件。"
+    ranked = tools._diversify(ranked)
+
+    # 把前 TOP_K 段涉及的所有文件整份讀入,依最佳名次排序,不做投票。
+    #
+    # 一開始用的是投票(每段替所屬檔案投一票、取票數最高的兩份),實測只有 46% / 21%
+    # 選到正確法規。診斷後發現檢索其實找得到——正確法規出現在前 6 段的比率是
+    # 85% / 89%,只是排名第 1 的只有 23% / 21%,首次出現的名次中位數是第 3 名。
+    # 加上 tools.DISTINCT_FILES = 4 的多樣性機制強制前 4 名來自不同檔案,
+    # 每份文件最多只拿得到 1 到 2 票,投票在這個設計下本來就失效。
+    # 改成全部收下之後,文件覆蓋率等於「正確法規出現在前 TOP_K 段」的比率。
+    seen, picked = set(), []
+    for pos in ranked[:tools.TOP_K]:
+        name = chunks[pos]["file"]
+        if name not in seen:
+            seen.add(name)
+            picked.append(name)
+    picked = picked[:max_docs]
+
+    # 長度與覆蓋率的取捨(2026-10-20 實測,num_ctx=16384):
+    #   max_docs=2  覆蓋 50%/32%,平均 6.4k/9.2k 字
+    #   max_docs=4  覆蓋 65%/79%,平均 14.7k/20.9k 字  <- 宿舍 16/19 題超出上限
+    #   max_docs=6  覆蓋 85%/89%,平均 18.6k/25.1k 字  <- 兩張都超出
+    # 要高覆蓋率就一定超過 context。所以預設採混合式:**排名最高的那一份整份讀入,
+    # 其餘仍以段落呈現**,長度可控而且保證至少有一份完整法規(期限、應檢附文件
+    # 這類與問題語意無關的條文才有機會進到提示)。max_docs 加大則退回純整份模式。
+    full_names = picked[:max_docs]          # 要整份讀入的文件,其餘以段落補
+    parts = []
+    for name in full_names:
+        path = os.path.join(DOCS, name)
+        if not os.path.exists(path):
+            continue
+        text = io.open(path, encoding="utf-8").read()
+        body = text.split("【條文】", 1)[1].strip() if "【條文】" in text else text.strip()
+        parts.append("【完整法規:" + name + "】\n" + body + "\n")
+    rest = [p for p in ranked[:tools.TOP_K] if chunks[p]["file"] not in full_names]
+    if rest:
+        seg = [f"[{chunks[p]['file']} 第{chunks[p]['index'] + 1}段]\n{chunks[p]['text']}"
+               for p in rest]
+        parts.append("【其他相關段落】\n" + "\n\n".join(seg) + "\n")
+    return "\n".join(parts) if parts else "找不到相關文件。"
+
+
 RETRY_LIMIT = 5
 RETRY_WAIT_SEC = 20
 
@@ -199,6 +334,11 @@ def main():
     parser.add_argument("--cases", nargs="*", help="只跑這幾題,預設全跑")
     parser.add_argument("--out", default=None,
                         help="逐題輸出的 jsonl 檔(預設寫到 benchmark/runs/)")
+    parser.add_argument("--context", choices=["full", "retrieval", "doc", "aspect"], default="full",
+                        help="full=整份對應法規塞進提示(等同 tau-bench 的設定);"
+                             "retrieval=不指定文件,只給檢索回來的段落;"
+                             "doc=先用檢索決定是哪幾份,再整份讀入;"
+                             "aspect=每個前置條件類型各查一次(固定面向)")
     parser.add_argument("--think", choices=["on", "off"], default=None,
                         help="思考型模型是否開啟思考。不指定就用模型預設")
     parser.add_argument("--fresh", action="store_true",
@@ -208,7 +348,7 @@ def main():
     args = parser.parse_args()
 
     cfg = FORMS[args.form]
-    documents = load_documents(cfg)
+    documents = load_documents(cfg) if args.context == "full" else None
     cases = json.load(io.open(os.path.join(FORMS_DIR, cfg["cases"]),
                               encoding="utf-8"))["cases"]
     if args.cases:
@@ -231,7 +371,8 @@ def main():
             except json.JSONDecodeError:
                 continue          # 斷電寫到一半的行,忽略
             if not rec.get("error"):
-                done.add((rec.get("variant", "base"), rec.get("model"), rec.get("id"), rec.get("run", 1)))
+                done.add((rec.get("context", "full"), rec.get("variant", "base"),
+                          rec.get("model"), rec.get("id"), rec.get("run", 1)))
         if done:
             print(f"續跑:{out_path} 已有 {len(done)} 筆完成的紀錄,將跳過")
     sink = io.open(out_path, "a" if done else "w", encoding="utf-8")
@@ -239,21 +380,30 @@ def main():
     summary = []
     for model in args.models:
         print("=" * 72)
-        print(f"表單:{args.form}  提示法:{args.variant}  模型:{model}  題數:{len(cases)} x {args.repeats} 次")
+        print(f"表單:{args.form}  提示法:{args.variant}  文件:{args.context}  模型:{model}  題數:{len(cases)} x {args.repeats} 次")
         print("=" * 72)
         ask_need = ask_hit = tell_need = tell_hit = 0
         redundant = verdict_right = parsed = 0
 
         pending = [(c, r) for r in range(1, args.repeats + 1) for c in cases
-                   if (args.variant, model, c["id"], r) not in done]
+                   if (args.context, args.variant, model, c["id"], r) not in done]
         if not pending:
             print("  這個模型的題目都已完成,跳過")
         for case, run_no in pending:
             started = time.time()
             tag = f"{case['id']}" + (f"#{run_no}" if args.repeats > 1 else "")
             try:
+                # retrieval 模式每題各自檢索,所以不能在迴圈外先算好
+                if documents is not None:
+                    docs_for_case = documents
+                elif args.context == "doc":
+                    docs_for_case = retrieve_whole_documents(case["opening"])
+                elif args.context == "aspect":
+                    docs_for_case = retrieve_multi_aspect(case["opening"], cfg)
+                else:
+                    docs_for_case = retrieve_documents(case["opening"])
                 raw = ask(args.host, model,
-                          build_prompt(args.variant, documents,
+                          build_prompt(args.variant, docs_for_case,
                                        cfg["verdict_options"], case["opening"]),
                           seed=run_no,
                           think=None if args.think is None else (args.think == "on"))
@@ -298,7 +448,7 @@ def main():
                   f" {'  '.join(flags) if flags else '全中'}  ({elapsed:.0f}s)")
 
             sink.write(json.dumps({
-                "form": args.form, "variant": args.variant, "model": model,
+                "form": args.form, "variant": args.variant, "context": args.context, "model": model,
                 "think": args.think, "run": run_no,
                 "id": case["id"], "opening": case["opening"],
                 "verdict_got": data.get("資格判定"), "verdict_ok": ok,
@@ -312,7 +462,7 @@ def main():
 
         n = parsed or 1
         summary.append({
-            "model": f"{model} [{args.variant}]", "題數": len(cases) * args.repeats, "可解析": parsed,
+            "model": f"{model} [{args.variant}/{args.context}]", "題數": len(cases) * args.repeats, "可解析": parsed,
             "資格判定正確率": verdict_right / n,
             "漏問率": 1 - (ask_hit / ask_need) if ask_need else 0,
             "冗餘提問數": redundant,

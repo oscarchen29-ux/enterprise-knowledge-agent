@@ -77,7 +77,8 @@ def main():
     for r in rows:
         if r.get("error"):
             continue
-        groups[(r.get("form", "?"), r.get("variant", "base"), r.get("model", "?"))].append(r)
+        groups[(r.get("form", "?"), r.get("variant", "base"),
+                r.get("context", "full"), r.get("model", "?"))].append(r)
 
     for form in sorted({k[0] for k in groups}):
         base, top, dist, ncase = majority_baseline(form) if form in CASE_FILES else (0, "?", {}, 0)
@@ -88,7 +89,7 @@ def main():
         print(f"  {'模型 [提示法]':<24} {'n':>4} {'資格判定':>14} {'漏問率':>15} {'冗餘':>4} {'告知完整':>14}")
         print("  " + "-" * 76)
 
-        for (f, variant, model), rs in sorted(groups.items()):
+        for (f, variant, context, model), rs in sorted(groups.items()):
             if f != form:
                 continue
             # 以「每一輪重複」各算一次,再看區間
@@ -111,12 +112,12 @@ def main():
                     return f"{xs[0]:.1%}"
                 return f"{sum(xs)/len(xs):.1%} ({min(xs):.0%}~{max(xs):.0%})"
 
-            print(f"  {model + ' [' + variant + ']':<24} {len(rs):>4} "
+            print(f"  {model + ' [' + variant + '/' + context + ']':<24} {len(rs):>4} "
                   f"{fmt(v_rates):>16} {fmt(m_rates):>16} {dup:>5} {fmt(t_rates):>16}")
 
         # 同一題跨重複是否穩定
         print()
-        for (f, variant, model), rs in sorted(groups.items()):
+        for (f, variant, context, model), rs in sorted(groups.items()):
             if f != form:
                 continue
             by_case = defaultdict(set)
@@ -124,7 +125,7 @@ def main():
                 by_case[r["id"]].add(r["verdict_got"])
             unstable = {c: v for c, v in by_case.items() if len(v) > 1}
             if len(set(r.get("run", 1) for r in rs)) > 1:
-                print(f"  {model} [{variant}]:{len(by_case)} 題中有 "
+                print(f"  {model} [{variant}/{context}]:{len(by_case)} 題中有 "
                       f"**{len(unstable)} 題三次給出不同判定**")
                 if args.detail and unstable:
                     for c, v in sorted(unstable.items()):

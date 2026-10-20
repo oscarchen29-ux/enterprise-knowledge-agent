@@ -141,7 +141,8 @@ def student_reply(question, profile, patterns):
     return f"關於{hits[0]}:{UNKNOWN_REPLY}", hits[0]
 
 
-def run_case(host, model, cfg, documents, case, variant, max_turns, timeout):
+def run_case(host, model, cfg, documents, case, variant, max_turns, timeout,
+             force_choice=False):
     """跑完一題的多輪對話,回傳整段紀錄。"""
     profile = case["profile"]
     student_patterns = cfg["student"]
@@ -192,8 +193,13 @@ def run_case(host, model, cfg, documents, case, variant, max_turns, timeout):
     forced = False
     if not str(data.get("資格判定") or "").strip() or "尚未" in str(data.get("資格判定")):
         forced = True
-        raw = ask(host, model, FORCE_TURN.format(verdict_options=cfg["verdict_options"]),
-                  timeout=timeout)
+        opts = cfg["verdict_options"]
+        if force_choice:
+            # 把「不確定」從選項拿掉。2026-10-20 實測:允許「不確定」時,
+            # qwen2.5:14b 在 separate 提示法下 26 題全部選它,等於沒有定案。
+            opts = " / ".join(o for o in opts.split(" / ") if "不確定" not in o)
+            opts += "(必須從以上選項擇一,不得回答不確定或尚未定案)"
+        raw = ask(host, model, FORCE_TURN.format(verdict_options=opts), timeout=timeout)
         forced_data = parse(raw)
         if forced_data:
             data = forced_data
@@ -210,6 +216,9 @@ def main():
     parser.add_argument("--models", nargs="+", default=["qwen2.5:14b"])
     parser.add_argument("--variant", default="base", choices=sorted(_VARIANT_INSTRUCTION))
     parser.add_argument("--host", default="http://localhost:11434")
+    parser.add_argument("--force-choice", action="store_true",
+                        help="強制定案時不給「不確定」這個選項,逼模型二選一。"
+                             "用來分辨「它真的判斷不出來」與「它只是不肯下結論」")
     parser.add_argument("--max-turns", type=int, default=4,
                         help="最多幾輪。撞到上限代表 Agent 不知道何時該停(對應 RQ3)")
     parser.add_argument("--cases", nargs="*")
@@ -257,7 +266,8 @@ def main():
             started = time.time()
             try:
                 res = run_case(args.host, model, cfg, documents, case,
-                               args.variant, args.max_turns, args.timeout)
+                               args.variant, args.max_turns, args.timeout,
+                               force_choice=args.force_choice)
             except (urllib.error.URLError, urllib.error.HTTPError,
                     TimeoutError, OSError) as exc:
                 print(f"  [{case['id']}] 連線失敗,待補:{exc}")
@@ -297,7 +307,8 @@ def main():
                   f"  {'  '.join(flags) if flags else '全中'}  ({elapsed:.0f}s)")
 
             sink.write(json.dumps({
-                "form": args.form, "variant": args.variant, "model": model,
+                "form": args.form, "variant": args.variant,
+                "force_choice": args.force_choice, "model": model,
                 "id": case["id"], "opening": case["opening"],
                 "verdict_got": data.get("資格判定"), "verdict_ok": ok,
                 "理由": data.get("理由"), "turns": res["turns"],
