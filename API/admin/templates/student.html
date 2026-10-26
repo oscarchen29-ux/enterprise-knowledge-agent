@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block title %}{{ student.name if student else "新增學生" }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('students') }}">← 學生列表</a></p>
+<div class="page-head">
+  {% if student %}
+    <h1>{{ student.name }}</h1>
+    <span class="muted">{{ student.student_id }}・{{ student.department }} {{ student.grade }} 年級・{{ age }} 歲</span>
+  {% else %}
+    <h1>新增學生</h1>
+  {% endif %}
+</div>
+
+<section class="card">
+  <h2>基本資料</h2>
+  <form method="post">
+    <div class="grid">
+      <label><span>學號</span>
+        {% if student %}
+          <input value="{{ student.student_id }}" readonly title="學號不能修改">
+        {% else %}
+          <input name="student_id" value="{{ form.student_id }}" required maxlength="20"
+                 pattern="[A-Za-z0-9]{1,20}" title="英數字 1–20 碼" placeholder="例如 115321001" autofocus>
+        {% endif %}
+      </label>
+      <label><span>姓名</span><input name="name" value="{{ form.name }}" required maxlength="50"></label>
+      <label><span>性別</span>
+        <select name="gender" required>
+          {% for value in genders %}<option{% if form.gender == value %} selected{% endif %}>{{ value }}</option>{% endfor %}
+        </select>
+      </label>
+      <label><span>出生日期</span><input type="date" name="birth_date" value="{{ form.birth_date }}" required max="{{ today }}"></label>
+      <label><span>學系</span><input name="department" value="{{ form.department }}" list="departments" required maxlength="50"></label>
+      <label><span>年級</span><input type="number" name="grade" value="{{ form.grade }}" min="1" max="7" required></label>
+      <label><span>國籍</span><input name="nationality" value="{{ form.nationality }}" list="nationalities" required maxlength="50"></label>
+      <label><span>身分別</span>
+        <select name="identity" required>
+          {% for value in identities %}<option{% if form.identity == value %} selected{% endif %}>{{ value }}</option>{% endfor %}
+        </select>
+      </label>
+      <label><span>入學管道</span>
+        <select name="admission_channel" required>
+          {% for value in admission_channels %}<option{% if form.admission_channel == value %} selected{% endif %}>{{ value }}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+    <datalist id="departments">{% for value in departments %}<option value="{{ value }}">{% endfor %}</datalist>
+    <datalist id="nationalities">{% for value in nationalities %}<option value="{{ value }}">{% endfor %}</datalist>
+    <div class="form-actions">
+      <button class="btn primary">{{ "儲存" if student else "新增學生" }}</button>
+      {% if not student %}<a class="btn" href="{{ url_for('students') }}">取消</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+{% if student %}
+<section class="card" id="records">
+  <h2>獎懲紀錄 <span class="count">{{ records|length }} 筆</span></h2>
+  <form class="row-form" method="post" action="{{ url_for('add_record', student_id=student.student_id) }}">
+    <label><span>日期</span><input type="date" name="record_date" value="{{ today }}" required></label>
+    <label><span>類別</span>{{ m.kind_select() }}</label>
+    <label><span>次數</span><input type="number" name="times" value="1" min="1" max="3" required></label>
+    <label><span>事由</span><input name="reason" required maxlength="200" placeholder="例如：擔任班級幹部認真負責"></label>
+    <button class="btn primary">新增</button>
+  </form>
+  <div class="table-wrap">{{ m.records_table(records) }}</div>
+</section>
+
+<section class="card" id="account">
+  <h2>登入帳號</h2>
+  {% if account %}
+    <p>已設定密碼（{{ account.created_at[:10] }} 建立），目前有 {{ account.sessions }} 個裝置登入中。</p>
+  {% else %}
+    <p class="muted">還沒有設定密碼，不能用 <code>POST /auth/login</code> 登入；用 <code>X-Student-ID</code> 查詢不受影響。</p>
+  {% endif %}
+  <form class="row-form password" method="post" action="{{ url_for('set_password', student_id=student.student_id) }}">
+    <label><span>{{ "新密碼" if account else "密碼" }}（{{ min_password_length }} 個字元以上）</span>
+      <input type="password" name="password" required minlength="{{ min_password_length }}"
+             maxlength="{{ max_password_length }}" autocomplete="new-password"></label>
+    <label><span>再輸入一次</span><input type="password" name="password_again" required autocomplete="new-password"></label>
+    <button class="btn primary">{{ "重設密碼" if account else "設定密碼" }}</button>
+  </form>
+  {% if account %}
+    <p class="hint">重設密碼會登出這位學生所有的裝置。
+      {{ m.delete_button(url_for('delete_account', student_id=student.student_id),
+                         "確定要刪除 " ~ student.name ~ " 的登入帳號？刪除後不能再用密碼登入", label="刪除帳號") }}
+    </p>
+  {% endif %}
+</section>
+
+<section class="card" id="passes">
+  <h2>通行證申請 <span class="count">{{ passes|length }} 筆</span></h2>
+  <div class="table-wrap">{{ m.passes_table(passes) }}</div>
+</section>
+
+<section class="card danger-zone">
+  <h2>刪除學生</h2>
+  <p class="muted">會一起刪掉登入帳號和 {{ records|length }} 筆獎懲紀錄；通行證申請紀錄會保留。</p>
+  {{ m.delete_button(url_for('delete_student', student_id=student.student_id),
+                     "確定要刪除 " ~ student.student_id ~ " " ~ student.name ~ "？帳號和獎懲紀錄會一起刪掉",
+                     label="刪除這位學生", button_class="btn danger") }}
+</section>
+{% endif %}
+{% endblock %}

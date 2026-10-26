@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}學生{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>學生</h1>
+  <span class="muted">{{ students|length }} 位{% if q %}符合「{{ q }}」{% endif %}</span>
+  <span class="spacer"></span>
+  <form class="search" method="get">
+    <input type="search" name="q" value="{{ q }}" placeholder="搜尋學號、姓名、學系">
+    <button class="btn">搜尋</button>
+  </form>
+  <a class="btn primary" href="{{ url_for('new_student') }}">＋ 新增學生</a>
+</div>
+
+<div class="card flush">
+  <table>
+    <thead>
+      <tr>
+        <th>學號</th><th>姓名</th><th>性別</th><th class="num">年齡</th><th>學系</th><th class="num">年級</th>
+        <th>國籍</th><th>身分別</th><th>入學管道</th><th>獎懲</th><th>帳號</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for s in students %}
+      {% set href = url_for('student', student_id=s.student_id) %}
+      <tr>
+        <td><a href="{{ href }}">{{ s.student_id }}</a></td>
+        <td><a href="{{ href }}">{{ s.name }}</a></td>
+        <td>{{ s.gender }}</td>
+        <td class="num">{{ s.age }}</td>
+        <td>{{ s.department }}</td>
+        <td class="num">{{ s.grade }}</td>
+        <td>{{ s.nationality }}</td>
+        <td>{{ s.identity }}</td>
+        <td>{{ s.admission_channel }}</td>
+        <td>
+          {% if s.rewards %}<span class="tag reward">獎 {{ s.rewards }}</span>{% endif %}
+          {% if s.punishments %}<span class="tag punish">懲 {{ s.punishments }}</span>{% endif %}
+          {% if not s.rewards and not s.punishments %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td>{% if s.has_account %}<span class="tag">可登入</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="11" class="empty">{{ "沒有符合的學生" if q else "還沒有學生，按「新增學生」建立" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+# 校務行政系統 API（FastAPI，0.0.0.0:7000，區網可連）。安裝方式見 docs/linux-deploy.md
+# 專案不在 /opt/school-portal、或執行帳號不是 school 的話，改下面的路徑和 User=
+[Unit]
+Description=School admin API (FastAPI, 0.0.0.0:7000)
+After=network.target
+
+[Service]
+User=school
+WorkingDirectory=/opt/school-portal
+ExecStart=/bin/bash /opt/school-portal/start-api.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

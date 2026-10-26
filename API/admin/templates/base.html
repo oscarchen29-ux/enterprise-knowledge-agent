@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %}｜校務資料庫管理</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f6f8; --surface: #fff; --text: #1d2125; --muted: #626b75; --border: #dde1e6;
+      --accent: #1f6feb; --danger: #c62828; --reward: #1b7f3b; --punish: #c62828;
+      --flash-ok: #e7f4eb; --flash-error: #fdecec; --hover: #f0f3f7;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111418; --surface: #1a1e23; --text: #e6e9ed; --muted: #9aa3ad; --border: #2e353d;
+        --accent: #5b9aff; --danger: #ff6b6b; --reward: #4cc27a; --punish: #ff6b6b;
+        --flash-ok: #173322; --flash-error: #3a1b1b; --hover: #20262d;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5;
+      font-family: system-ui, "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-size: 13px; padding: 1px 5px; border-radius: 4px; background: var(--hover); }
+
+    header { background: var(--surface); border-bottom: 1px solid var(--border); }
+    header .inner { display: flex; align-items: center; gap: 28px; height: 54px; }
+    header .inner, main { max-width: 1200px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+    .brand { font-weight: 600; color: var(--text); }
+    header nav { display: flex; gap: 4px; }
+    header nav a { color: var(--muted); padding: 6px 12px; border-radius: 6px; }
+    header nav a:hover { background: var(--hover); text-decoration: none; }
+    header nav a.active { color: var(--text); font-weight: 600; background: var(--hover); }
+    header .note { margin-left: auto; color: var(--muted); font-size: 13px; }
+    main { padding-top: 24px; padding-bottom: 56px; }
+
+    .crumb { margin: 0 0 8px; font-size: 14px; }
+    .page-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 18px; }
+    .page-head h1 { margin: 0; font-size: 22px; }
+    .page-head .spacer { flex: 1; }
+    .muted { color: var(--muted); }
+    .hint { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; }
+    .card.flush { padding: 0; overflow-x: auto; }
+    .card h2 { font-size: 16px; margin: 0 0 14px; }
+    .card h2 .count { color: var(--muted); font-weight: normal; font-size: 14px; margin-left: 6px; }
+    .card p { margin: 0 0 12px; }
+    .card.danger-zone { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+    .table-wrap { overflow-x: auto; margin: 0 -20px -18px; border-top: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+    th { color: var(--muted); font-weight: 500; font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: var(--hover); }
+    td.wrap { white-space: normal; min-width: 220px; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.actions { text-align: right; }
+    td.actions > * + *, td.links > * + * { margin-left: 12px; }
+    td.empty { text-align: center; color: var(--muted); padding: 32px; }
+
+    .tag { display: inline-block; padding: 0 9px; border-radius: 999px; font-size: 13px; background: var(--hover); }
+    .tag.reward { color: var(--reward); background: color-mix(in srgb, var(--reward) 13%, transparent); }
+    .tag.punish { color: var(--punish); background: color-mix(in srgb, var(--punish) 13%, transparent); }
+
+    label > span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%; padding: 7px 10px; font: inherit; color: var(--text); background: var(--bg);
+      border: 1px solid var(--border); border-radius: 6px;
+    }
+    input:focus, select:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); border-color: var(--accent); }
+    input[readonly] { background: var(--hover); color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px 18px; }
+    .grid .wide { grid-column: span 2; }
+    .row-form { display: grid; grid-template-columns: 160px 130px 90px 1fr auto; gap: 10px; align-items: end; margin-bottom: 18px; }
+    .row-form.password { grid-template-columns: repeat(2, minmax(0, 260px)) auto; justify-content: start; margin-bottom: 0; }
+    .form-actions { margin-top: 18px; display: flex; gap: 10px; }
+    form.inline { display: inline; }
+    form.search { display: flex; gap: 8px; }
+    form.search input { width: 240px; }
+
+    .btn {
+      display: inline-block; padding: 7px 16px; font: inherit; color: var(--text); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 6px; cursor: pointer; white-space: nowrap;
+    }
+    .btn:hover { background: var(--hover); text-decoration: none; }
+    .btn.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+    .btn.primary:hover { filter: brightness(1.08); }
+    .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); }
+    .link-btn { padding: 0; font: inherit; color: var(--accent); background: none; border: 0; cursor: pointer; }
+    .link-btn.danger { color: var(--danger); }
+    .link-btn:hover { text-decoration: underline; }
+
+    .tabs { display: flex; gap: 4px; }
+    .tabs a { color: var(--muted); padding: 5px 14px; border-radius: 6px; border: 1px solid transparent; }
+    .tabs a:hover { text-decoration: none; background: var(--hover); }
+    .tabs a.active { color: var(--text); background: var(--surface); border-color: var(--border); }
+
+    .flash { padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; background: var(--flash-ok); }
+    .flash.error { background: var(--flash-error); color: var(--danger); }
+
+    @media (max-width: 760px) {
+      header .note { display: none; }
+      .row-form, .row-form.password { grid-template-columns: 1fr 1fr; }
+      .grid .wide { grid-column: auto; }
+      form.search, form.search input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <a class="brand" href="{{ url_for('students') }}">校務資料庫管理</a>
+    <nav>
+      <a href="{{ url_for('students') }}" class="{{ 'active' if request.path.startswith('/students') }}">學生</a>
+      <a href="{{ url_for('records') }}" class="{{ 'active' if request.path.startswith('/records') }}">獎懲紀錄</a>
+      <a href="{{ url_for('vehicle_passes') }}" class="{{ 'active' if request.path.startswith('/vehicle-passes') }}">通行證申請</a>
+    </nav>
+    <span class="note">只限本機使用・修改會直接寫入 data/school.db</span>
+  </div>
+</header>
+<main>
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>
