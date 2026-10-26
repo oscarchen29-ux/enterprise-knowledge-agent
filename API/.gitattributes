@@ -1,0 +1,4 @@
+# Linux 的腳本和 systemd 設定一定要 LF，在 Windows 用 git 取出也不能變成 CRLF（bash 會報 $'\r': command not found）
+*.sh      text eol=lf
+*.service text eol=lf
+*.cmd     text eol=crlf

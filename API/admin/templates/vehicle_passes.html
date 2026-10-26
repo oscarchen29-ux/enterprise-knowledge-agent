@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block title %}通行證申請{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>通行證申請</h1>
+  <span class="muted">{{ passes|length }} 筆・由學生透過 API 申請，這裡只能查看和刪除</span>
+</div>
+<div class="card flush">{{ m.passes_table(passes, show_student=true) }}</div>
+{% endblock %}

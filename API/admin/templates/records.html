@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block title %}獎懲紀錄{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>獎懲紀錄</h1>
+  <span class="muted">{{ records|length }} 筆・要新增請到學生的頁面登記</span>
+  <span class="spacer"></span>
+  <nav class="tabs">
+    {% for value, label in [("", "全部"), ("獎勵", "獎勵"), ("懲處", "懲處")] %}
+      <a href="{{ url_for('records', category=value or none) }}" class="{{ 'active' if selected == value }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+</div>
+<div class="card flush">{{ m.records_table(records, show_student=true) }}</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{# 用 {% import "_macros.html" as m with context %} 引入，才拿得到 request 和 context_processor 的變數 #}
+
+{% macro delete_button(action, question, label="刪除", next=none, button_class="link-btn danger") -%}
+  {# tojson 會跳脫單引號，所以 onsubmit 要用單引號包起來 #}
+  <form class="inline" method="post" action="{{ action }}" onsubmit='return confirm({{ question|tojson }})'>
+    {%- if next %}<input type="hidden" name="next" value="{{ next }}">{% endif -%}
+    <button class="{{ button_class }}">{{ label }}</button>
+  </form>
+{%- endmacro %}
+
+{% macro kind_select(selected=none) -%}
+  <select name="kind" required>
+    {% for group in ["獎勵", "懲處"] %}
+      <optgroup label="{{ group }}">
+        {% for kind in reward_kinds if kind|category == group %}
+          <option{% if kind == selected %} selected{% endif %}>{{ kind }}</option>
+        {% endfor %}
+      </optgroup>
+    {% endfor %}
+  </select>
+{%- endmacro %}
+
+{% macro records_table(records, show_student=false) -%}
+<table>
+  <thead>
+    <tr>
+      <th>日期</th>
+      {% if show_student %}<th>學號</th><th>姓名</th>{% endif %}
+      <th>類別</th><th class="num">次數</th><th>事由</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for r in records %}
+    <tr>
+      <td>{{ r.record_date }}</td>
+      {% if show_student %}
+        <td><a href="{{ url_for('student', student_id=r.student_id) }}">{{ r.student_id }}</a></td>
+        <td>{{ r.name }}</td>
+      {% endif %}
+      <td><span class="tag {{ 'reward' if r.kind|category == '獎勵' else 'punish' }}">{{ r.kind }}</span></td>
+      <td class="num">{{ r.times }}</td>
+      <td class="wrap">{{ r.reason }}</td>
+      <td class="actions">
+        <a href="{{ url_for('record', record_id=r.id, next=request.full_path) }}">編輯</a>
+        {{- delete_button(url_for('delete_record', record_id=r.id),
+                          "確定要刪除 " ~ r.record_date ~ " 的" ~ r.kind ~ "？", next=request.full_path) }}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="{{ 7 if show_student else 5 }}" class="empty">沒有獎懲紀錄</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro passes_table(passes, show_student=false) -%}
+<table>
+  <thead>
+    <tr>
+      <th class="num">#</th><th>申請時間</th>
+      {% if show_student %}<th>學號</th><th>姓名</th>{% endif %}
+      <th>車種</th><th>型號</th><th>證件</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in passes %}
+    <tr>
+      <td class="num">{{ p.id }}</td>
+      <td>{{ p.created_at[:16]|replace("T", " ") }}</td>
+      {% if show_student %}
+        {% if p.name %}
+          <td><a href="{{ url_for('student', student_id=p.student_id) }}">{{ p.student_id }}</a></td><td>{{ p.name }}</td>
+        {% else %}
+          <td>{{ p.student_id }}</td><td class="muted">沒有學生資料</td>
+        {% endif %}
+      {% endif %}
+      <td>{{ vehicle_types.get(p.vehicle_type, p.vehicle_type) }}</td>
+      <td>{{ p.vehicle_model }}</td>
+      <td class="links">
+        {% for kind, label in image_kinds.items() %}
+          <a href="{{ url_for('vehicle_pass_image', pass_id=p.id, kind=kind) }}" target="_blank">{{ label }}</a>
+        {% endfor %}
+      </td>
+      <td class="actions">
+        {{ delete_button(url_for('delete_vehicle_pass', pass_id=p.id),
+                         "確定要刪除通行證申請 #" ~ p.id ~ "？行照、駕照圖片也會一起刪掉", next=request.full_path) }}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="{{ 8 if show_student else 6 }}" class="empty">沒有通行證申請</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
