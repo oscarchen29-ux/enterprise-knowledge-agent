@@ -2038,3 +2038,61 @@ qwen3.8:27b,think off。五種給法規方式的完整對照。
 - 英語 self-aspect+繁 組 n=25(一題未完成)。
 - self-aspect 每題多一次模型呼叫(先產生查詢),成本高於其他模式,本節未計入耗時比較。
 
+### 這週的方法在文獻上的出處(2026-10-26 查證)
+
+為了回答「這禮拜做的事是參考哪篇論文」,逐項查證方法的來源。
+**結論:多面向查詢與模型自行生成查詢,都不是本研究提出的新方法。**
+
+**一、多查詢 + 合併結果 = RAG-Fusion**
+
+> Zackary Rackauckas. "RAG-Fusion: a New Take on Retrieval-Augmented Generation."
+> arXiv:2402.03367, 2024-01(Infineon Technologies)。
+
+該方法由 LLM 對使用者問題產生數個改寫版本,各自做向量檢索,
+再以 Reciprocal Rank Fusion(分數 1/(rank+k))合併重排。
+論文的例子是把「Tell me about MEMs microphones」拆成數個較窄的問題。
+它也記錄了一個失敗模式:當生成的查詢與原問題關聯薄弱時,答案會偏題。
+
+**本專案的 `aspect` 與 `self-aspect` 在結構上就是 RAG-Fusion 的變體**,
+差異有三點,但都不足以主張是新方法:
+
+| | RAG-Fusion | 本專案 |
+|---|---|---|
+| 生成什麼 | 同一問題的**改寫** | 不同**前置條件類型**的查詢(較接近 query decomposition) |
+| 合併方式 | RRF 重排 | 取各查詢前 k 名後去重 |
+| 動機 | 提升 recall | 涵蓋「使用者不會問、但必須告知」的條文 |
+
+**二、問題本身的命名 = TAG**
+
+> Zhixing Sun, Shenghe Xu, Tao Li. "Beyond Similarity: Task-Aligned Retrieval
+> for Language Models." arXiv:2605.27951, 2026-05-27。
+
+retrieval objective mismatch(檢索以相似度為目標,任務需要的卻是適用規則)。
+詳見前面「文獻定位」一節。
+
+**三、讓模型自行決定檢索策略**
+
+接近 Agentic RAG 綜述(arXiv:2501.09136)所分類的 Adaptive RAG
+(由模型判斷查詢複雜度後決定檢索策略),以及 query decomposition 這條線。
+**尚未找到專門做「從規則文件推導出該查哪些面向」的論文,但也尚未窮盡搜尋。**
+
+### 因此本週工作的可主張貢獻
+
+不能主張的:多查詢檢索、查詢改寫、模型自主決定檢索 —— 皆為既有方法。
+
+可主張的,且都要以數字呈現:
+
+1. **在繁體中文真實法規上量化這些方法的效果**,而非英語合成語料
+2. **「告知完整率」這個條文層級的指標** —— 量的是「使用者不會問但必須告知
+   的條文有沒有被涵蓋」,RAG-Fusion 量的是答案的 accuracy/relevance/comprehensiveness
+   (且為人工評分),顆粒度不同
+3. **人工固定面向 vs 模型自行決定的對照** —— 回答「模型自己能走到人工上界的多遠」
+   (英語追平、宿舍差 11.1 個百分點)
+4. **本地端 7B~27B 的可行性** —— RAG-Fusion 用的是 GPT 系列
+
+### 要補的查證
+
+- [ ] RAG-Fusion 的評測方式需讀全文核對(本節依搜尋摘要撰寫,未讀 PDF)
+- [ ] 是否有專門研究「規則文件的前置條件推導」的論文,搜尋尚未窮盡
+- [ ] query decomposition 這條線的代表性文獻尚未整理
+
