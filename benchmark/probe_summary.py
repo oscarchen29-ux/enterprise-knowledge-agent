@@ -78,7 +78,8 @@ def main():
         if r.get("error"):
             continue
         groups[(r.get("form", "?"), r.get("variant", "base"),
-                r.get("context", "full"), r.get("model", "?"))].append(r)
+                r.get("context", "full") + ("+繁" if r.get("trad_hint") else ""),
+                r.get("model", "?"))].append(r)
 
     for form in sorted({k[0] for k in groups}):
         base, top, dist, ncase = majority_baseline(form) if form in CASE_FILES else (0, "?", {}, 0)

@@ -187,6 +187,84 @@ def retrieve_multi_aspect(opening, cfg):
     return "【檢索到的法規段落】\n" + "\n\n".join(blocks) + "\n" if blocks else "找不到相關文件。"
 
 
+ASPECT_PLAN_PROMPT = """你是學校的行政助理,要幫學生辦一項申請。
+你還沒有看到任何法規內容,只知道學校有下面這些法規文件:
+
+{titles}
+
+【學生說】
+{opening}
+
+在查資料之前,先想清楚:**要判斷這件事並且告訴學生該準備什麼,你需要查哪些東西?**
+
+請輸出 3 到 6 個**搜尋查詢**,每個查詢針對一個不同的面向。
+查詢要寫成「法規裡會出現的字詞」,不是「學生會怎麼問」。
+例如要找截止日,寫「申請期限 截止 逾時」會比寫「什麼時候要交」有效。
+
+只輸出 JSON,不要有其他文字:
+{{"查詢": ["...", "...", "..."]}}"""
+
+# 2026-10-26 實測:qwen3.8:27b 自行生成的查詢有 61% 含簡體字,100% 的題目至少出現一次
+# (gemma4:12b 為 17% / 65%)。知識庫是繁體中文,檢索為字面比對,
+# 「奖励」命中不了「獎勵」,因此這些查詢等於白查。下面這段是修法,做成開關以便對照。
+TRAD_HINT = """
+
+**所有查詢必須使用繁體中文(台灣用字)。** 知識庫是繁體中文的法規,
+檢索是逐字比對,簡體字查不到任何東西 —— 例如「奖励」找不到「獎勵」、
+「检测」找不到「檢測」。輸出前請逐字檢查。"""
+
+
+def retrieve_self_aspect(opening, cfg, host, model, think, timeout=900, trad_hint=False):
+    """self-aspect 模式:讓模型自己決定要查哪些面向,再用它給的查詢去檢索。
+
+    與 aspect 模式的差別就是**誰決定面向**:
+      aspect       面向由人寫死在 forms_config.py,換領域要重寫
+      self-aspect  模型先看文件標題清單(不給全文),自己列出要查什麼
+
+    這是 RQ1 的核心:缺資訊時,Agent 知不知道自己該去查什麼?
+    aspect 是人工上界,self-aspect 量的是模型自己能走到哪裡。
+
+    回傳 (提示用的文字, 模型實際生成的查詢清單)。查詢清單要記錄下來 ——
+    它比分數更有價值,因為看得出模型想到了哪些面向、漏了哪些。
+    """
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    import tools
+
+    chunks = tools._load_chunks()
+    titles = sorted({c["file"] for c in chunks})
+    plan_prompt = ASPECT_PLAN_PROMPT.format(
+        titles="\n".join("  - " + t for t in titles), opening=opening)
+    if trad_hint:
+        plan_prompt += TRAD_HINT
+    try:
+        plan = parse(ask(host, model, plan_prompt, timeout=timeout, think=think))
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError):
+        raise
+    queries = [str(q) for q in (plan or {}).get("查詢", []) if str(q).strip()]
+    if not queries:
+        # 模型沒給出查詢:退回只用使用者原話,並把這件事記錄下來
+        queries = [opening]
+
+    seen, blocks = set(), []
+    for q in queries[:6]:
+        ranked = tools._m3_ranking(q) or tools._rrf_ranking(q)
+        if not ranked:
+            continue
+        ranked = tools._diversify(ranked)
+        picked = []
+        for pos in ranked[:cfg.get("aspect_top_k", 3)]:
+            if pos in seen:
+                continue
+            seen.add(pos)
+            c = chunks[pos]
+            picked.append(f"[{c['file']} 第{c['index'] + 1}段]\n{c['text']}")
+        if picked:
+            blocks.append(f"〈查詢:{q}〉\n" + "\n\n".join(picked))
+    text = ("【檢索到的法規段落】\n" + "\n\n".join(blocks) + "\n") if blocks else "找不到相關文件。"
+    return text, queries
+
+
 def retrieve_whole_documents(opening, max_docs=1):
     """doc 模式:先用檢索決定是「哪幾份」法規,再把那幾份整份放進提示。
 
@@ -334,11 +412,15 @@ def main():
     parser.add_argument("--cases", nargs="*", help="只跑這幾題,預設全跑")
     parser.add_argument("--out", default=None,
                         help="逐題輸出的 jsonl 檔(預設寫到 benchmark/runs/)")
-    parser.add_argument("--context", choices=["full", "retrieval", "doc", "aspect"], default="full",
+    parser.add_argument("--context", choices=["full", "retrieval", "doc", "aspect", "self-aspect"], default="full",
                         help="full=整份對應法規塞進提示(等同 tau-bench 的設定);"
                              "retrieval=不指定文件,只給檢索回來的段落;"
                              "doc=先用檢索決定是哪幾份,再整份讀入;"
-                             "aspect=每個前置條件類型各查一次(固定面向)")
+                             "aspect=每個前置條件類型各查一次(人工固定面向);"
+                             "self-aspect=模型先看文件標題清單,自己決定查什麼")
+    parser.add_argument("--trad-hint", action="store_true",
+                        help="self-aspect 模式:在提示中明確要求查詢必須用繁體中文。"
+                             "用來對照「模型自行生成簡體查詢」這個失敗模式修掉後的差異")
     parser.add_argument("--think", choices=["on", "off"], default=None,
                         help="思考型模型是否開啟思考。不指定就用模型預設")
     parser.add_argument("--fresh", action="store_true",
@@ -371,7 +453,7 @@ def main():
             except json.JSONDecodeError:
                 continue          # 斷電寫到一半的行,忽略
             if not rec.get("error"):
-                done.add((rec.get("context", "full"), rec.get("variant", "base"),
+                done.add((rec.get("context", "full"), rec.get("trad_hint", False), rec.get("variant", "base"),
                           rec.get("model"), rec.get("id"), rec.get("run", 1)))
         if done:
             print(f"續跑:{out_path} 已有 {len(done)} 筆完成的紀錄,將跳過")
@@ -385,8 +467,9 @@ def main():
         ask_need = ask_hit = tell_need = tell_hit = 0
         redundant = verdict_right = parsed = 0
 
+        self_queries = None
         pending = [(c, r) for r in range(1, args.repeats + 1) for c in cases
-                   if (args.context, args.variant, model, c["id"], r) not in done]
+                   if (args.context, args.trad_hint, args.variant, model, c["id"], r) not in done]
         if not pending:
             print("  這個模型的題目都已完成,跳過")
         for case, run_no in pending:
@@ -400,6 +483,12 @@ def main():
                     docs_for_case = retrieve_whole_documents(case["opening"])
                 elif args.context == "aspect":
                     docs_for_case = retrieve_multi_aspect(case["opening"], cfg)
+                elif args.context == "self-aspect":
+                    docs_for_case, self_queries = retrieve_self_aspect(
+                        case["opening"], cfg, args.host, model,
+                        None if args.think is None else (args.think == "on"),
+                        timeout=args.timeout if hasattr(args, "timeout") else 900,
+                        trad_hint=args.trad_hint)
                 else:
                     docs_for_case = retrieve_documents(case["opening"])
                 raw = ask(args.host, model,
@@ -448,7 +537,8 @@ def main():
                   f" {'  '.join(flags) if flags else '全中'}  ({elapsed:.0f}s)")
 
             sink.write(json.dumps({
-                "form": args.form, "variant": args.variant, "context": args.context, "model": model,
+                "form": args.form, "variant": args.variant, "context": args.context,
+                "trad_hint": args.trad_hint, "self_queries": self_queries, "model": model,
                 "think": args.think, "run": run_no,
                 "id": case["id"], "opening": case["opening"],
                 "verdict_got": data.get("資格判定"), "verdict_ok": ok,
@@ -462,7 +552,9 @@ def main():
 
         n = parsed or 1
         summary.append({
-            "model": f"{model} [{args.variant}/{args.context}]", "題數": len(cases) * args.repeats, "可解析": parsed,
+            "model": f"{model} [{args.variant}/{args.context}"
+                     + ("+繁" if args.trad_hint else "") + "]",
+            "題數": len(cases) * args.repeats, "可解析": parsed,
             "資格判定正確率": verdict_right / n,
             "漏問率": 1 - (ask_hit / ask_need) if ask_need else 0,
             "冗餘提問數": redundant,
